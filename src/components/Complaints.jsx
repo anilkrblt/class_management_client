@@ -6,6 +6,7 @@ import Image from 'react-bootstrap/Image';
 
 const Complaints = () => {
     var complaints = [
+        {name:"Can Öztürkk", exp: "Sınıf arıza bildirimi", class: "L201"}, 
         {name:"Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201"}, 
         {name:"Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208"}, 
         {name:"Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201"}, 
