@@ -3,7 +3,7 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Image from 'react-bootstrap/Image';
 
-const Navbar  = () => {
+const Navbarx  = () => {
     return <Navbar bg="light" data-bs-theme="light">
     <Container >
       <Navbar.Brand href="#home">
@@ -23,4 +23,4 @@ const Navbar  = () => {
   </Navbar>
 }
 
-export default Navbar
+export default Navbarx
