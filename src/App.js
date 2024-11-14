@@ -1,27 +1,42 @@
-import './App.css';
+import React, { useState } from 'react';
+import { Form, Button, Modal, Alert, Image } from 'react-bootstrap';
+import ComplaintForm from './components/ComplaintForm';
 
-import Button from 'react-bootstrap/Button';
-import React from 'react';
-import { ListGroup, Card, Container } from 'react-bootstrap';
-import Image from 'react-bootstrap/Image';
-import Navbarx from './components/Navbar';
 
-function App() {
+const App = () => {
+  const [complaintTitle, setComplaintTitle] = useState('');
+  const [complaintDescription, setComplaintDescription] = useState('');
+  const [complaintType, setComplaintType] = useState('');
+  const [image, setImage] = useState(null); // Fotoğraf durumu
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
-  var complaints = [
-    {name:"Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201"}, 
-    {name:"Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201"}, 
-    {name:"Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208"}, 
-    {name:"Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201"}, 
-    {name:"Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204"}, 
-  ]
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImage(reader.result); // Fotoğrafı state'e kaydediyoruz
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (complaintTitle && complaintDescription && complaintType) {
+      // Şikayet başarılı şekilde gönderildiğinde modal'ı göster
+      setShowModal(true);
+      setShowAlert(false);
+    } else {
+      // Eksik alan varsa uyarı göster
+      setShowAlert(true);
+    }
+  };
+
   return (
-
-
-    <div style={{backgroundColor:"#ff0000", width: 100, height:100, borderRadius: 50, textAlign:'center', paddingTop: 30, fontSize: 35, textColor: "white" }}><b>F</b></div>
-   
-   
+  <ComplaintForm/>
   );
-}
+};
 
 export default App;
