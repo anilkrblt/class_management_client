@@ -5,8 +5,8 @@ const ComplaintForm = () => {
   const [complaintTitle, setComplaintTitle] = useState('');
   const [complaintDescription, setComplaintDescription] = useState('');
   const [complaintType, setComplaintType] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState(''); // Telefon numarası durumu
-  const [image, setImage] = useState(null); // Fotoğraf durumu
+  const [phoneNumber, setPhoneNumber] = useState(''); 
+  const [image, setImage] = useState(null); 
   const [showModal, setShowModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
@@ -15,7 +15,7 @@ const ComplaintForm = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result); // Fotoğrafı state'e kaydediyoruz
+        setImage(reader.result); 
       };
       reader.readAsDataURL(file);
     }
@@ -24,11 +24,9 @@ const ComplaintForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (complaintTitle && complaintDescription && complaintType && phoneNumber) {
-      // Şikayet başarılı şekilde gönderildiğinde modal'ı göster
       setShowModal(true);
       setShowAlert(false);
     } else {
-      // Eksik alan varsa uyarı göster
       setShowAlert(true);
     }
   };
