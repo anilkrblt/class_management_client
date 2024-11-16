@@ -36,7 +36,7 @@ const ComplaintForm = () => {
       <h2>Şikayet Oluştur</h2>
       {showAlert && (
         <Alert variant="danger">
-          Lütfen tüm alanları doldurduğunuzdan emin olun!!
+          Lütfen tüm alanları doldurduğunuzdan emin olun!
         </Alert>
       )}
       <Form onSubmit={handleSubmit}>
