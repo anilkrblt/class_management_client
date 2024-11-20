@@ -10,56 +10,67 @@ moment.locale('tr');
 // Moment.js'yi takvime bağlamak için
 const localizer = momentLocalizer(moment);
 
-const ClassCalendar = () => {
-  const [events, setEvents] = useState([
-    {
-      title: 'Toplantı',
-      start: new Date(2024, 10, 14, 10, 0), // 14 Kasım 2024, 10:00
-      end: new Date(2024, 10, 14, 11, 0), 
-      type: "Ders"
-    },
-    {
-      title: 'Yazılım Eğitimi',
-      start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
-      end: new Date(2024, 10, 14, 15, 0),    // 14 Kasım 2024, 15:00
-      type: "Telafi dersi"
-    },
-    {
-      title: 'Yazılım Eğitimi',
-      start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 13:30
-      end: new Date(2024, 10, 14, 17, 30),    // 14 Kasım 2024, 15:00
-      type: "Etkinlik"
-    },
-  ]);
+const ClassCalendar = ({ onDataSubmit, lessonName, events, setEvents  } ) => {
 
-  const currentTime = new Date();
 
-  // Geçmiş etkinlikleri filtrele
-  const futureEvents = events.filter(event => new Date(event.start) >= currentTime);
 
-  const maxTime = new Date(currentTime);
-  maxTime.setHours(20, 0, 0); // Akşam 20:00
+  const handleSelectSlot = ({ start, end }) => {
+    const now = new Date();
+    if (start >= now) { // Sadece gelecekteki etkinlikleri kabul et
+      const newEvent = {
+        title: lessonName, // lessonName'i etkinlik başlığı olarak ata
+        start,
+        end,
+        type:"Ek ders"
+      };
+      setEvents([...events, newEvent]); // Yeni etkinliği events dizisine ekle
 
+      // Seçilen tarihi ve saatleri üst bileşene ilet
+      onDataSubmit({
+        date: moment(start).format('YYYY-MM-DD'), // 'YYYY-MM-DD' formatında
+        startTime: moment(start).format('HH:mm'), // 'HH:mm' formatında
+        endTime: moment(end).format('HH:mm'),     // 'HH:mm' formatında
+      });
+    
+    } else {
+      alert('Geçmiş bir zamana etkinlik ekleyemezsiniz.');
+    }
+  };
+console.log(lessonName)
+console.log(events)
+  const minTime = new Date();
+  const maxTime = new Date();
+  minTime.setHours(8, 0, 0); // Minimum saati 08:00 olarak ayarla
+  maxTime.setHours(22, 0, 0); // Maksimum saati 22:00 olarak ayarla
+
+  console.log(events)
   return (
     <div style={{ height: '100vh' }}>
       <Calendar
         localizer={localizer}
-        events={futureEvents} // Geçmiş etkinlikler filtrelendi
+        events={events} // Tüm etkinlikleri göster
         step={30}
         views={['day', 'week']}
-        defaultView='day'
-        defaultDate={new Date()}
+        defaultView="day"
+        selectable={true} // Takvimde aralık seçimi yapılabilsin
+        onSelectSlot={handleSelectSlot} // Slot seçimi fonksiyonu
         showMultiDayTimes={true}
-        min={currentTime}
+        min={minTime}
         max={maxTime}
         formats={{
           timeGutterFormat: 'HH:mm',
           dayHeaderFormat: 'DD MMMM dddd', // Tarih formatını "14 Kasım Perşembe" olarak ayarla
           dayRangeHeaderFormat: ({ start, end }, culture, localizer) =>
             `${localizer.format(start, 'DD MMMM', culture)} - ${localizer.format(end, 'DD MMMM', culture)}`,
-          eventTimeRangeFormat: ({ start, end }) => {
-            return `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`;
-          },
+          eventTimeRangeFormat: ({ start, end }) =>
+            `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`,
+        }}
+        components={{
+          event: ({ event }) => (
+            <span>
+              <strong>{event.title}</strong> - {event.type} {/* Etkinlik adı ve türü */}
+            </span>
+          ),
         }}
         messages={{
           today: 'Bugün',
