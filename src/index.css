@@ -12,3 +12,69 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.scrollable {
+  height: 600px; /* Örnek bir yükseklik */
+  overflow-y: scroll; /* Kaydırma fonksiyonu aktif */
+}
+
+.scrollable::-webkit-scrollbar {
+  display: none; /* Webkit tarayıcılarda kaydırma çubuğunu gizler */
+}
+
+.scrollable {
+  -ms-overflow-style: none;  /* Internet Explorer ve Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.homepage {
+  background-color: rgb(236, 237, 206) ;
+}
+
+.schedule {
+  width: 85%;
+  height: 95%;
+}
+
+.icon-container {
+  position: relative; /* Çizgiyi ve çemberi ikonla ilişkilendirmek için */
+  display: inline-block; /* İkona göre hizalama */
+  width: 45px; /* Çemberin genişliği */
+  height: 45px; /* Çemberin yüksekliği */
+  border: 4px solid rgb(255, 0, 0); /* Çemberin kenarlığı */
+  border-radius: 50%; /* Çember oluşturur */
+  text-align: center; /* İkonu ortalamak için */
+  line-height: 45px; /* İkonu dikey olarak ortalamak için */
+  overflow: hidden; /* Çizgi veya içerik taşmasını önler */
+  
+}
+
+.icon-container::before {
+  content: ""; /* Çizgiyi oluştur */
+  position: absolute; /* Çizgiyi ikonun üstüne yerleştir */
+  top: 50%; /* Çizgiyi çemberin ortasına yerleştir */
+  left: 50%;
+  width: 140%; /* Çizginin uzunluğu (çemberi kapsar) */
+  height: 4px; /* Çizginin kalınlığı */
+  background-color: red; /* Çizginin rengi */
+  transform: translate(-50%, -50%) rotate(-45deg); /* Çizgiyi çapraz döndür ve ortala */
+  z-index: 2; /* Çizgiyi ikonun önüne getir */
+}
+
+.custom-accordion .accordion-item {
+  border: none;
+}
+
+.custom-accordion .accordion-button {
+  border: none;
+  box-shadow: none;
+  background-color: transparent; /* Düz görünüm */
+}
+
+.custom-accordion .accordion-button:not(.collapsed) {
+  background-color: transparent; /* Açıldığında arka plan koruması */
+}
+
+.custom-accordion .accordion-body {
+  border-top: none; /* Accordion gövdesindeki çizgiyi kaldır */
+}

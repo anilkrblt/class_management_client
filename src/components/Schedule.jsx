@@ -1,66 +1,115 @@
-import React from 'react';
-import { ListGroup, Card, Container } from 'react-bootstrap';
-import Image from 'react-bootstrap/Image';
+import React from "react";
+import { ListGroup, Card, Container, Accordion } from "react-bootstrap";
+import Image from "react-bootstrap/Image";
 
 const Schedule = () => {
+  const schedule = [
+    {
+      logo: "/tu_logo.jpg",
+      day: "Pazartesi",
+      lessons: [
+        { class: "L208", lesson: "Makine Öğrenmesi", hours: "13:00 - 14:00" },
+        { class: "L208", lesson: "Makine Öğrenmesi", hours: "14:00 - 15:00" },
+        { class: "L208", lesson: "Makine Öğrenmesi", hours: "14:00 - 15:00" }
+      ],
+    },
+    {
+      logo: "/tu_logo.jpg",
+      day: "Salı",
+      lessons: { class: "L210", lesson: "Yapay Zeka", hours: "14:00 - 15:00" },
+    },
+    {
+      logo: "/tu_logo.jpg",
+      day: "Çarşamba",
+      lessons: [],
+    },
+    {
+      logo: "/tu_logo.jpg",
+      day: "Perşembe",
+      lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
+    },
+    {
+      logo: "/tu_logo.jpg",
+      day: "Cuma",
+      lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
+    },
+  ];
 
-    let schedule = [
-        {
-          logo: "/tu_logo.jpg",
-          day: "Pazartesi",
-          lessons: { class: "L208", lesson: "Makine Öğrenmesi", hours: "13:00 - 14:00" },
-        },
-        {
-          logo: "/tu_logo.jpg",
-          day: "Salı",
-          lessons: { class: "L210", lesson: "Yapay Zeka", hours: "14:00 - 15:00" },
-        },
-        {
-          logo: "/tu_logo.jpg",
-          day: "Çarşamba",
-          lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
-        },
-        {
-            logo: "/tu_logo.jpg",
-            day: "Perşembe",
-            lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
-          },
-        {
-            logo: "/tu_logo.jpg",
-            day: "Cuma",
-            lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
-          },
-      ];
+  return (
+    <Container className="bg-light rounded-3 schedule ps-2">
+      <h2 className="my-4 text-center">Ders Programı</h2>
+      <ListGroup className="ms-1">
 
-    return <Container style={{width: "25rem"}}>
-    
-    <h2 className="my-4 text-center">Ders Programı</h2>
-    <ListGroup style={{ width: '25rem' }}>
-      {schedule.map((item, index) => (
-        <Card 
-        key={index} 
-        className="my-1"
-        style={{ backgroundColor: index % 2 === 0 ? '#fef7ff' : 'white' }}>
-          <Card.Body className="d-flex align-items-center">
-       
-            <Image 
-                src= {item.logo}
-                roundedCircle
-                width={50} 
-                className='me-3'
-         />
-            <div>
-              <Card.Title className="text-start">{item.day}</Card.Title>
-              <Card.Text className="text-start">
-                {item.lessons.class} - {item.lessons.lesson}  {item.lessons.hours}
-              </Card.Text>
-            </div>
-          </Card.Body>
-        </Card>
-      ))}
-    </ListGroup>
+        <Accordion className="custom-accordion">
+          {schedule.map((item, index) => (
+            item.lessons.length > 1
+              ? <Accordion.Item eventKey={index.toString()} key={index} className="border-0">
+                <Card
+                  className="my-2"
+                  style={{
+                    backgroundColor: index % 2 === 0 ? "#fef7ff" : "white",
+                  }}
+                >
+                  <Accordion.Header className="" >
+                    <div className="d-flex align-items-center w-100 ">
+                      <Image
+                        src={item.logo}
+                        roundedCircle
+                        width={50}
+                        className="me-3"
+                      />
+                      <div>
+                        <Card.Title className="text-start">{item.day}</Card.Title>
+                        <Card.Text className="text-start">
+                          {item.lessons.length} adet dersiniz var
+                        </Card.Text>
+                      </div>
+                    </div>
+                  </Accordion.Header>
+                  <Accordion.Body className="px-3 py-2">
+                    {item.lessons.map((lesson, idx) => (
+                      <Card.Text className="text-start" key={idx}>
+                        {lesson.lesson.length === 0 && <h2>ders oyk</h2>}  {lesson.class} - {lesson.lesson} ({lesson.hours})
+                      </Card.Text>
+                    ))}
+                  </Accordion.Body>
+                </Card>
+              </Accordion.Item>
+              : <Card
+                key={index}
+                className="my-1"
+                style={{ backgroundColor: index % 2 === 0 ? '#fef7ff' : 'white' }}>
+                <Card.Body className="d-flex align-items-center">
+
+                  <Image
+                    src={item.logo}
+                    roundedCircle
+                    width={50}
+                    className='me-3'
+                  />
+                  <div>
+                    <Card.Title className="text-start">{item.day}</Card.Title>
+                    <Card.Text className="text-start">
+                      {item.lessons.length !== 0 ? (
+                        `${item.lessons.class} - ${item.lessons.lesson} ${item.lessons.hours}`
+                      ) : (
+                        <>Dersiniz yok</>
+                      )}
+                    </Card.Text>
+                  </div>
+                </Card.Body>
+              </Card>
+          ))}
+        </Accordion>
+      </ListGroup>
+
+
+
 
     </Container>
-}
 
-export default Schedule
+
+  );
+};
+
+export default Schedule;

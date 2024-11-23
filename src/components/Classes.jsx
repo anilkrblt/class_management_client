@@ -1,25 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Container, Row, Col, Card, Dropdown, DropdownButton, Modal, Button, ProgressBar } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import * as Icon from 'react-bootstrap-icons';
 import ClassCalendar from './ClassCalendar';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
+import { UserContext } from './UserContext';
+import ClassCalendarStudent from './ClassCalendarStudent';
 
 const Classes = () => {
-    
+
+    const { userType } = useContext(UserContext);
+
     const [events, setEvents] = useState([
         {
-          title: 'Toplantı',
-          start: new Date(2024, 10, 20, 13, 0), // 14 Kasım 2024, 10:00
-          end: new Date(2024, 10, 20, 15, 0),
-          type: 'Ders',
+            title: 'Toplantı',
+            start: new Date(2024, 10, 20, 13, 0), // 14 Kasım 2024, 10:00
+            end: new Date(2024, 10, 20, 15, 0),
+            type: 'Ders',
         },
         {
-          title: 'Bilgisayar mimarisi',
-          start: new Date(2024, 10, 20, 16, 30), // 16 Aralık 2024, 13:30
-          end: new Date(2024, 10, 20, 18, 0), // 16 Aralık 2024, 15:00
-          type: 'Telafi dersi',
+            title: 'Bilgisayar mimarisi',
+            start: new Date(2024, 10, 20, 16, 30), // 16 Aralık 2024, 13:30
+            end: new Date(2024, 10, 20, 18, 0), // 16 Aralık 2024, 15:00
+            type: 'Telafi dersi',
         },
-      ]);
+    ]);
 
     const [date, setDate] = useState("");
 
@@ -34,7 +39,7 @@ const Classes = () => {
     });
     const [showAddLesson, setShowAddLesson] = useState(false); // Ek ders formunun görünürlüğü
     const [lessonDetails, setLessonDetails] = useState({
-        title: '', 
+        title: '',
         date: '',
         startTime: '',
         endTime: '',
@@ -58,6 +63,14 @@ const Classes = () => {
     const handleCloseModal = () => {
         setShowModal(false);
         setSelectedCard(null);
+        setLessonDetails({
+            title: "",
+            date: "",
+            startTime: "",
+            endTime: "",
+            type: "Ek ders",
+        });
+        setShowAddLesson(false);
     };
 
     const handleSearchChange = (e) => {
@@ -100,29 +113,65 @@ const Classes = () => {
             date: value.date,
             startTime: value.startTime,
             endTime: value.endTime,
-            type:"Ek ders",
-           
-        }); 
+            type: "Ek ders",
+
+        });
     };
 
     const handleSaveLesson = () => {
-  
+        // Alanların boş olup olmadığını kontrol et
+        if (!lessonDetails.title || !lessonDetails.date || !lessonDetails.startTime || !lessonDetails.endTime) {
+            alert('Lütfen tüm alanları doldurunuz.');
+            return;
+        }
+
+        // Başlangıç ve bitiş zamanlarını birleştir
+        const start = new Date(`${lessonDetails.date}T${lessonDetails.startTime}`);
+        const end = new Date(`${lessonDetails.date}T${lessonDetails.endTime}`);
+
+        // Çakışma kontrolü
+        const hasConflict = events.some(event => {
+            return (
+                (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
+                (end > event.start && end <= event.end) ||     // Bitiş zamanı başka bir etkinlik arasında mı?
+                (start <= event.start && end >= event.end)     // Seçim tamamen başka bir etkinliği kapsıyor mu?
+            );
+        });
+
+        if (hasConflict) {
+            alert('Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.');
+            return;
+        }
+
+        // Yeni etkinlik oluştur
         const newEvent = {
             title: lessonDetails.title,
-            start: new Date(lessonDetails.date + 'T' + lessonDetails.startTime),
-            end: new Date(lessonDetails.date + 'T' + lessonDetails.endTime),
+            start,
+            end,
             type: 'Ek ders',
         };
-    
+
         // Yeni etkinliği events array'ine ekle
         setEvents(prevEvents => [...prevEvents, newEvent]);
-    
-        // Kaydedilen ders bilgilerini konsola yazdırma (isteğe bağlı)
+
+        // Ders detaylarını sıfırla
+        setLessonDetails({
+            title: "",
+            date: "",
+            startTime: "",
+            endTime: "",
+            type: "Ek ders",
+        });
+
+        setShowAddLesson(false);
+
         console.log('Ek ders bilgileri:', lessonDetails);
-    };  
+    };
+
+
 
     return (
-        <Container style={{ width: "45rem" }}>
+        <Container style={{ width: "45rem" }} className='rounded-3 bg-light'>
 
             <Row className="my-4">
                 <Col>
@@ -150,17 +199,50 @@ const Classes = () => {
             </Row>
 
             <Row>
-                {filteredCards.map((card) => (
-                    <Col key={card.id} md={6} className="mb-4">
-                        <Card className="py-3" onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
-                            <Card.Body>
-                                <Card.Title className="fw-bold">{card.title}</Card.Title>
-                                <Card.Text className="text-muted fw-light fw-bold">{card.text}</Card.Text>
-                                <Card.Text className="fw-bolder">{card.text2}</Card.Text>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                ))}
+                {
+                    filteredCards.length === 0 ? (
+                        <Col className='text-center'>
+                            <p>Seçimlerinize uygun sınıf bulunamadı.</p>
+                        </Col>
+                    ) :
+                        filteredCards.map((card) => (
+                            <Col key={card.id} md={6} className="mb-4 ">
+                                <Card className="py-3" onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
+                                    <Card.Body>
+                                        <Row className='row-cols-auto '>
+                                            <Col md={7}> <Card.Title className="fw-bold ">{card.title}</Card.Title></Col>
+                                            <Col md={2} >
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Projeksiyon Cihazı</Tooltip>}
+                                                >
+                                                    <div style={{ cursor: 'pointer' }}>
+                                                        <Icon.Projector size={30} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>
+                                            <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div style={{ cursor: 'pointer' }}>
+                                                        <Icon.PcDisplay size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>
+                                        </Row>
+
+                                        <Card.Text className="text-muted fw-light fw-bold">{card.text}</Card.Text>
+                                        <Card.Text className="fw-bolder">{card.text2}</Card.Text>
+
+
+
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        )
+                        )}
             </Row>
 
             {/* Filtre Modal */}
@@ -190,7 +272,20 @@ const Classes = () => {
                                 Kapasite: {filterOptions.capacity} kişi
                             </Form.Text>
                         </Form.Group>
-
+                        <Form.Group controlId="formClassType">
+                            <Form.Label>Sınıf Türü</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="classType"
+                                value={filterOptions.classType}
+                                onChange={handleFilterChange}
+                            >
+                                <option value="">Tümü</option>
+                                <option value="Derslik">Derslik</option>
+                                <option value="Amfi">Amfi</option>
+                                <option value="Laboratuvar">Laboratuvar</option>
+                            </Form.Control>
+                        </Form.Group>
 
                         <Form.Group controlId="formProjection">
                             <Form.Label>Projeksiyon</Form.Label>
@@ -206,19 +301,7 @@ const Classes = () => {
                             </Form.Control>
                         </Form.Group>
 
-                        <Form.Group controlId="formClassType">
-                            <Form.Label>Sınıf Türü</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="classType"
-                                value={filterOptions.classType}
-                                onChange={handleFilterChange}
-                            >
-                                <option value="">Tümü</option>
-                                <option value="Derslik">Derslik</option>
-                                <option value="Laboratuvar">Laboratuvar</option>
-                            </Form.Control>
-                        </Form.Group>
+
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
@@ -290,13 +373,13 @@ const Classes = () => {
                                 <Button
                                     variant="success"
                                     className="mt-3"
-                                    onClick={handleSaveLesson} 
+                                    onClick={handleSaveLesson}
                                 >
                                     Kaydet
                                 </Button>
                             </Form>
                         )}
-                        <ClassCalendar onDataSubmit={handleDataFromChild} lessonName={lessonDetails.title} lesson = {lessonDetails} events={events} setEvents={setEvents}/>
+                       {userType==="student" ? <ClassCalendarStudent/>: <ClassCalendar onDataSubmit={handleDataFromChild} lessonName={lessonDetails.title} lesson={lessonDetails} events={events} setEvents={setEvents} /> } 
 
                     </Modal.Body>
                 </Modal>

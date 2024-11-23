@@ -16,26 +16,51 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, setEvents  } ) => {
 
   const handleSelectSlot = ({ start, end }) => {
     const now = new Date();
-    if (start >= now) { // Sadece gelecekteki etkinlikleri kabul et
-      const newEvent = {
-        title: lessonName, // lessonName'i etkinlik başlığı olarak ata
-        start,
-        end,
-        type:"Ek ders"
-      };
-      setEvents([...events, newEvent]); // Yeni etkinliği events dizisine ekle
-
-      // Seçilen tarihi ve saatleri üst bileşene ilet
-      onDataSubmit({
-        date: moment(start).format('YYYY-MM-DD'), // 'YYYY-MM-DD' formatında
-        startTime: moment(start).format('HH:mm'), // 'HH:mm' formatında
-        endTime: moment(end).format('HH:mm'),     // 'HH:mm' formatında
-      });
-    
-    } else {
+  
+    // Geçmiş bir zamana etkinlik eklenemez
+    if (start < now) {
       alert('Geçmiş bir zamana etkinlik ekleyemezsiniz.');
+      return;
     }
+  
+    // Çakışma kontrolü
+    const hasConflict = events.some(event => {
+      return (
+        (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
+        (end > event.start && end <= event.end) || // Bitiş zamanı başka bir etkinlik arasında mı?
+        (start <= event.start && end >= event.end) // Seçim tamamen başka bir etkinliği kapsıyor mu?
+      );
+    });
+  
+    if (hasConflict) {
+      alert('Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.');
+      return;
+    }
+  
+    if(!lessonName){
+      lessonName = window.prompt("Ders")
+    }
+    // Yeni etkinlik ekleme
+ 
+  
+    const newEvent = {
+      title: lessonName,
+      start,
+      end,
+      type: 'Ek ders',
+    };
+  
+    setEvents([...events, newEvent]);
+  
+    // Üst bileşene veri gönder
+    onDataSubmit({
+      date: moment(start).format('YYYY-MM-DD'),
+      startTime: moment(start).format('HH:mm'),
+      endTime: moment(end).format('HH:mm'),
+    });
   };
+  
+  
 console.log(lessonName)
 console.log(events)
   const minTime = new Date();
