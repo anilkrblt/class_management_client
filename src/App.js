@@ -11,7 +11,7 @@ const App = () => {
   return (
     <UserProvider>
       
-      <StudentHomePage/>
+      <InstructorHomePage/>
     </UserProvider>
    
 

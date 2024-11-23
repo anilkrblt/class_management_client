@@ -36,7 +36,7 @@ const Schedule = () => {
   ];
 
   return (
-    <Container className="bg-light rounded-3 schedule ps-2">
+    <Container className="bg-light rounded-4 schedule ps-2">
       <h2 className="my-4 text-center">Ders Programı</h2>
       <ListGroup className="ms-1">
 

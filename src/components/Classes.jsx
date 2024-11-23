@@ -53,6 +53,12 @@ const Classes = () => {
         { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar" },
         { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
         { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
+
+         { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik" },
+        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik" },
+        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar" },
+        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
+        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
     ];
 
     const handleCardClick = (card) => {
@@ -171,9 +177,9 @@ const Classes = () => {
 
 
     return (
-        <Container style={{ width: "45rem" }} className='rounded-3 bg-light'>
+        <Container style={{ width: "45rem" }} className=' bg-light'>
 
-            <Row className="my-4">
+            <Row className="bg-light mb-3 py-2 " style={{position:"sticky", top:0, zIndex:100}}>
                 <Col>
                     <DropdownButton title="Tüm sınıflar">
                         <Dropdown.Item eventKey="1">Derslikler</Dropdown.Item>

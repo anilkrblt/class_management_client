@@ -17,7 +17,7 @@ const InstructorHomePage = () => {
     return <Container >
         <Navbarx />
         <Row style={{ marginTop: "100px" }} className="homepage " >
-            <Col className="overflow-y-auto scrollable rounded-4  " md={7}  ><Classes /></Col>
+            <Col className=" scrollable bg-light rounded-4 mt-4 " md={7}  ><Classes /></Col>
             <Col md={5}><Schedule /></Col>
         </Row>
     </Container>
