@@ -1,24 +1,37 @@
 import React, { useState } from 'react';
 import { Form, Button, Modal, Alert, Image } from 'react-bootstrap';
+import * as Icon from 'react-bootstrap-icons';
 
 const ComplaintForm = () => {
   const [complaintTitle, setComplaintTitle] = useState('');
   const [complaintDescription, setComplaintDescription] = useState('');
   const [complaintType, setComplaintType] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState(''); 
-  const [image, setImage] = useState(null); 
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [images, setImages] = useState([]);
+  const [hoverIndex, setHoverIndex] = useState(null); // Hover edilen görüntünün indeksini saklayın
   const [showModal, setShowModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
+    const files = Array.from(e.target.files);
+    const newImages = [];
+    files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setImage(reader.result); 
+        newImages.push(reader.result);
+        if (newImages.length === files.length) {
+          setImages((prevImages) => [...prevImages, ...newImages]);
+        }
       };
       reader.readAsDataURL(file);
-    }
+    });
+    e.target.value = '';
+  };
+
+  const handleImageRemove = (index) => {
+    const updatedImages = [...images];
+    updatedImages.splice(index, 1);
+    setImages(updatedImages);
   };
 
   const handleSubmit = (e) => {
@@ -32,7 +45,7 @@ const ComplaintForm = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container my-5">
       <h2>Şikayet Oluştur</h2>
       {showAlert && (
         <Alert variant="danger">
@@ -49,7 +62,6 @@ const ComplaintForm = () => {
             onChange={(e) => setComplaintTitle(e.target.value)}
           />
         </Form.Group>
-
         
         <Form.Group controlId="complaintPlace">
           <Form.Label>Şikayet Yeri</Form.Label>
@@ -77,7 +89,6 @@ const ComplaintForm = () => {
           />
         </Form.Group>
 
-
         <Form.Group controlId="phoneNumber">
           <Form.Label>Telefon Numarası</Form.Label>
           <Form.Control
@@ -89,21 +100,58 @@ const ComplaintForm = () => {
         </Form.Group>
 
         <Form.Group controlId="complaintImage">
-          <Form.Label>Fotoğraf (isteğe bağlı)</Form.Label>
-          <Form.Control
-            type="file"
-            id="complaintImage"
-            onChange={handleImageChange}
-          />
-          {image && (
-            <div className="mt-3">
-              <h5>Yüklenen Fotoğraf:</h5>
-              <Image src={image} rounded style={{ maxWidth: '200px' }} />
+          <Form.Label>Fotoğraflar (isteğe bağlı)</Form.Label>
+          <div className="mb-3">
+            <Form.Control
+              type="file"
+              multiple
+              id="complaintImage"
+              onChange={handleImageChange}
+            />
+          </div>
+          {images.length > 0 && (
+            <div className="d-flex flex-wrap align-items-center">
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  className="image-container"
+                  onMouseEnter={() => setHoverIndex(index)}
+                  onMouseLeave={() => setHoverIndex(null)}
+                >
+                  <Image
+                    src={img}
+                    rounded
+                    style={{
+                      maxWidth: '100px',
+                    }}
+                  />
+                  {hoverIndex === index && (
+                    <div
+                      className="image-overlay"
+                      onClick={() => handleImageRemove(index)}
+                    >
+                      <Icon.Trash3
+                        style={{
+                          fontSize: '24px',
+                          color: 'white',
+                        }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+              <Button
+                className='image-add'
+                variant="outline-warning"
+                onClick={() => document.getElementById('complaintImage').click()}
+              >
+                +
+              </Button>
             </div>
           )}
         </Form.Group>
 
-        <Button variant="primary" type="submit" className='my-3'>
+        <Button variant="primary" type="submit" className="my-3">
           Şikayet Gönder
         </Button>
       </Form>

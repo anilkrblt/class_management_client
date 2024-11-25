@@ -328,13 +328,13 @@ const Classes = () => {
                     </Modal.Header>
                     <Modal.Body>
 
-                        <Button
+                    {userType!=="student" && <Button
                             variant="outline-primary"
                             className="mt-3"
                             onClick={handleAddLessonClick}
                         >
                             Ek Ders Ekle
-                        </Button>
+                        </Button> } 
                         {showAddLesson && (
                             <Form className="mt-3">
                                 <Form.Group controlId="formLesson">
