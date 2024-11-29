@@ -102,10 +102,6 @@ const Schedule = () => {
           ))}
         </Accordion>
       </ListGroup>
-
-
-
-
     </Container>
 
 

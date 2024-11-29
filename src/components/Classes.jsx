@@ -54,11 +54,7 @@ const Classes = () => {
         { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
         { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
 
-         { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik" },
-        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik" },
-        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar" },
-        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
-        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
+     
     ];
 
     const handleCardClick = (card) => {
@@ -318,7 +314,7 @@ const Classes = () => {
 
             {/* Card Detayları Modal */}
             {selectedCard && (
-                <Modal show={showModal} size="md" onHide={handleCloseModal}>
+                <Modal show={showModal} size="lg" onHide={handleCloseModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>{selectedCard.title}</Modal.Title>
                     </Modal.Header>
