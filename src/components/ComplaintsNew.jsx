@@ -14,7 +14,7 @@ const ComplaintsNew = () => {
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Can Öztürk Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
@@ -44,12 +44,12 @@ const ComplaintsNew = () => {
 
     return (
         <Container className="bg-light rounded-4  ps-2" >
-            <h2 className="my-2 text-center sticky-top bg-light py-1"  style={{ zIndex: 10 }}>Şikayetler</h2>
+            <h2 className="my-3 text-center sticky-top bg-light py-1"  style={{ zIndex: 10 }}>Şikayetler</h2>
             <ListGroup className="ms-1 ">
                 {complaints.map((item, index) => (
                    <Card
                    key={index}
-                   className="py-2 my-1"
+                   className="py-2 ps-2 my-1"
                    style={{
                        backgroundColor: index % 2 === 0 ? "#edfaf9" : "white",
                    }}
@@ -57,8 +57,6 @@ const ComplaintsNew = () => {
 
                    <Row className=" d-flex align-items-center justify-content-around w-100' ">
                        <Col md={1}>
-
-
                            <Image
                                src={item.logo || "https://via.placeholder.com/50"}
                                roundedCircle
@@ -66,7 +64,7 @@ const ComplaintsNew = () => {
                                className="me-3"
                            />
                        </Col>
-                       <Col md={3}>
+                       <Col md={4} className='ms-2'>
                            <div>
                                <Card.Title className="text-start">{item.name}</Card.Title>
                                <Card.Text className="text-start">
@@ -74,16 +72,15 @@ const ComplaintsNew = () => {
                                </Card.Text>
                            </div>
                        </Col>
-                       <Col md={1}>
+                       <Col md={2}>
                            <h3>L208</h3>
                        </Col>
-                       <Col md={1}>
+                       <Col md={2}>
 
                            <Col className='fs-4 fw-bold ms-2'>15</Col>
                            <Col className='fs-5 text-secondary'>Kasım</Col>
-
                        </Col>
-                       <Col md={1}>
+                       <Col md={2}>
                            <Button variant="danger" onClick={() => handleShow(item)}>İncele</Button>
                        </Col>
 

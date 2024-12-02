@@ -67,7 +67,7 @@ const ComplaintsOld = () => {
     return (
         <Container className="bg-light rounded-4  ps-2">
             <div className=" text-center sticky-top bg-light" style={{ zIndex: 10 }}>
-            <h2 className="my-4 text-center">Çözülen Şikayetler</h2>
+            <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
             {/* Yıl seçimi için Pagination */}
             <div className="d-flex justify-content-left align-items-center">
                 <Pagination className="mb-3" >{items}</Pagination>
@@ -83,7 +83,7 @@ const ComplaintsOld = () => {
                     .map((item, index) => (
                         <Card
                             key={index}
-                            className="py-2 my-1"
+                            className="py-2 ps-2 my-1"
                             style={{
                                 backgroundColor: index % 2 === 0 ? "#edfaf9" : "white",
                             }}
@@ -91,8 +91,6 @@ const ComplaintsOld = () => {
 
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
                                 <Col md={1}>
-
-
                                     <Image
                                         src={item.logo || "https://via.placeholder.com/50"}
                                         roundedCircle
@@ -100,7 +98,7 @@ const ComplaintsOld = () => {
                                         className="me-3"
                                     />
                                 </Col>
-                                <Col md={3}>
+                                <Col md={4} className='ms-2'>
                                     <div>
                                         <Card.Title className="text-start">{item.name}</Card.Title>
                                         <Card.Text className="text-start">
@@ -108,16 +106,16 @@ const ComplaintsOld = () => {
                                         </Card.Text>
                                     </div>
                                 </Col>
-                                <Col md={1}>
+                                <Col md={2}>
                                     <h3>L208</h3>
                                 </Col>
-                                <Col md={1}>
+                                <Col md={2}>
 
                                     <Col className='fs-4 fw-bold ms-2'>15</Col>
                                     <Col className='fs-5 text-secondary'>Kasım</Col>
 
                                 </Col>
-                                <Col md={1}>
+                                <Col md={2}>
                                     <Button variant="danger" onClick={() => handleShow(item)}>İncele</Button>
                                 </Col>
 

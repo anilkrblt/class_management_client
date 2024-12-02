@@ -1,16 +1,17 @@
-import { Col, Container } from "react-bootstrap"
+import { Col, Container, Row } from "react-bootstrap"
 import Complaints from "../components/Complaints"
 import ComplaintsOld from "../components/ComplaintsOld"
 import Navbarx from "../components/Navbar"
 import ComplaintsNew from "../components/ComplaintsNew"
 
 const ComplaintsPage = () => {
-    return <Container>
+    return <Container fluid>
         <Navbarx/>
-       <Col style={{ marginTop: "120px" }}>
-       <div className=" scrollable bg-light rounded-4 mb-5 "><ComplaintsNew/></div>
-       <div className=" scrollable bg-light rounded-4 mb-3 "><ComplaintsOld /></div>
-       </Col>        
+       <Row style={{ marginTop: "120px" }}>
+            <Col className="scrollable bg-light rounded-4 mb-3 ms-5 me-2 "><ComplaintsNew/></Col>
+            <Col className="scrollable bg-light rounded-4 mb-3 me-5 ms-2"><ComplaintsOld/></Col>
+
+        </Row>     
     </Container>
 }
 
