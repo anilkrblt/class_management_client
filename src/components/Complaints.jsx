@@ -13,6 +13,21 @@ const Complaints = () => {
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
+        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
+        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
+        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
+        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
+        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
+        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
         
     ];
 
@@ -27,8 +42,8 @@ const Complaints = () => {
     };
 
     return (
-        <Container className="bg-light rounded-4 schedule ps-2">
-            <h2 className="my-4 text-center">Şikayetler</h2>
+        <Container className="bg-light rounded-4 ps-2 ">
+            <h2 className="my-3 text-center sticky-top bg-light py-1">Şikayetler</h2>
             <ListGroup className="ms-1">
                 {complaints.map((item, index) => (
                     <Card
@@ -36,7 +51,7 @@ const Complaints = () => {
                         className="my-1"
                         style={{ backgroundColor: index % 2 === 0 ? '#edfaf9' : 'white' }}
                     >
-                        <Card.Body className="d-flex align-items-center justify-content-between">
+                        <Card.Body className="d-flex align-items-center justify-content-around">
                             <Image
                                 src={item.logo || 'https://via.placeholder.com/50'}
                                 roundedCircle

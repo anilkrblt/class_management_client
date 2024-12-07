@@ -20,6 +20,9 @@ const LessonManager = () => {
     const [showAll, setShowAll] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [showRemoveModal, setShowRemoveModal] = useState(false);
+    const [selectedLesson, setSelectedLesson] = useState(null);
+
     const toggleDepartmentSelection = (department) => {
         const updatedDepartments = selectedDepartments.includes(department)
             ? selectedDepartments.filter((d) => d !== department)
@@ -84,6 +87,24 @@ const LessonManager = () => {
         setShowInstructorModal(true);
     };
 
+    const handleRemoveInstructor = (lessonIndex) => {
+        setSelectedLesson(lessons[lessonIndex]);
+        setShowRemoveModal(true);
+    };
+    const handleConfirmRemove = (instructorIndex) => {
+        const updatedLessons = [...lessons];
+
+        const lessonIndex = updatedLessons.findIndex(
+            lesson => lesson.lessonId === selectedLesson.lessonId);
+
+
+        if (lessonIndex !== -1) {
+            updatedLessons[lessonIndex].instructors.splice(instructorIndex, 1);
+        }
+        setLessons(updatedLessons);
+    };
+
+
     const handleConfirmInstructor = () => {
         const updatedLessons = [...lessons];
         if (!updatedLessons[currentLessonIndex].instructors.includes(selectedInstructor)) {
@@ -129,7 +150,7 @@ const LessonManager = () => {
     const instructors = ["Altan Mesut", "Emir Öztürk", "Aydın Carus"]; // Öğretim üyeleri listesi
 
 
-    //  console.log(lessons)
+
 
 
     return (
@@ -229,8 +250,8 @@ const LessonManager = () => {
             <h4 className="mt-4">Ders Listesi</h4>
 
             <Row>
-                <Col>
-                    <Pagination className="mb-3">
+                <Col md={10}>
+                    <Pagination className="mb-3" >
                         <Pagination.Item
                             onClick={() => {
                                 setShowAll(true);
@@ -281,6 +302,9 @@ const LessonManager = () => {
                                     : 'Atanmadı'}
                                 <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
                                     Öğretim Üyesi Ekle
+                                </Button>
+                                <Button size='sm' variant='danger' onClick={() => handleRemoveInstructor(index)}>
+                                    Öğretim Üyesi Kaldır
                                 </Button>
                             </td>
 
@@ -365,6 +389,48 @@ const LessonManager = () => {
                 </Modal.Footer>
             </Modal>
 
+            <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Öğretim Üyesi Kaldır</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {selectedLesson && selectedLesson.instructors.length > 0 ? (
+                        <Table striped bordered hover>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Öğretim Üyesi</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {selectedLesson.instructors.map((instructor, idx) => (
+                                    <tr key={idx}>
+                                        <td>{idx + 1}</td>
+                                        <td>{instructor}</td>
+                                        <td>
+                                            <Button
+                                                size="sm"
+                                                variant="danger"
+                                                onClick={() => handleConfirmRemove(idx)}
+                                            >
+                                                Kaldır
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        <p>Bu ders için atanmış öğretim üyesi bulunmamaktadır.</p>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowRemoveModal(false)}>
+                        Kapat
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

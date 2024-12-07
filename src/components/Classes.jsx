@@ -7,7 +7,7 @@ import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { UserContext } from './UserContext';
 import ClassCalendarStudent from './ClassCalendarStudent';
 
-const Classes = () => {
+const Classes = ({col}) => {
 
     const { userType } = useContext(UserContext);
 
@@ -54,7 +54,7 @@ const Classes = () => {
         { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
         { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
 
-     
+
     ];
 
     const handleCardClick = (card) => {
@@ -173,9 +173,10 @@ const Classes = () => {
 
 
     return (
-        <Container style={{ width: "45rem" }} className=' bg-light'>
+        <Container  className='w-100 bg-light'>
 
-            <Row className="bg-light mb-3 py-2 " style={{position:"sticky", top:0, zIndex:100}}>
+            <Row className="bg-light mb-3 py-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
+               
                 <Col>
                     <DropdownButton title="Tüm sınıflar">
                         <Dropdown.Item eventKey="1">Derslikler</Dropdown.Item>
@@ -194,7 +195,7 @@ const Classes = () => {
                             />
                         </Col>
                         <Col className="my-1" md={2}>
-                            <Icon.Funnel size={28} onClick={handleShowFilterModal} style={{ cursor: 'pointer' }} />
+                            <Icon.Funnel size={28} onClick={handleShowFilterModal} className='cursor-pointer'/>
                         </Col>
                     </Row>
                 </Col>
@@ -208,8 +209,13 @@ const Classes = () => {
                         </Col>
                     ) :
                         filteredCards.map((card) => (
-                            <Col key={card.id} md={6} className="mb-4 ">
-                                <Card className="py-3" onClick={() => handleCardClick(card)} style={{ cursor: 'pointer' }}>
+                            <Col key={card.id} md={col} className="mb-4 ">
+                                <Card
+                                    className={`py-3   ${card.text === "Sınıf kapalı" ? "hover-disable-card" : "cursor-pointer"} 
+                                    ${card.text === "Sınıf kapalı" ? "shadow-lg-danger" : card.text === "Boş" ? "shadow-sm-success"  :"" }`}
+                                    onClick={() => card.text === "Sınıf kapalı" ? null : handleCardClick(card)}
+                                    style={{height:"20vh"}}
+                                >
                                     <Card.Body>
                                         <Row className='row-cols-auto '>
                                             <Col md={7}> <Card.Title className="fw-bold ">{card.title}</Card.Title></Col>
@@ -218,7 +224,7 @@ const Classes = () => {
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Projeksiyon Cihazı</Tooltip>}
                                                 >
-                                                    <div style={{ cursor: 'pointer' }}>
+                                                    <div className='cursor-pointer'>
                                                         <Icon.Projector size={30} />
                                                     </div>
                                                 </OverlayTrigger>
@@ -228,14 +234,17 @@ const Classes = () => {
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
                                                 >
-                                                    <div style={{ cursor: 'pointer' }}>
+                                                    <div className='cursor-pointer'>
                                                         <Icon.PcDisplay size={20} />
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>
                                         </Row>
 
-                                        <Card.Text className="text-muted fw-light fw-bold">{card.text}</Card.Text>
+                                        <Card.Text className={`fw-light fw-bold ${card.text === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success"  :"text-muted" }`}>
+                                            {card.text}
+                                        </Card.Text>
+
                                         <Card.Text className="fw-bolder">{card.text2}</Card.Text>
 
 
@@ -271,7 +280,7 @@ const Classes = () => {
                                 onChange={handleFilterChange}
                             />
                             <Form.Text className="text-muted">
-                                Kapasite: {filterOptions.capacity} kişi
+                                Kapasite: Minimum {filterOptions.capacity} kişilik
                             </Form.Text>
                         </Form.Group>
                         <Form.Group controlId="formClassType">
@@ -324,13 +333,13 @@ const Classes = () => {
                     </Modal.Header>
                     <Modal.Body>
 
-                    {userType!=="student" && <Button
+                        {userType !== "student" && <Button
                             variant="outline-primary"
                             className="mt-3"
                             onClick={handleAddLessonClick}
                         >
                             Ek Ders Ekle
-                        </Button> } 
+                        </Button>}
                         {showAddLesson && (
                             <Form className="mt-3">
                                 <Form.Group controlId="formLesson">
@@ -381,7 +390,7 @@ const Classes = () => {
                                 </Button>
                             </Form>
                         )}
-                       {userType==="student" ? <ClassCalendarStudent/>: <ClassCalendar onDataSubmit={handleDataFromChild} lessonName={lessonDetails.title} lesson={lessonDetails} events={events} setEvents={setEvents} /> } 
+                        {userType === "student" ? <ClassCalendarStudent /> : <ClassCalendar onDataSubmit={handleDataFromChild} lessonName={lessonDetails.title} lesson={lessonDetails} events={events} setEvents={setEvents} />}
 
                     </Modal.Body>
                 </Modal>

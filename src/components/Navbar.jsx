@@ -6,18 +6,27 @@ import { UserContext } from './UserContext';
 import { useContext } from 'react';
 
 
+
 let menusStudent = [
-  { name: "Ana sayfa", href: "#home" },
-  { name: "Sınıflar", href: "#features" },
+  { name: "Ana sayfa", href: "/anasayfa" },
+  { name: "Sınıflar", href: "sınıflar" },
   { name: "Şikayet oluştur", href: "#pricing" },
   { name: "Sınavlar", href: "#features" },
   { name: "Çıkış yap", href: "#logout" }
 ];
 let menusInstructor = [
-  { name: "Ana sayfa", href: "#home" },
+  { name: "Ana sayfa", href: "/anasayfa" },
   { name: "Sınıflar", href: "#features" },
+  { name: "Ders programı", href: "/dersprogrami" },
   { name: "Şikayet oluştur", href: "#pricing" },
-  { name: "instructor", href: "#features" },
+  { name: "Çıkış yap", href: "#logout" }
+];
+let menusAdmin = [
+  { name: "Ana sayfa", href: "/anasayfa" },
+  { name: "Sınıflar", href: "/sınıflar" },
+  { name: "Dersler", href: "/dersler" },
+  { name: "Sınıf yönetimi", href: "/sınıfyonetimi" },
+  { name: "Şikayetler", href: "/şikayetler" },
   { name: "Çıkış yap", href: "#logout" }
 ];
 
@@ -25,7 +34,14 @@ let menusInstructor = [
 const Navbarx = () => {
   const { userType } = useContext(UserContext); 
   console.log(userType)
-  const menus = userType === "student" ? menusStudent : menusInstructor;
+  const menus = 
+  userType === "admin" 
+    ? menusAdmin 
+    : userType === "instructor" 
+      ? menusInstructor 
+      : menusStudent;
+
+
   return (
     <Navbar bg="light" data-bs-theme="light" fixed='top'>
       <Container>
