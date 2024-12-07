@@ -161,3 +161,16 @@ code {
 .cursor-pointer {
   cursor: pointer
 }
+
+.hover-effect {
+  background-color: #233E90;
+ border-color: #233E90;
+}
+.hover-effect:hover {
+  background-color: #011f77;
+  border-color: #011f77;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  accent-color: #011f77;
+}
