@@ -16,13 +16,14 @@ import ClassesPage from './pages/ClassesPage';
 import LessonManagerPage from './pages/LessonManegerPage';
 import InstructorSchedule from './components/InstructorSchedule';
 import InstructorSchedulePage from './pages/InstructorSchedulePage';
+import LoginPage from './pages/LoginPage';
 
 const App = () => {
   return (
 
     <BrowserRouter>
       <Routes> {/* Router yerine Routes kullanılır */}
-        <Route path='/' element={<StudentHomePage />} />
+        <Route path='/' element={<LessonPlaningPage />} />
         <Route path='/anasayfa' element={<StudentHomePage />} />
         <Route path='/sınıflar' element={<ClassesPage />} />
         <Route path='/dersler' element={<LessonManagerPage />} />
