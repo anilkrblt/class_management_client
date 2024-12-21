@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { RRule } from "rrule";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Card, DropdownButton, Dropdown, Col, Row, Container } from "react-bootstrap";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import ClassCalendar from "./ClassCalendar";
 import ClassChangeCalendar from "./ClassChangeCalendar";
+import ClassesList from "./ClassesList";
 
 // Localizer ayarı
 const localizer = momentLocalizer(moment);
@@ -59,20 +60,26 @@ const InstructorSchedule = ({ lesson }) => {
     date: '',
     startTime: '',
     endTime: '',
-    type: ''
+    type: '',
+    location: ''
 
   });
   // Tüm tekrar eden etkinlikleri oluştur
-  const events = baseEvents.flatMap(event =>
-    generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
-  );
+  const [events,setEvents] = useState(baseEvents.flatMap(event =>
+    generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location,)
+  )) 
 
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showChangeClassModal, setShowChangeClassModal] = useState(false);
-  const [newLocation, setNewLocation] = useState("");
+
   const [showExtraLessonModal, setShowExtraLessonModal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
+  const [showMessage, setShowMessage] = useState(false);
+
+
+
 
 
   const handleDataFromChild = (value) => {
@@ -86,8 +93,10 @@ const InstructorSchedule = ({ lesson }) => {
 
     });
   };
-  console.log(lessonDetails)
+  
   const handleSelectEvent = (event) => {
+
+    setShowMessage();
     setSelectedEvent(event);
     setShowModal(true);
   };
@@ -104,18 +113,24 @@ const InstructorSchedule = ({ lesson }) => {
 
   const handleCloseChangeClassModal = () => {
     setShowChangeClassModal(false);
-    setNewLocation("");
+    setSelectedCard(null)
+    setLessonDetails({
+      title: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      type: '',
+      location: ''
+
+    })
   };
 
-  const handleSaveNewLocation = () => {
-    if (selectedEvent) {
-      selectedEvent.location = newLocation; // Yeni sınıf bilgisini güncelle
-      setShowChangeClassModal(false);
-    }
-  };
 
   const handleSave = () => {
-    if (selectedEvent) {
+
+
+    if (selectedEvent && selectedCard) {
+
       // `baseEvents` üzerinde değişiklik yapmadan yeni bir liste oluştur
       const updatedEvents = baseEvents.map(event =>
         event.title === selectedEvent.title
@@ -123,25 +138,66 @@ const InstructorSchedule = ({ lesson }) => {
             ...event,
             start: moment(`${lessonDetails.date}T${lessonDetails.startTime}`).toDate(),
             end: moment(`${lessonDetails.date}T${lessonDetails.endTime}`).toDate(),
-            location: newLocation
+            location: selectedCard?.title
           }
           : event
       );
+      console.log(updatedEvents);
 
       // State'i güncelle
       setBaseEvents(updatedEvents);
-      console.log("Güncellenmiş Etkinlikler:", updatedEvents);
       setShowChangeClassModal(false); // Modal'ı kapat
     }
+    else {
+      setShowMessage(true)
+    }
+
+    setSelectedCard(null)
+    setLessonDetails({
+      title: '',
+      date: '',
+      startTime: '',
+      endTime: '',
+      type: '',
+      location: ''
+
+    })
   };
 
   const handleCancelLesson = () => {
-    console.log(selectedEvent)
-  }
+
+    if (selectedEvent) {
+      // Seçilen etkinliği kaldır
+      const updatedEvents = events.filter(
+        event =>
+          !(
+            event.title === selectedEvent.title &&
+            event.start.getTime() === selectedEvent.start.getTime() &&
+            event.end.getTime() === selectedEvent.end.getTime()
+          )
+      );
+      console.log(updatedEvents)
+
+      setEvents(updatedEvents)
+
+      // State'i güncelle
+  //    setBaseEvents(updatedEvents);
+
+      // Modal'ı kapat ve seçimi sıfırla
+      setShowModal(false);
+      setSelectedEvent(null);
+    }
+ 
+    
+  };
+
+  console.log(events)
+
 
   const handleOpenExtraLessonModal = () => {
     setShowExtraLessonModal(true);
   };
+
 
   const handleCloseExtraLessonModal = () => {
     setShowExtraLessonModal(false);
@@ -155,16 +211,58 @@ const InstructorSchedule = ({ lesson }) => {
         title: selectedEvent.title,
         start: moment(`${lessonDetails.date}T${lessonDetails.startTime}`).toDate(),
         end: moment(`${lessonDetails.date}T${lessonDetails.endTime}`).toDate(),
-        location: newLocation,
+        location: selectedCard.title,
         rule: { freq: RRule.DAILY, interval: 1, count: 1 },
-    }]
+        text: "Ek ders"
+      }]
 
       // State'i güncelle
       setBaseEvents(updatedEvents);
-     // console.log("Güncellenmiş Etkinlikler:", updatedEvents);
-     // setShowChangeClassModal(false); // Modal'ı kapat
+      // console.log("Güncellenmiş Etkinlikler:", updatedEvents);
+      // setShowChangeClassModal(false); // Modal'ı kapat
+
+      handleCloseExtraLessonModal(
+
+        
+      )
     }
   }
+
+  const [showComponent, setShowComponent] = useState(false);
+
+  const handleToggleComponent = () => {
+    setShowComponent(!showComponent);
+  };
+
+
+  const handleSelectClass = () => {
+    handleToggleComponent()
+
+  }
+
+  const EventComponent = ({ event }) => {
+    // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
+
+    return (
+      <Container className="d-flex flex-column align-items-center">
+        <div className="d-flex align-items-center ">
+          <span className="fs-5 fw-semibold">{event.title}</span>
+        </div>
+        <div className=" d-flex align-items-center mt-2">
+          <span className='fs-5 fw-semibold'>{event.location}</span>
+        </div>
+        <div className=" d-flex align-items-center mt-2">
+          <span className='fs-5 fw-semibold'>{event.text}</span>
+        </div>
+       
+
+
+      </Container>
+    );
+
+
+
+  };
 
   return (
     <>
@@ -178,6 +276,9 @@ const InstructorSchedule = ({ lesson }) => {
         style={{ height: "100%" }}
         min={new Date().setHours(8, 0, 0)}
         max={new Date().setHours(22, 0, 0)}
+        components={{
+          event: EventComponent, // Özel etkinlik bileşeni
+        }}
         formats={{
           timeGutterFormat: "HH:mm",
           dayHeaderFormat: "DD MMMM dddd",
@@ -190,14 +291,14 @@ const InstructorSchedule = ({ lesson }) => {
           today: "Bugün",
           previous: "Önceki",
           next: "Sonraki",
-          day: "Gün",
+          day: "Günlük",
           week: "Hafta",
           month: "Ay",
           agenda: "Ajanda",
           date: "Tarih",
           time: "Saat",
           event: "Etkinlik",
-          work_week: "Çalışma Haftası",
+          work_week: "Haftalık",
         }}
         onSelectEvent={handleSelectEvent}
       />
@@ -224,84 +325,104 @@ const InstructorSchedule = ({ lesson }) => {
       </Modal>
 
       {/* Sınıf Değiştirme Modalı */}
-      <Modal show={showChangeClassModal} onHide={handleCloseChangeClassModal}>
+      <Modal size="xl" show={showChangeClassModal} onHide={handleCloseChangeClassModal}>
         <Modal.Header closeButton>
           <Modal.Title>Sınıfı Değiştir</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form>
-            <Form.Group>
-              <Form.Label>Yeni Sınıf</Form.Label>
+          <Row>
+            <Col md="6">
+              <div className="d-flex flex-wrap">
+                {showMessage && <div className="px-2" style={{ flex: "0 0 100%" }}>
+                  <p className="text-danger">Lütfen sınıf ve zaman seçiniz.</p>
+                </div>}
+                <br />
+                {selectedCard && (
+                  <div className="px-2" style={{ flex: "0 0 50%" }}>
+                    <p>Seçilen sınıf: {selectedCard.title}</p>
+                  </div>
+                )}
+                {lessonDetails.startTime && (
+                  <>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen başlangıç saati: {lessonDetails.startTime}</p>
+                    </div>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen bitiş saati: {lessonDetails.endTime}</p>
+                    </div>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen gün: {moment(lessonDetails.date).format("dddd")}</p>
+                    </div>
+                  </>
+                )}
 
-              <Form.Select name="newClass" value={newLocation} onChange={(e) => setNewLocation(e.target.value)}>
-                <option>Sınıf seçin</option>
-                <option value="L208">L208</option>
-                <option value="L305">L305</option>
-                <option value="L104">L104</option>
-                <option value="D204">D204</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-          <p> Seçilen başlangıç saati {lessonDetails.startTime}</p>
-          <p>Seçilen bitiş saati {lessonDetails.endTime}</p>
-          <p>Seçilen gün: {moment(lessonDetails.date).format("dddd")}</p>
-          <Button onClick={handleSave}>Kaydet</Button>
+              </div>
+              <div className="scrollable"> <ClassesList setSelectedCard={setSelectedCard} /></div>
+            </Col>
 
+            <Col md="6">
 
-
-          <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+            </Col>
+          </Row>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseChangeClassModal}>
             İptal
           </Button>
-          <Button variant="primary" onClick={handleSaveNewLocation}>
+          <Button variant="primary" onClick={handleSave}>
             Kaydet
           </Button>
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showExtraLessonModal} onHide={handleCloseExtraLessonModal}>
+      <Modal size="xl" show={showExtraLessonModal} onHide={handleCloseExtraLessonModal}>
         <Modal.Header closeButton>
           <Modal.Title>Ek Ders Ekle</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-         Ders adı: {selectedEvent?.title}
-         <Form>
-            <Form.Group>
-              <Form.Label>Yeni Sınıf</Form.Label>
+          Ders adı: {selectedEvent?.title}
+          <Row>
+            <Col md="6">
+              <div className="d-flex flex-wrap">
+                {showMessage && <div className="px-2" style={{ flex: "0 0 100%" }}>
+                  <p className="text-danger">Lütfen sınıf ve zaman seçiniz.</p>
+                </div>}
+                <br />
+                {selectedCard && (
+                  <div className="px-2" style={{ flex: "0 0 50%" }}>
+                    <p>Seçilen sınıf: {selectedCard.title}</p>
+                  </div>
+                )}
+                {lessonDetails.startTime && (
+                  <>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen başlangıç saati: {lessonDetails.startTime}</p>
+                    </div>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen bitiş saati: {lessonDetails.endTime}</p>
+                    </div>
+                    <div className="px-2" style={{ flex: "0 0 50%" }}>
+                      <p>Seçilen gün: {moment(lessonDetails.date).format("dddd")}</p>
+                    </div>
+                  </>
+                )}
 
-              <Form.Select name="newClass" value={newLocation} onChange={(e) => setNewLocation(e.target.value)}>
-                <option>Sınıf seçin</option>
-                <option value="L208">L208</option>
-                <option value="L305">L305</option>
-                <option value="L104">L104</option>
-                <option value="D204">D204</option>
-              </Form.Select>
-            </Form.Group>
-          </Form>
-          <p> Seçilen başlangıç saati {lessonDetails.startTime}</p>
-          <p>Seçilen bitiş saati {lessonDetails.endTime}</p>
-          <p>Seçilen gün: {moment(lessonDetails.date).format("dddd")}</p>
-          <Button onClick={handleExtraLesson}>Kaydet</Button>
+              </div>
+              <div className="scrollable"> <ClassesList setSelectedCard={setSelectedCard} /></div>
+            </Col>
 
-          <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+            <Col md="6">
+
+              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+            </Col>
+          </Row>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseExtraLessonModal}>
             İptal
           </Button>
-          <Button variant="primary" onClick={() => {
-            // Ek ders detaylarını kaydet
-            setBaseEvents([...baseEvents, {
-              title: lessonDetails.title,
-              start: moment(`${lessonDetails.date}T${lessonDetails.startTime}`).toDate(),
-              end: moment(`${lessonDetails.date}T${lessonDetails.endTime}`).toDate(),
-              location: lessonDetails.location,
-              rule: { freq: RRule.DAILY, interval: 1, count: 1 }, // Tek seferlik ders
-            }]);
-            handleCloseExtraLessonModal(); // Modal'ı kapat
-          }}>
+          <Button variant="primary" onClick={handleExtraLesson}>
             Kaydet
           </Button>
         </Modal.Footer>

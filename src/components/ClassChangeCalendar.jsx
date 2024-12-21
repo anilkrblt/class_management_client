@@ -34,15 +34,18 @@ const ClassChangeCalendar = ({ onDataSubmit, lessonName, } ) => {
     },
   ]);
 
+   const [message, setMessage] = useState (false)
+   const [message2, setMessage2] = useState (false)
+
   const handleSelectSlot = ({ start, end }) => {
     const now = new Date();
   
     // Geçmiş bir zamana etkinlik eklenemez
     if (start < now) {
-      alert('Geçmiş bir zamana etkinlik ekleyemezsiniz.');
+      setMessage(true)
       return;
     }
-  
+  setMessage(false)
     // Çakışma kontrolü
     const hasConflict = events.some(event => {
       return (
@@ -53,10 +56,11 @@ const ClassChangeCalendar = ({ onDataSubmit, lessonName, } ) => {
     });
   
     if (hasConflict) {
-      alert('Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.');
-      return;
+     // alert('Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.');
+     setMessage2(true)
+     return;
     }
-  
+    setMessage2(false)
     
     // Yeni etkinlik ekleme
  
@@ -89,6 +93,8 @@ console.log(events)
   console.log(events)
   return (
     <div style={{ height: '100vh' }}>
+      {message && <p className='text-danger'>Geçmiş bir zamana etkinlik ekleyemezsiniz.</p>}
+      {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.</p>}
       <Calendar
         localizer={localizer}
         events={events} // Tüm etkinlikleri göster

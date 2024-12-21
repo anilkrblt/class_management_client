@@ -8,6 +8,35 @@ const ComplaintsNew = () => {
     const [show, setShow] = useState(false);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
 
+    function formatToInitials(str) {
+        // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
+        const map = {
+          'ç': 'c',
+          'ğ': 'g',
+          'ı': 'i',
+          'İ': 'I',
+          'ö': 'o',
+          'ş': 's',
+          'ü': 'u',
+          'Ç': 'c',
+          'Ö': 'o',
+          'Ş': 's',
+          'Ğ': 'g',
+          'Ü': 'u',
+        };
+      
+        // Kelimeleri boşluktan ayırıyoruz
+        const words = str.split(' ');
+      
+        // İlk harfleri alıp küçük yaparak dönüştürme
+        const initials = words.map(word => {
+          const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
+          return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+        }).join('');
+      
+        return initials;
+      }
+
     const complaints = [
         { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
@@ -58,11 +87,12 @@ const ComplaintsNew = () => {
                    <Row className=" d-flex align-items-center justify-content-around w-100' ">
                        <Col md={1}>
                            <Image
-                               src={item.logo || "https://via.placeholder.com/50"}
-                               roundedCircle
-                               width={50}
-                               className="me-3"
-                           />
+                                 src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                 roundedCircle
+                                
+                                width={50}
+                                className="me-3"
+                            />
                        </Col>
                        <Col md={4} className='ms-2'>
                            <div>

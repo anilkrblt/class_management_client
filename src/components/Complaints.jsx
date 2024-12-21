@@ -28,7 +28,7 @@ const Complaints = () => {
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        
+
     ];
 
     const handleShow = (complaint) => {
@@ -40,6 +40,36 @@ const Complaints = () => {
         setShow(false);
         setSelectedComplaint(null);
     };
+
+    function formatToInitials(str) {
+        // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
+        const map = {
+          'ç': 'c',
+          'ğ': 'g',
+          'ı': 'i',
+          'İ': 'I',
+          'ö': 'o',
+          'ş': 's',
+          'ü': 'u',
+          'Ç': 'c',
+          'Ö': 'o',
+          'Ş': 's',
+          'Ğ': 'g',
+          'Ü': 'u',
+        };
+      
+        // Kelimeleri boşluktan ayırıyoruz
+        const words = str.split(' ');
+      
+        // İlk harfleri alıp küçük yaparak dönüştürme
+        const initials = words.map(word => {
+          const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
+          return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+        }).join('');
+      
+        return initials;
+      }
+    
 
     return (
         <Container className="bg-light rounded-4 ps-2 ">
@@ -53,8 +83,9 @@ const Complaints = () => {
                     >
                         <Card.Body className="d-flex align-items-center justify-content-around">
                             <Image
-                                src={item.logo || 'https://via.placeholder.com/50'}
-                                roundedCircle
+                                 src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                 roundedCircle
+                                
                                 width={50}
                                 className="me-3"
                             />
@@ -91,7 +122,7 @@ const Complaints = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={handleClose}>
-                    {selectedComplaint && ( selectedComplaint.class)} sınıfını kapat
+                        {selectedComplaint && (selectedComplaint.class)} sınıfını kapat
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat

@@ -7,26 +7,33 @@ import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { UserContext } from './UserContext';
 import ClassCalendarStudent from './ClassCalendarStudent';
 
-const Classes = ({col}) => {
+const Classes = ({ col }) => {
 
     const { userType } = useContext(UserContext);
 
-    const [events, setEvents] = useState([
+     const [events, setEvents] = useState([
         {
-            title: 'Toplantı',
-            start: new Date(2024, 10, 20, 13, 0), // 14 Kasım 2024, 10:00
-            end: new Date(2024, 10, 20, 15, 0),
-            type: 'Ders',
+          title: 'Mimari mimari mimari mimari',
+          start: new Date(2024, 11, 19, 10, 0), // 19 Aralık 2024, 10:00
+          end: new Date(2024, 11, 19, 13, 0),
+          type: "Bilgisayar Mühendisliği",
+          message: "Ali Duru"
         },
         {
-            title: 'Bilgisayar mimarisi',
-            start: new Date(2024, 10, 20, 16, 30), // 16 Aralık 2024, 13:30
-            end: new Date(2024, 10, 20, 18, 0), // 16 Aralık 2024, 15:00
-            type: 'Telafi dersi',
+          title: 'Yazılım Eğitimi',
+          start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
+          end: new Date(2024, 10, 14, 15, 0),
+          type: "Telafi dersi",
+          message: "Aylin Kaya"
         },
-    ]);
-
-    const [date, setDate] = useState("");
+        {
+          title: 'Etkinlik',
+          start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 16:00
+          end: new Date(2024, 10, 14, 17, 30),
+          type: "Etkinlik",
+          message: "Seminer: Yazılım Geliştirme"
+        },
+      ]);
 
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
@@ -53,8 +60,6 @@ const Classes = ({col}) => {
         { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar" },
         { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
         { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
-
-
     ];
 
     const handleCardClick = (card) => {
@@ -74,6 +79,7 @@ const Classes = ({col}) => {
         });
         setShowAddLesson(false);
     };
+
 
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value.toLowerCase());
@@ -108,6 +114,7 @@ const Classes = ({col}) => {
     const handleShowFilterModal = () => setShowFilterModal(true);
     const handleCloseFilterModal = () => setShowFilterModal(false);
 
+
     const handleDataFromChild = (value) => {
         // Update the lessonDetails with the received data
         setLessonDetails({
@@ -118,7 +125,11 @@ const Classes = ({col}) => {
             type: "Ek ders",
 
         });
+        setShowAddLesson(showAddLesson === false ? true : showAddLesson)
+
     };
+
+    const [selectedEvent, setSelectedEvent] = useState({ start: "", end: "", title: "seçilen" })
 
     const handleSaveLesson = () => {
         // Alanların boş olup olmadığını kontrol et
@@ -156,6 +167,8 @@ const Classes = ({col}) => {
         // Yeni etkinliği events array'ine ekle
         setEvents(prevEvents => [...prevEvents, newEvent]);
 
+        setSelectedEvent({ start: "", end: "", title: "seçilen" })
+
         // Ders detaylarını sıfırla
         setLessonDetails({
             title: "",
@@ -173,10 +186,10 @@ const Classes = ({col}) => {
 
 
     return (
-        <Container  className='w-100 bg-light'>
+        <Container className='w-100 bg-light'>
 
             <Row className="bg-light mb-3 py-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
-               
+
                 <Col>
                     <DropdownButton title="Tüm sınıflar">
                         <Dropdown.Item eventKey="1">Derslikler</Dropdown.Item>
@@ -195,7 +208,7 @@ const Classes = ({col}) => {
                             />
                         </Col>
                         <Col className="my-1" md={2}>
-                            <Icon.Funnel size={28} onClick={handleShowFilterModal} className='cursor-pointer'/>
+                            <Icon.Funnel size={28} onClick={handleShowFilterModal} className='cursor-pointer' />
                         </Col>
                     </Row>
                 </Col>
@@ -212,9 +225,9 @@ const Classes = ({col}) => {
                             <Col key={card.id} md={col} className="mb-4 ">
                                 <Card
                                     className={`py-3   ${card.text === "Sınıf kapalı" ? "hover-disable-card" : "cursor-pointer"} 
-                                    ${card.text === "Sınıf kapalı" ? "shadow-lg-danger" : card.text === "Boş" ? "shadow-sm-success"  :"" }`}
+                                    ${card.text === "Sınıf kapalı" ? "shadow-lg-danger" : card.text === "Boş" ? "shadow-sm-success" : ""}`}
                                     onClick={() => card.text === "Sınıf kapalı" ? null : handleCardClick(card)}
-                                    style={{height:"20vh"}}
+                                    style={{ height: "20vh" }}
                                 >
                                     <Card.Body>
                                         <Row className='row-cols-auto '>
@@ -241,7 +254,7 @@ const Classes = ({col}) => {
                                             </Col>
                                         </Row>
 
-                                        <Card.Text className={`fw-light fw-bold ${card.text === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success"  :"text-muted" }`}>
+                                        <Card.Text className={`fw-light fw-bold ${card.text === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
                                             {card.text}
                                         </Card.Text>
 
@@ -328,9 +341,14 @@ const Classes = ({col}) => {
                         <Modal.Title>{selectedCard.title}</Modal.Title>
                     </Modal.Header>
                     <Modal.Header>
-                        {selectedCard.text2} - Bilgisayar Mühendisliği
-                        <br /> Bitiş saati <b>13:00</b>
+                        {selectedCard.text === "Ders işleniyor" && (
+                            <>
+                                {selectedCard.text2} - Bilgisayar Mühendisliği - <b>13:00</b>
+
+                            </>
+                        )}
                     </Modal.Header>
+
                     <Modal.Body>
 
                         {userType !== "student" && <Button
@@ -351,35 +369,45 @@ const Classes = ({col}) => {
                                         onChange={handleLessonDetailsChange}
                                     />
                                 </Form.Group>
-                                <Form.Group controlId="formDate">
-                                    <Form.Label>Tarih</Form.Label>
-                                    <Form.Control
-                                        type="date"
-                                        name="date"
-                                        value={lessonDetails.date}
-                                        onChange={handleLessonDetailsChange}
-                                    />
-                                </Form.Group>
 
-                                <Form.Group controlId="formStartTime" className="mt-2">
-                                    <Form.Label>Başlangıç Saati</Form.Label>
-                                    <Form.Control
-                                        type="time"
-                                        name="startTime"
-                                        value={lessonDetails.startTime}
-                                        onChange={handleLessonDetailsChange}
-                                    />
-                                </Form.Group>
+                                <Row>
+                                    <Col>
+                                        <Form.Group controlId="formDate">
+                                            <Form.Label>Tarih</Form.Label>
+                                            <Form.Control
+                                                type="date"
+                                                name="date"
+                                                value={lessonDetails.date}
+                                                onChange={handleLessonDetailsChange}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col>
+                                        <Form.Group controlId="formStartTime" className="mt-2">
+                                            <Form.Label>Başlangıç Saati</Form.Label>
+                                            <Form.Control
+                                                type="time"
+                                                name="startTime"
+                                                value={lessonDetails.startTime}
+                                                onChange={handleLessonDetailsChange}
+                                            />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col>
+                                        <Form.Group controlId="formEndTime" className="mt-2">
+                                            <Form.Label>Bitiş Saati</Form.Label>
+                                            <Form.Control
+                                                type="time"
+                                                name="endTime"
+                                                value={lessonDetails.endTime}
+                                                onChange={handleLessonDetailsChange}
+                                            />
+                                        </Form.Group>
+                                    </Col>
 
-                                <Form.Group controlId="formEndTime" className="mt-2">
-                                    <Form.Label>Bitiş Saati</Form.Label>
-                                    <Form.Control
-                                        type="time"
-                                        name="endTime"
-                                        value={lessonDetails.endTime}
-                                        onChange={handleLessonDetailsChange}
-                                    />
-                                </Form.Group>
+                                </Row>
+
+
 
                                 <Button
                                     variant="success"
@@ -390,7 +418,16 @@ const Classes = ({col}) => {
                                 </Button>
                             </Form>
                         )}
-                        {userType === "student" ? <ClassCalendarStudent /> : <ClassCalendar onDataSubmit={handleDataFromChild} lessonName={lessonDetails.title} lesson={lessonDetails} events={events} setEvents={setEvents} />}
+                        {userType === "student"
+                            ? <ClassCalendarStudent />
+                            : <ClassCalendar
+                                onDataSubmit={handleDataFromChild}
+                                lessonName={lessonDetails.title}
+                                lesson={lessonDetails}
+                                events={events}
+                                setEvents={setEvents}
+                                selectedEvent={selectedEvent}
+                                setSelectedEvent={setSelectedEvent} />}
 
                     </Modal.Body>
                 </Modal>

@@ -64,19 +64,48 @@ const ComplaintsOld = () => {
         );
     }
 
+    function formatToInitials(str) {
+        // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
+        const map = {
+            'ç': 'c',
+            'ğ': 'g',
+            'ı': 'i',
+            'İ': 'I',
+            'ö': 'o',
+            'ş': 's',
+            'ü': 'u',
+            'Ç': 'c',
+            'Ö': 'o',
+            'Ş': 's',
+            'Ğ': 'g',
+            'Ü': 'u',
+        };
+
+        // Kelimeleri boşluktan ayırıyoruz
+        const words = str.split(' ');
+
+        // İlk harfleri alıp küçük yaparak dönüştürme
+        const initials = words.map(word => {
+            const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
+            return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+        }).join('');
+
+        return initials;
+    }
+
     return (
         <Container className="bg-light rounded-4  ps-2">
             <div className=" text-center sticky-top bg-light" style={{ zIndex: 10 }}>
-            <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
-            {/* Yıl seçimi için Pagination */}
-            <div className="d-flex justify-content-left align-items-center">
-                <Pagination className="mb-3" >{items}</Pagination>
-                <Button variant="link" onClick={showAll} className="ms-3">
-                    Tümü
-                </Button>
+                <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
+                {/* Yıl seçimi için Pagination */}
+                <div className="d-flex justify-content-left align-items-center">
+                    <Pagination className="mb-3" >{items}</Pagination>
+                    <Button variant="link" onClick={showAll} className="ms-3">
+                        Tümü
+                    </Button>
+                </div>
             </div>
-            </div>
-            
+
             <ListGroup className="ms-1">
                 {oldComplaints
                     .filter((item) => selectedYears.length === 0 || selectedYears.includes(item.year)) // Yıl filtresi
@@ -92,8 +121,9 @@ const ComplaintsOld = () => {
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
                                 <Col md={1}>
                                     <Image
-                                        src={item.logo || "https://via.placeholder.com/50"}
+                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
                                         roundedCircle
+
                                         width={50}
                                         className="me-3"
                                     />
@@ -130,7 +160,7 @@ const ComplaintsOld = () => {
                     <Modal.Title>Şikayet Detayları</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Alert  variant="success">
+                    <Alert variant="success">
                         Şikayet çözüldü <strong>Sınıf kapatıldı</strong>
                     </Alert>
                     {selectedComplaint && (
@@ -141,7 +171,7 @@ const ComplaintsOld = () => {
                             <p><strong>Şikayet Tarihi:</strong></p>
                             <p><strong>Şikayet Açıklaması:</strong> Türkiye, resmî adıyla Türkiye Cumhuriyeti, topraklarının büyük bölümü Batı Asya'da Anadolu'da, diğer bir bölümü ise Güneydoğu Avrupa'nın uzantısı Doğu Trakya'da olan kıtalararası bir ülkedir. Batıda Bulgaristan ve Yunanistan, doğuda Gürcistan, Ermenistan, İran ve Azerbaycan, güneyde ise Irak ve Suriye ile sınır komşusudur. Güneyini Kıbrıs ve Akdeniz, batısını Ege Denizi, kuzeyini ise Karadeniz çevreler. Marmara Denizi ise İstanbul Boğazı ve Çanakkale Boğazı ile birlikte Anadolu'yu Trakya'dan, yani Asya'yı Avrupa'dan ayırır. Resmî olarak laik bir devlet olan Türkiye'de nüfusun çoğunluğu Müslüman'dır. Ankara, Türkiye'nin başkenti ve ikinci en kalabalık şehri; İstanbul ise, Türkiye'nin en kalabalık şehri, ekonomik ve finansal merkezi ve aynı zamanda Avrupa'nın en kalabalık şehridir.</p>
                             <p><strong>Fotoğraflar:</strong> </p> <Image src="/tu_logo.jpg" />
-                             
+
                         </>
                     )}
                 </Modal.Body>

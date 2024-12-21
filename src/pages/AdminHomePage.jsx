@@ -6,22 +6,27 @@ import Schedule from "../components/Schedule"
 import Classes from "../components/Classes"
 import Complaints from "../components/Complaints";
 import { locale } from "moment";
+import { Helmet } from 'react-helmet';
 
 const AdminHomePage = () => {
-    const {userType, setUserType } = useContext(UserContext);
-    
+    const { userType, setUserType } = useContext(UserContext);
+
     useEffect(() => {
         setUserType("admin");
-      }, [setUserType]);
+    }, [setUserType]);
 
     return <Container >
+        <Helmet>
+            <title>Ana Sayfa</title>
+        </Helmet>
+
         <Navbarx />
         <Row style={{ marginTop: "100px" }} className="homepage justify-content-around" >
             <Col className=" scrollable bg-light rounded-4 mt-4 " md={7}  ><Classes col={6} /></Col>
-            
+
             <Col md={4} className=" scrollable bg-light rounded-4 mt-4 ">
-                <Complaints/>
-                
+                <Complaints />
+
             </Col>
         </Row>
     </Container>

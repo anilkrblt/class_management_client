@@ -1,6 +1,7 @@
 import React from "react";
 import { ListGroup, Card, Container, Accordion } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
+import * as Icon from 'react-bootstrap-icons';
 
 const Schedule = () => {
   const schedule = [
@@ -35,6 +36,26 @@ const Schedule = () => {
     },
   ];
 
+  function turkishToLatin(str) {
+    const map = {
+      'ç': 'c',
+      'ğ': 'g',
+      'ı': 'i',
+      'İ': 'I',
+      'ö': 'o',
+      'ş': 's',
+      'ü': 'u',
+      'Ç': 'c',
+      'Ö': 'o',
+      'Ş': 's', 
+      'Ğ': 'g', 
+      'Ü': 'u', 
+    };
+  
+    return str.replace(/[çğıİöşüÇÖŞĞÜ]/g, match => map[match] || match).toLowerCase();
+  }
+  
+
   return (
     <Container className="bg-light rounded-4 schedule ps-2">
       <h2 className="my-4 text-center">Ders Programı</h2>
@@ -53,7 +74,7 @@ const Schedule = () => {
                   <Accordion.Header className="" >
                     <div className="d-flex align-items-center w-100 ">
                       <Image
-                        src={item.logo}
+                        src={`https://cdn.auth0.com/avatars/${turkishToLatin(item.day[0])}.png`} 
                         roundedCircle
                         width={50}
                         className="me-3"
@@ -61,7 +82,7 @@ const Schedule = () => {
                       <div>
                         <Card.Title className="text-start">{item.day}</Card.Title>
                         <Card.Text className="text-start">
-                          {item.lessons.length} adet dersiniz var
+                         <Icon.PlusSquare/> {item.lessons.length} adet dersiniz var
                         </Card.Text>
                       </div>
                     </div>
@@ -69,7 +90,7 @@ const Schedule = () => {
                   <Accordion.Body className="px-3 py-2">
                     {item.lessons.map((lesson, idx) => (
                       <Card.Text className="text-start" key={idx}>
-                        {lesson.lesson.length === 0 && <h2>ders oyk</h2>}  {lesson.class} - {lesson.lesson} ({lesson.hours})
+                        {lesson.lesson.length === 0 && <h2>Ders yok</h2>}  <Icon.Building /> {lesson.class} <Icon.JournalText/> {lesson.lesson} <Icon.Clock/> {lesson.hours}
                       </Card.Text>
                     ))}
                   </Accordion.Body>
@@ -82,20 +103,25 @@ const Schedule = () => {
                 <Card.Body className="d-flex align-items-center">
 
                   <Image
-                    src={item.logo}
+                    src={`https://cdn.auth0.com/avatars/${turkishToLatin(item.day[0])}.png`}
                     roundedCircle
                     width={50}
                     className='me-3'
                   />
                   <div>
                     <Card.Title className="text-start">{item.day}</Card.Title>
-                    <Card.Text className="text-start">
+                    <Card.Text className="text-start align-items-center justify-content-between">
                       {item.lessons.length !== 0 ? (
-                        `${item.lessons.class} - ${item.lessons.lesson} ${item.lessons.hours}`
+                        <>
+                          <Icon.Building /> {item.lessons.class} <Icon.JournalText/> {item.lessons.lesson} <Icon.Clock/> {item.lessons.hours}
+                         
+                        </>
                       ) : (
-                        <>Dersiniz yok</>
+                        <>
+                        <Icon.XSquare/> Dersiniz yok</>
                       )}
                     </Card.Text>
+
                   </div>
                 </Card.Body>
               </Card>

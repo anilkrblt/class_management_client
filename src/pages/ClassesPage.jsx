@@ -1,9 +1,13 @@
 import { Container } from "react-bootstrap"
 import Navbarx from "../components/Navbar"
 import Classes from "../components/Classes"
+import { Helmet } from 'react-helmet';
 
 const ClassesPage = () => {
     return <Container>
+        <Helmet>
+            <title>Sınıflar</title>
+        </Helmet>
         <Navbarx />
         <div
             className="bg-light rounded-4 py-2"

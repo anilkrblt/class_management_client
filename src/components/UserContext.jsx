@@ -3,10 +3,14 @@ import React, { createContext, useState, useEffect } from "react";
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
-  const [userType, setUserType] = useState(localStorage.getItem('userType') || "student");
+  const [userType, setUserType] = useState(() => {
+    return localStorage.getItem('userType') || null;
+  });
 
   useEffect(() => {
-    localStorage.setItem('userType', userType);
+    if (userType !== null) {
+      localStorage.setItem('userType', userType);
+    }
   }, [userType]);
 
   return (

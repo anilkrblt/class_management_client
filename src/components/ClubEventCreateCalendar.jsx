@@ -3,8 +3,6 @@ import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/tr'; // Türkçe lokali içe aktar
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Container } from 'react-bootstrap';
-import * as Icon from 'react-bootstrap-icons';
 
 // Moment.js'i Türkçe kullanacak şekilde ayarla
 moment.locale('tr');
@@ -12,12 +10,33 @@ moment.locale('tr');
 // Moment.js'yi takvime bağlamak için
 const localizer = momentLocalizer(moment);
 
-const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSelectedEvent  } ) => {
+const ClubEventCreateCalendar = ({ setSelectedTime } ) => {
 
-  const [view, setView] = useState('day');
+    const [events, setEvents] = useState([
+        {
+          title: 'Toplantı',
+          start: new Date(2024, 10, 14, 10, 0), // 14 Kasım 2024, 10:00
+          end: new Date(2024, 10, 14, 11, 0),
+          type: 'Ders',
+        },
+        {
+          title: 'Yazılım Eğitimi',
+          start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
+          end: new Date(2024, 10, 14, 15, 0),
+          type: 'Telafi dersi',
+        },
+        {
+          title: 'Yazılım Eğitimi',
+          start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 16:00
+          end: new Date(2024, 10, 14, 17, 30),
+          type: 'Etkinlik',
+        },
+      ]);
+    
+
  const [message, setMessage] = useState (false)
  const [message2, setMessage2] = useState (false)
-
+ const [selectedEvent, setSelectedEvent] = useState(null)
 
   const handleSelectSlot = ({ start, end }) => {
     const now = new Date();
@@ -49,9 +68,7 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
     console.log(start)
 
    // setSelectedEvent({start:start , end:end , title: "seçilen"})
-    if(!lessonName){
-      //lessonName = window.prompt("Ders")
-    }
+  
     // Yeni etkinlik ekleme
  
   
@@ -64,15 +81,10 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
   
     // setEvents([...events, newEvent]);
   
-    // Üst bileşene veri gönder
-    onDataSubmit({
-      date: moment(start).format('YYYY-MM-DD'),
-      startTime: moment(start).format('HH:mm'),
-      endTime: moment(end).format('HH:mm'),
-    }
-  );
+
+
   setSelectedEvent({start:start , end:end , title: "Seçtiğiniz zaman"})
-  
+  setSelectedTime({start:start, end:end})
   };
   
   
@@ -82,51 +94,17 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
   minTime.setHours(8, 0, 0); // Minimum saati 08:00 olarak ayarla
   maxTime.setHours(22, 0, 0); // Maksimum saati 22:00 olarak ayarla
 
-  const EventComponent = ({ event }) => {
-    // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
-    if (view === 'day') {
-      return (
-        <Container className="d-flex flex-column align-items-center">
-          <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size={25} />
-            <strong className="fs-2 ms-2">{event.title}</strong>
-          </div>
-          <div className="mb-2 d-flex align-items-center">
-
-            <Icon.PcDisplay size={25} />
-            <span className='fs-4 ms-2'>{event.type}</span>
-          </div>
-          <div className="d-flex align-items-center">
-            <Icon.PersonFill className="me-1" size={20} />
-            <span className='fs-4 fw-semibold'>{event.message}</span>
-          </div>
-        </Container>
-      );
-    }
-
-    // Diğer görünümler için sadece başlık göster
-    return <Container className="d-flex flex-column">
-      <div className="d-flex align-items-center mb-2">
-        <strong className="ms-2">{event.title}</strong>
-      </div>
-      <div className="mb-2 d-flex align-items-center">
-        {event.type}
-      </div>
-      {event.message}
-    </Container>
-  };
   
   return (
     <div style={{ height: '100vh' }}>
-      {message && <p className='text-danger'>Geçmiş bir zamana ders ekleyemezsiniz.</p>}
-      {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor</p>}
+      {message && <p className='text-danger'>Geçmiş bir zamana etkinlik ekleyemezsiniz.</p>}
+      {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.</p>}
 
       <Calendar
         localizer={localizer}
         events={[...events, selectedEvent]} // Tüm etkinlikleri göster
         step={30}
         views={{ work_week: true, day: true }}
-        onView={(view) => setView(view)}
         defaultView="day"
         selectable={true} // Takvimde aralık seçimi yapılabilsin
         onSelectSlot={handleSelectSlot} // Slot seçimi fonksiyonu
@@ -142,7 +120,11 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
             `${moment(start).format('HH:mm')} - ${moment(end).format('HH:mm')}`,
         }}
         components={{
-          event: EventComponent, // Özel etkinlik bileşeni
+          event: ({ event }) => (
+            <span>
+              <strong>{event.title}</strong>
+            </span>
+          ),
         }}
         messages={{
           today: 'Bugün',
@@ -162,4 +144,4 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
   );
 };
 
-export default ClassCalendar;
+export default ClubEventCreateCalendar;
