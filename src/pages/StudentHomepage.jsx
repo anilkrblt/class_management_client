@@ -6,6 +6,7 @@ import Classes from "../components/Classes"
 import { useContext, useEffect } from "react"
 import { UserContext } from "../components/UserContext"
 import { Helmet } from 'react-helmet';
+import StudentExams from "../components/StudentExams"
 
 const StudentHomePage = () => {
 
@@ -23,7 +24,7 @@ const StudentHomePage = () => {
     <Navbarx />
     <Row style={{ marginTop: "100px" }} className="homepage " >
       <Col className=" scrollable bg-light rounded-4 mt-4 " md={7} ><Classes col={6} /></Col>
-      <Col md={5}><Schedule /></Col>
+      <Col md={5}><StudentExams /></Col>
     </Row>
   </Container>
 }

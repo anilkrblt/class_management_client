@@ -66,11 +66,12 @@ const EventComponent = ({ event }) => {
   return (
     <Container className="d-flex flex-column align-items-center ">
       <div className="d-flex align-items-center ">
-       <span className="fs-5 fw-semibold">{event.title}</span> 
+       <span className="fw-bolder lh-sm" style={{fontSize:"1.8vw"}}>{event.title}</span> 
       </div>
       <div className=" d-flex align-items-center mt-2">
-        <span className='fs-5 fw-semibold'>L208 Tolga Sakallı{event.instructor}</span>
+        <span className='fw-semibold' style={{fontSize:"1.4vw"}}>L208 Tolga Sakallı{event.instructor}</span>
       </div>
+      
      
     </Container>
   );

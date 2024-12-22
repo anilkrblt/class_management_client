@@ -31,6 +31,7 @@ let menusAdmin = [
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
   { name: "Dersler", href: "/dersler", icon: <Icon.LayersFill size={20} />, disableIcon: <Icon.Layers /> },
   { name: "Sınıf yönetimi", href: "/sınıfyonetimi" },
+  { name: "Kulüpler", href: "/kulüpler", icon: <Icon.LightningChargeFill size={20} />, disableIcon: <Icon.LightningCharge /> },
   { name: "Şikayetler", href: "/şikayetler" },
 ];
 

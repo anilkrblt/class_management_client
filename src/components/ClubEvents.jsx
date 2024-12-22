@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Card, Col, Container, Image, Modal, Row, Button, Form, Alert } from "react-bootstrap";
 import ClassesList from "./ClassesList";
 import ClassCalendarStudent from "./ClassCalendarStudent";
 import ClubEventCreateCalendar from "./ClubEventCreateCalendar";
 import moment from 'moment';
 import 'moment/locale/tr';
+import { Link, useNavigate } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 moment.locale('tr');
 
@@ -15,6 +17,8 @@ const events = [
 ];
 
 const ClubEvents = () => {
+    const { userType } = useContext(UserContext);
+
     const [showModal, setShowModal] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewEventModal, setShowNewEventModal] = useState(false);
@@ -111,11 +115,16 @@ const ClubEvents = () => {
 
     const formattedDate = `${start} - ${end}`;
 
+    const navigate = useNavigate();
+
     return (
         <Container className="bg-light rounded-4">
             <Row className="justify-content-start align-items-center">
                 <Col md="auto"><h3 className="sticky-top bg-light">Henüz gerçekleşmeyen kulüp etkinlikleri</h3></Col>
                 <Col md="auto"><Button variant="outline-success" onClick={handleShowNewEventModal}>Yeni etkinlik oluştur</Button></Col>
+              {userType === "admin" &&
+              <Col md="auto"><Button variant="outline-success" onClick={()=>{navigate("/kulüpler-rezervasyon")}}>Etkinlik İstekleri</Button></Col>
+              }  
             </Row>
 
             <Row>
@@ -140,7 +149,7 @@ const ClubEvents = () => {
                                     <Col md={9}>
                                         <div className="twinkle-star-regular text-center">{event.eventsDate}</div>
                                         <div
-                                            className="twinkle-star-regular"
+                                            className="d-flex twinkle-star-regular"
                                             style={{
                                                 fontSize:
                                                     event.eventsName.length <= 22

@@ -145,8 +145,13 @@ const InstructorSchedule = ({ lesson }) => {
       console.log(updatedEvents);
 
       // State'i güncelle
-      setBaseEvents(updatedEvents);
+      setBaseEvents(updatedEvents); //? şüpheli
+      setEvents(updatedEvents.flatMap(event =>
+        generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
+      ));
       setShowChangeClassModal(false); // Modal'ı kapat
+      console.log(updatedEvents);
+      
     }
     else {
       setShowMessage(true)
@@ -163,6 +168,7 @@ const InstructorSchedule = ({ lesson }) => {
 
     })
   };
+console.log(baseEvents);
 
   const handleCancelLesson = () => {
 
@@ -217,9 +223,15 @@ const InstructorSchedule = ({ lesson }) => {
       }]
 
       // State'i güncelle
-      setBaseEvents(updatedEvents);
-      // console.log("Güncellenmiş Etkinlikler:", updatedEvents);
+    //  setBaseEvents(updatedEvents);
+       console.log("Güncellenmiş Etkinlikler:", updatedEvents);
       // setShowChangeClassModal(false); // Modal'ı kapat
+
+      setEvents(updatedEvents.flatMap(event =>
+        generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
+      ));
+      console.log(events);
+      
 
       handleCloseExtraLessonModal(
 
@@ -246,13 +258,13 @@ const InstructorSchedule = ({ lesson }) => {
     return (
       <Container className="d-flex flex-column align-items-center">
         <div className="d-flex align-items-center ">
-          <span className="fs-5 fw-semibold">{event.title}</span>
+          <span className=" fw-bolder lh-sm" style={{fontSize:"1.8vw"}}>{event.title}</span>
         </div>
         <div className=" d-flex align-items-center mt-2">
-          <span className='fs-5 fw-semibold'>{event.location}</span>
+          <span className='fw-semibold' style={{fontSize:"1.5vw"}}>{event.location}</span>
         </div>
         <div className=" d-flex align-items-center mt-2">
-          <span className='fs-5 fw-semibold'>{event.text}</span>
+          <span className='fs-5 fw-medium'>{event.text}</span>
         </div>
        
 
@@ -312,9 +324,20 @@ const InstructorSchedule = ({ lesson }) => {
           <p><strong>Başlangıç:</strong> {moment(selectedEvent?.start).format("DD MMMM YYYY, HH:mm")}</p>
           <p><strong>Bitiş:</strong> {moment(selectedEvent?.end).format("DD MMMM YYYY, HH:mm")}</p>
           <p><strong>Sınıf:</strong> {selectedEvent?.location}</p>
-          <Button onClick={handleOpenChangeClassModal}>Sınıfı değiştir</Button>
-          <Button onClick={handleCancelLesson}>İptal et</Button>
-          <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
+          <Row className="d-flex justify-content-center">
+            <Col md="auto">
+              <Button onClick={handleOpenChangeClassModal}>Sınıfı değiştir</Button>
+            </Col>
+            <Col md="auto">
+            <Button onClick={handleCancelLesson}>İptal et</Button>
+            </Col>
+            <Col md="auto">
+            <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
+            </Col>
+          </Row>
+          
+          
+          
 
         </Modal.Body>
         <Modal.Footer>

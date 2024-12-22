@@ -11,29 +11,29 @@ const Classes = ({ col }) => {
 
     const { userType } = useContext(UserContext);
 
-     const [events, setEvents] = useState([
+    const [events, setEvents] = useState([
         {
-          title: 'Mimari mimari mimari mimari',
-          start: new Date(2024, 11, 19, 10, 0), // 19 Aralık 2024, 10:00
-          end: new Date(2024, 11, 19, 13, 0),
-          type: "Bilgisayar Mühendisliği",
-          message: "Ali Duru"
+            title: 'Mimari mimari mimari mimari',
+            start: new Date(2024, 11, 19, 10, 0), // 19 Aralık 2024, 10:00
+            end: new Date(2024, 11, 19, 13, 0),
+            type: "Bilgisayar Mühendisliği",
+            message: "Ali Duru"
         },
         {
-          title: 'Yazılım Eğitimi',
-          start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
-          end: new Date(2024, 10, 14, 15, 0),
-          type: "Telafi dersi",
-          message: "Aylin Kaya"
+            title: 'Yazılım Eğitimi',
+            start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
+            end: new Date(2024, 10, 14, 15, 0),
+            type: "Telafi dersi",
+            message: "Aylin Kaya"
         },
         {
-          title: 'Etkinlik',
-          start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 16:00
-          end: new Date(2024, 10, 14, 17, 30),
-          type: "Etkinlik",
-          message: "Seminer: Yazılım Geliştirme"
+            title: 'Etkinlik',
+            start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 16:00
+            end: new Date(2024, 10, 14, 17, 30),
+            type: "Etkinlik",
+            message: "Seminer: Yazılım Geliştirme"
         },
-      ]);
+    ]);
 
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
@@ -42,8 +42,11 @@ const Classes = ({ col }) => {
     const [filterOptions, setFilterOptions] = useState({
         capacity: '',
         projection: '',
+        isActive: '',
+        isEmpty: '',
         classType: ''
     });
+
     const [showAddLesson, setShowAddLesson] = useState(false); // Ek ders formunun görünürlüğü
     const [lessonDetails, setLessonDetails] = useState({
         title: '',
@@ -55,11 +58,11 @@ const Classes = ({ col }) => {
     });
 
     const cards = [
-        { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik" },
-        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik" },
-        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar" },
-        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar" },
-        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik" },
+        { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
+        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
+        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
     ];
 
     const handleCardClick = (card) => {
@@ -100,8 +103,32 @@ const Classes = ({ col }) => {
         card.title.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
         (filterOptions.projection ? card.projection === (filterOptions.projection === "true") : true) &&
+        (filterOptions.isActive ? card.isActive === (filterOptions.isActive === "true") : true) &&
+        (filterOptions.isEmpty ? card.isEmpty === (filterOptions.isEmpty === "true") : true) &&
         (filterOptions.classType ? card.classType === filterOptions.classType : true)
     );
+
+    console.log(filterOptions.projection)
+    const filterText = `
+    ${filterOptions.capacity !== ''
+            ? `kapasitesi en az ${filterOptions.capacity} kişilik,` : ""}
+
+    ${filterOptions.classType !== ''
+            ? `${filterOptions.classType} türünde,` : ""}
+
+    ${filterOptions.projection !== ''
+            ? `projeksiyonu ${filterOptions.projection === "true" ? "bulunan," : "bulunmayan,"} ` : ""}
+     ${filterOptions.isEmpty !== ''
+            ? `şu anda ${filterOptions.isEmpty === "true" ? "boş," : "dolu,"} ` : ""}
+              ${filterOptions.isActive !== ''
+            ? `kullanıma ${filterOptions.isActive === "true" ? "açık," : "kapalı,"} ` : ""}
+
+          ${Object.values(filterOptions).every((value) => value === "")
+            ? "tüm sınıflar"
+            : "olan sınıflar"
+        }
+    `
+
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -191,10 +218,8 @@ const Classes = ({ col }) => {
             <Row className="bg-light mb-3 py-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
 
                 <Col>
-                    <DropdownButton title="Tüm sınıflar">
-                        <Dropdown.Item eventKey="1">Derslikler</Dropdown.Item>
-                        <Dropdown.Item eventKey="2">Laboratuvarlar</Dropdown.Item>
-                    </DropdownButton>
+                    <h2 className='ps-2'>Sınıflar</h2>
+                    
                 </Col>
                 <Col>
                     <Row>
@@ -215,6 +240,7 @@ const Classes = ({ col }) => {
             </Row>
 
             <Row>
+                <p>{filterText}</p>
                 {
                     filteredCards.length === 0 ? (
                         <Col className='text-center'>
@@ -224,9 +250,10 @@ const Classes = ({ col }) => {
                         filteredCards.map((card) => (
                             <Col key={card.id} md={col} className="mb-4 ">
                                 <Card
-                                    className={`py-3   ${card.text === "Sınıf kapalı" ? "hover-disable-card" : "cursor-pointer"} 
-                                    ${card.text === "Sınıf kapalı" ? "shadow-lg-danger" : card.text === "Boş" ? "shadow-sm-success" : ""}`}
-                                    onClick={() => card.text === "Sınıf kapalı" ? null : handleCardClick(card)}
+                                    className={`py-3 ${card.isActive ? "cursor-pointer" : "hover-disable-card"} 
+                                     ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}`}
+
+                                    onClick={() => !card.isActive ? null : handleCardClick(card)}
                                     style={{ height: "20vh" }}
                                 >
                                     <Card.Body>
@@ -311,6 +338,33 @@ const Classes = ({ col }) => {
                             </Form.Control>
                         </Form.Group>
 
+                        <Form.Group controlId="formisActive">
+                            <Form.Label>Açık/Kapalı Sınıf</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="isActive"
+                                value={filterOptions.isActive}
+                                onChange={handleFilterChange}
+                            >
+                                <option value="">Tümü</option>
+                                <option value={true}>Açık sınıflar</option>
+                                <option value={false}>Kapalı sınıflar</option>
+                            </Form.Control>
+                        </Form.Group>
+                        <Form.Group controlId="formisempty">
+                            <Form.Label>Boş/Dolu Sınıf</Form.Label>
+                            <Form.Control
+                                as="select"
+                                name="isEmpty"
+                                value={filterOptions.isEmpty}
+                                onChange={handleFilterChange}
+                            >
+                                <option value="">Tümü</option>
+                                <option value={true}>Boş sınıflar</option>
+                                <option value={false}>Dolu sınıflar</option>
+                            </Form.Control>
+                        </Form.Group>
+
                         <Form.Group controlId="formProjection">
                             <Form.Label>Projeksiyon</Form.Label>
                             <Form.Control
@@ -320,8 +374,8 @@ const Classes = ({ col }) => {
                                 onChange={handleFilterChange}
                             >
                                 <option value="">Tümü</option>
-                                <option value="true">Var</option>
-                                <option value="false">Yok</option>
+                                <option value={true}>Var</option>
+                                <option value={false}>Yok</option>
                             </Form.Control>
                         </Form.Group>
 
@@ -353,7 +407,7 @@ const Classes = ({ col }) => {
 
                         {userType !== "student" && <Button
                             variant="outline-primary"
-                            className="mt-3"
+                            className="mb-2"
                             onClick={handleAddLessonClick}
                         >
                             Ek Ders Ekle

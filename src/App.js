@@ -22,6 +22,8 @@ import ClubEventsOld from './components/ClubEventsOld';
 import ClubEventsPage from './pages/ClubEventsPage';
 import ClassReservationRequests from './components/ClassReservationRequests';
 import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
+import LessonPlaning from './components/LessonPlaning';
+import StudentExams from './components/StudentExams';
 
 const App = () => {
 
@@ -106,7 +108,8 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<ErrorPage />} />
+        <Route path="*" element={<StudentExams />} />
+
         <Route
           path="/profil"
           element={
@@ -126,7 +129,7 @@ const App = () => {
        <Route
           path="/kulüpler-rezervasyon"
           element={
-            <PrivateRoute allowedRoles={["student", "admin", "instructor"]}>
+            <PrivateRoute allowedRoles={[ "admin"]}>
               <ClassReservationRequestsPage />
             </PrivateRoute>
           }

@@ -5,7 +5,8 @@ import ClassReservationRequests from "../components/ClassReservationRequests"
 const ClassReservationRequestsPage = () => {
     return <Container>
         <Navbarx/>
-        <div style={{ marginTop: "120px" }}>
+        <div style={{ marginTop: "120px" }} 
+        className="scrollable bg-light rounded-4" >
             <ClassReservationRequests/>
         </div>
     </Container>

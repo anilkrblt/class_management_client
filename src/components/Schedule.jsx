@@ -57,7 +57,7 @@ const Schedule = () => {
   
 
   return (
-    <Container className="bg-light rounded-4 schedule ps-2">
+    <Container className="bg-light rounded-4 schedule px-2">
       <h2 className="my-4 text-center">Ders Programı</h2>
       <ListGroup className="ms-1">
 
@@ -98,7 +98,7 @@ const Schedule = () => {
               </Accordion.Item>
               : <Card
                 key={index}
-                className="my-1"
+                className="my-2"
                 style={{ backgroundColor: index % 2 === 0 ? '#fef7ff' : 'white' }}>
                 <Card.Body className="d-flex align-items-center">
 

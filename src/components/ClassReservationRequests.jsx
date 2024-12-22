@@ -11,7 +11,56 @@ const ClassReservationRequests = () => {
         { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
         { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
         { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
+        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
+        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
+        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
+        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
+        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
+        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
+        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
+        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
+        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
+        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
+        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
+        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
+        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
+        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
+        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
+        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
     ]);
+
+    function formatToInitials(str) {
+        // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
+        const map = {
+            'ç': 'c',
+            'ğ': 'g',
+            'ı': 'i',
+            'İ': 'I',
+            'ö': 'o',
+            'ş': 's',
+            'ü': 'u',
+            'Ç': 'c',
+            'Ö': 'o',
+            'Ş': 's',
+            'Ğ': 'g',
+            'Ü': 'u',
+        };
+
+        // Kelimeleri boşluktan ayırıyoruz
+        const words = str.split(' ');
+
+        // İlk harfleri alıp küçük yaparak dönüştürme
+        const initials = words.map(word => {
+            const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
+            return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+        }).join('');
+
+        return initials;
+    }
 
     const handleShowModal = (request) => {
         setSelectedRequest(request);
@@ -32,7 +81,7 @@ const ClassReservationRequests = () => {
 
     return (
         <Container className='rounded-4 bg-light pb-2'>
-            <h2 className="my-4 text-center">Kulüp rezervasyon istekleri</h2>
+            <h2 className="my-3 text-center sticky-top bg-light" style={{ zIndex: 10 }}>Kulüp Rezervasyon İstekleri</h2>
             {requests.length > 0 ? (
                 requests.map((item, index) => (
                     <Card
@@ -41,6 +90,14 @@ const ClassReservationRequests = () => {
                         style={{ backgroundColor: index % 2 === 0 ? '#fff9ed' : 'white' }}
                     >
                         <Row className="d-flex align-items-center justify-content-between w-100">
+                            <Col md={1}>
+                                <Image
+                                    src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                    roundedCircle
+                                    width={50}
+                                    className="me-3"
+                                />
+                            </Col>
                             <Col md={3}>
                                 <Container className="pt-2">
                                     <h5>{item.name}</h5>
@@ -50,7 +107,7 @@ const ClassReservationRequests = () => {
                             <Col md={2}>
                                 <h3>{item.class}</h3>
                             </Col>
-                            <Col md={2}>
+                            <Col md={1}>
                                 <Col className="fs-4 fw-bold ms-2">15</Col>
                                 <Col className="fs-5 text-secondary">Kasım</Col>
                             </Col>

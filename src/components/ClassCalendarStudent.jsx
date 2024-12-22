@@ -59,35 +59,34 @@ const ClassCalendarStudent = () => {
       return (
         <Container className="d-flex flex-column align-items-center">
           <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size={25} />
-            <strong className="fs-2 ms-2">{event.title}</strong>
+            <Icon.Stack size="2.1vw" />
+            <strong className="ms-2" style={{fontSize:"2.1vw"}}>{event.title}</strong>
           </div>
           <div className="mb-2 d-flex align-items-center">
 
-            <Icon.PcDisplay size={25} />
-            <span className='fs-4 ms-2'>{event.type}</span>
+            <Icon.PcDisplay size="2.1vw" />
+            <span className='ms-2' style={{fontSize:"2vw"}}>{event.type}</span>
           </div>
-          <div className="d-flex align-items-center mt-4">
-            <Icon.PersonFill className="me-1" size={20} />
-            <span className='fs-4 fw-semibold'>{event.message}</span>
+          <div className="d-flex align-items-center">
+            <Icon.PersonFill className="me-1" size="1.8vw" />
+            <span className='fw-semibold' style={{fontSize:"1.5vw"}}>{event.message}</span>
           </div>
         </Container>
       );
     }
 
     // Diğer görünümler için sadece başlık göster
-    return <Container className="d-flex flex-column align-items-center mt-5">
+    return <Container className="d-flex flex-column">
       <div className="d-flex align-items-center mb-2">
-        <strong className="ms-2">{event.title}</strong>
+        <strong className="ms-2" style={{fontSize:"1vw"}}>{event.title}</strong>
       </div>
-      <div className="mb-2 d-flex align-items-center">
+      <div className="mb-2 d-flex align-items-center" style={{fontSize:"1vw"}}>
         {event.type}
       </div>
-
       {event.message}
-
     </Container>
   };
+  
 
   return (
     <div style={{ height: '100vh' }}>
