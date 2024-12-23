@@ -10,7 +10,7 @@ const CreateComplaintPage = () => {
             <title>Şikayet Oluştur</title>
         </Helmet>
         <Navbarx />
-        <Container className=" bg-light rounded-4" style={{ marginTop: "120px" }} >
+        <Container className=" bg-light rounded-4 shadow" style={{ marginTop: "120px" }} >
             <ComplaintForm
             />
         </Container>

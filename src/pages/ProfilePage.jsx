@@ -22,7 +22,7 @@ const ProfilePage = () => {
             </Helmet>
 
             <Navbarx />
-            <Container style={{ marginTop: "150px" }} className="w-50 bg-light rounded-4 p-4 " >
+            <Container style={{ marginTop: "150px" }} className="w-50 bg-light rounded-4 p-4 shadow" >
                 <h2>Profil bilgileriniz</h2>
                 <ListGroup >
                     {infos.map((info, index) => (

@@ -188,7 +188,7 @@ code {
 .twinkle-star-regular {
   font-family: "Twinkle Star";
   font-weight: 700;
-  font-size: 18px;
+  font-size: 1.4vw;
   font-style: normal;
 }
 
@@ -207,3 +207,55 @@ code {
   background-color: #233E90; /* Seçildiğinde kırmızı renk */
 }
 
+/* custom-calendar.css */
+.rbc-calendar {
+  background-color: #f8fcf8; /* Arka plan rengini değiştir */
+  font-family: 'Arial', sans-serif; /* Yazı tipi */
+}
+
+.rbc-header {
+  background-color: #4caf50; /* Başlık arka plan rengi */
+  color: white; /* Başlık yazı rengi */
+}
+
+.rbc-event {
+  background-color: #ff5722 !important; /* Etkinliklerin rengi */
+  color: white !important; /* Etkinlik yazı rengi */
+  border-radius: 4px; /* Köşeleri yuvarla */
+}
+
+.rbc-today {
+  background-color: #eaf8e9; /* Bugünün arka plan rengi */
+}
+
+.rbc-allday-cell, 
+.rbc-allday {
+  display: none !important;
+}
+
+/* Butonların arka plan rengini değiştir */
+.rbc-toolbar button {
+  background-color: #4caf50; /* Yeşil */
+  color: white; /* Yazı rengi */
+  border: none; /* Kenar çizgisini kaldır */
+  padding: 8px 12px; /* Boşluklar */
+  border-radius: 4px; /* Köşeleri yuvarla */
+  font-weight: bold; /* Yazı tipi kalınlığı */
+}
+
+/* Hover durumunda buton rengini değiştir */
+.rbc-toolbar button:hover {
+  background-color: #388e3c; /* Daha koyu yeşil */
+  cursor: pointer; /* El işareti */
+}
+
+/* Aktif buton rengi */
+.rbc-toolbar button:active {
+  background-color: #2e7d32; /* Çok koyu yeşil */
+}
+
+.custom-pagination {
+  max-width: 100%; /* Maksimum genişlik */
+  width: fit-content; /* İçeriğe göre genişlik */
+  margin: 0 auto; /* Ortalamak için */
+}

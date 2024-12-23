@@ -36,6 +36,7 @@ const ClubEventCreateCalendar = ({ setSelectedTime } ) => {
 
  const [message, setMessage] = useState (false)
  const [message2, setMessage2] = useState (false)
+ const [message3, setMessage3] = useState (false)
  const [selectedEvent, setSelectedEvent] = useState(null)
 
   const handleSelectSlot = ({ start, end }) => {
@@ -49,6 +50,14 @@ const ClubEventCreateCalendar = ({ setSelectedTime } ) => {
     }
     setMessage(false)
   
+    const minDate = new Date(now);
+    minDate.setDate(now.getDate() + 3); // 3 gün sonrası
+    if (start < minDate) {
+      setMessage3(true); // Yeni bir hata durumu göstermek için
+      return;
+    }
+    setMessage3(false);
+
     // Çakışma kontrolü
     const hasConflict = events.some(event => {
       return (
@@ -99,7 +108,7 @@ const ClubEventCreateCalendar = ({ setSelectedTime } ) => {
     <div style={{ height: '100vh' }}>
       {message && <p className='text-danger'>Geçmiş bir zamana etkinlik ekleyemezsiniz.</p>}
       {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.</p>}
-
+      {message3 && <p className='text-danger'>Bugünden en az 3 gün sonrasını seçmelisiniz.</p>}
       <Calendar
         localizer={localizer}
         events={[...events, selectedEvent]} // Tüm etkinlikleri göster

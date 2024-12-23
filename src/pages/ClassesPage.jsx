@@ -10,7 +10,7 @@ const ClassesPage = () => {
         </Helmet>
         <Navbarx />
         <div
-            className="bg-light rounded-4 py-2"
+            className="  py-2"
             style={{ marginTop: "120px" }}
         ><Classes col={3} /></div>
     </Container>

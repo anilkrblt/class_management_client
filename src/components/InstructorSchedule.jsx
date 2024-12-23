@@ -65,9 +65,9 @@ const InstructorSchedule = ({ lesson }) => {
 
   });
   // Tüm tekrar eden etkinlikleri oluştur
-  const [events,setEvents] = useState(baseEvents.flatMap(event =>
+  const [events, setEvents] = useState(baseEvents.flatMap(event =>
     generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location,)
-  )) 
+  ))
 
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -93,7 +93,7 @@ const InstructorSchedule = ({ lesson }) => {
 
     });
   };
-  
+
   const handleSelectEvent = (event) => {
 
     setShowMessage();
@@ -151,7 +151,7 @@ const InstructorSchedule = ({ lesson }) => {
       ));
       setShowChangeClassModal(false); // Modal'ı kapat
       console.log(updatedEvents);
-      
+
     }
     else {
       setShowMessage(true)
@@ -168,12 +168,25 @@ const InstructorSchedule = ({ lesson }) => {
 
     })
   };
-console.log(baseEvents);
+  console.log(baseEvents);
 
-  const handleCancelLesson = () => {
 
+  const [showConfirmCancelModal, setShowConfirmCancelModal] = useState(false); // Onay modali için state
+
+  // Onay modali açma
+  const handleConfirmCancelLesson = () => {
+    setShowModal(false)
+    setShowConfirmCancelModal(true);
+  };
+
+  // Onay modali kapatma
+  const handleCloseConfirmCancelModal = () => {
+    setShowConfirmCancelModal(false);
+  };
+
+  // Ders iptal etme işlemi
+  const handleCancelLessonConfirmed = () => {
     if (selectedEvent) {
-      // Seçilen etkinliği kaldır
       const updatedEvents = events.filter(
         event =>
           !(
@@ -182,20 +195,14 @@ console.log(baseEvents);
             event.end.getTime() === selectedEvent.end.getTime()
           )
       );
-      console.log(updatedEvents)
 
-      setEvents(updatedEvents)
-
-      // State'i güncelle
-  //    setBaseEvents(updatedEvents);
-
-      // Modal'ı kapat ve seçimi sıfırla
-      setShowModal(false);
-      setSelectedEvent(null);
+      setEvents(updatedEvents);
+      setShowModal(false); // Ana modalı kapat
+      setShowConfirmCancelModal(false); // Onay modalını kapat
+      setSelectedEvent(null); // Seçimi sıfırla
     }
- 
-    
   };
+
 
   console.log(events)
 
@@ -223,19 +230,19 @@ console.log(baseEvents);
       }]
 
       // State'i güncelle
-    //  setBaseEvents(updatedEvents);
-       console.log("Güncellenmiş Etkinlikler:", updatedEvents);
+      //  setBaseEvents(updatedEvents);
+      console.log("Güncellenmiş Etkinlikler:", updatedEvents);
       // setShowChangeClassModal(false); // Modal'ı kapat
 
       setEvents(updatedEvents.flatMap(event =>
         generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
       ));
       console.log(events);
-      
+
 
       handleCloseExtraLessonModal(
 
-        
+
       )
     }
   }
@@ -258,15 +265,15 @@ console.log(baseEvents);
     return (
       <Container className="d-flex flex-column align-items-center">
         <div className="d-flex align-items-center ">
-          <span className=" fw-bolder lh-sm" style={{fontSize:"1.8vw"}}>{event.title}</span>
+          <span className=" fw-bolder lh-sm" style={{ fontSize: "1.8vw" }}>{event.title}</span>
         </div>
         <div className=" d-flex align-items-center mt-2">
-          <span className='fw-semibold' style={{fontSize:"1.5vw"}}>{event.location}</span>
+          <span className='fw-semibold' style={{ fontSize: "1.5vw" }}>{event.location}</span>
         </div>
         <div className=" d-flex align-items-center mt-2">
           <span className='fs-5 fw-medium'>{event.text}</span>
         </div>
-       
+
 
 
       </Container>
@@ -329,15 +336,15 @@ console.log(baseEvents);
               <Button onClick={handleOpenChangeClassModal}>Sınıfı değiştir</Button>
             </Col>
             <Col md="auto">
-            <Button onClick={handleCancelLesson}>İptal et</Button>
+              <Button onClick={handleConfirmCancelLesson}>İptal et</Button>
             </Col>
             <Col md="auto">
-            <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
+              <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
             </Col>
           </Row>
-          
-          
-          
+
+
+
 
         </Modal.Body>
         <Modal.Footer>
@@ -447,6 +454,24 @@ console.log(baseEvents);
           </Button>
           <Button variant="primary" onClick={handleExtraLesson}>
             Kaydet
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Ders iptali için onay modali */}
+      <Modal show={showConfirmCancelModal} onHide={handleCloseConfirmCancelModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Dersi İptal Et</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Bu dersi iptal etmek istediğinizden emin misiniz?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseConfirmCancelModal}>
+            Hayır
+          </Button>
+          <Button variant="danger" onClick={handleCancelLessonConfirmed}>
+            Evet, İptal Et
           </Button>
         </Modal.Footer>
       </Modal>

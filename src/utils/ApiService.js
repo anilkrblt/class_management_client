@@ -23,9 +23,31 @@ const getAllLectures = () => {
     // instructorNameForLecture, dersAdı, derskodu, bölüm, sınıf, dönem, departman
 }
 
+const getExam = () =>{
+    // ders adı bölüm saat sınıflar tarih, bölüm, sınıf, dönem?
+}
+
 const getUserInformation = () => {
     // ad soyad, öğrencino, personelno, eposta,fuckülte, bölüm, sınıf
 }
+
+const getClubEventsReservation = () => {
+    // öğrenci adı soyadı, sınıf, tarih, başlangıç saat, bitiş saati
+    // detaylar, eventslink, clubName, clupIcon, kulüp adı, etkinlik adı, afiş
+}
+
+const putClubReservationConfirm = () => {
+    // etkinlik isteğini kabul etmek
+}
+
+const putClubReservationDecline = () => {
+    // etkinlik isteğini reddetmek
+}
+
+const postCreateClubEvent = () => {
+    // kulüp adı, etkinlik adı, sınıf,  tarih, başlangıç saat, bitiş saati, link
+}
+
 
 const postComplaint = async (title, place, details, photos, id,type) => {
     try {
@@ -85,3 +107,28 @@ const postExtraLesson = async (lectureCode, date, startTime, endTime, room) => {
       throw error; // Hata fırlatmak isteyebilirsiniz
     }
   };
+
+  const putChangeLessonTime = () =>{
+    // ders adı, başlangıç saati, bitiş saati, gün, sınıf
+  }
+
+  const deleteLesson = () => {
+    //ders adı, başlangıç saati, bitiş saati
+    //  tarih ders iptal olsun
+  }
+const postClassroom = async () => {
+   // sınıf adı, kapasitesi, sınav kapasitesi, sınıf özelliği, block, derslik tipi(sınıf,amfi)
+   //yeni sınıf oluştur projeksiyon ve isactive default true olsun
+  }
+
+
+  const putClassroom = async () => {
+    // sınıf adı, kapasitesi, sınav kapasitesi, sınıf özelliği, block, derslik tipi(sınıf,amfi)
+    //projeksiyon ve isActive update olabilecek
+   }
+  const postLesson = () => {
+    //ders adı, ders kodu, bölüm, sınıf, dönem, öğretim üyesi 
+  }
+
+
+  

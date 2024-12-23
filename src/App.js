@@ -108,7 +108,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<StudentExams />} />
+        <Route path="*" element={<LessonPlaning />} />
 
         <Route
           path="/profil"

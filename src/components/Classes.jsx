@@ -6,6 +6,7 @@ import ClassCalendar from './ClassCalendar';
 import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { UserContext } from './UserContext';
 import ClassCalendarStudent from './ClassCalendarStudent';
+import getAllRooms from '../utils/ApiService';
 
 const Classes = ({ col }) => {
 
@@ -124,8 +125,8 @@ const Classes = ({ col }) => {
             ? `kullanıma ${filterOptions.isActive === "true" ? "açık," : "kapalı,"} ` : ""}
 
           ${Object.values(filterOptions).every((value) => value === "")
-            ? "tüm sınıflar"
-            : "olan sınıflar"
+            ? "tüm sınıflar."
+            : "olan sınıflar."
         }
     `
 
@@ -213,9 +214,9 @@ const Classes = ({ col }) => {
 
 
     return (
-        <Container className='w-100 bg-light'>
+        <Container className='w-100 bg-light rounded-4 '>
 
-            <Row className="bg-light mb-3 py-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
+            <Row className=" pt-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
 
                 <Col>
                     <h2 className='ps-2'>Sınıflar</h2>
@@ -240,7 +241,7 @@ const Classes = ({ col }) => {
             </Row>
 
             <Row>
-                <p>{filterText}</p>
+                <p className='ps-4'>{filterText}</p>
                 {
                     filteredCards.length === 0 ? (
                         <Col className='text-center'>
@@ -320,7 +321,8 @@ const Classes = ({ col }) => {
                                 onChange={handleFilterChange}
                             />
                             <Form.Text className="text-muted">
-                                Kapasite: Minimum {filterOptions.capacity} kişilik
+                              {filterOptions.capacity &&
+                          <> Kapasite: Minimum {filterOptions.capacity} kişilik</>    } 
                             </Form.Text>
                         </Form.Group>
                         <Form.Group controlId="formClassType">

@@ -251,18 +251,20 @@ const LessonManager = () => {
 
             <Row>
                 <Col md={10}>
-                    <Pagination className="mb-3" >
-                        <Pagination.Item
-                            onClick={() => {
-                                setShowAll(true);
-                                setSelectedDepartments([]);
-                            }}
-                            active={showAll}
-                        >
-                            Tümü
-                        </Pagination.Item>
-                        {items}
-                    </Pagination>
+                    <div className="overflow-auto">
+                        <Pagination className="mb-3">
+                            <Pagination.Item
+                                onClick={() => {
+                                    setShowAll(true);
+                                    setSelectedDepartments([]);
+                                }}
+                                active={showAll}
+                            >
+                                Tümü
+                            </Pagination.Item>
+                            {items}
+                        </Pagination>
+                    </div>
                 </Col>
                 <Col md={2}>
                     <Form.Control
@@ -273,53 +275,56 @@ const LessonManager = () => {
                     />
                 </Col>
             </Row>
-
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Ders Adı</th>
-                        <th>Ders Kodu</th>
-                        <th>Bölüm</th>
-                        <th>Sınıf</th>
-                        <th>Dönem</th>
-                        <th>Öğretim Üyesi</th>
-                        <th>İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {filteredLessons.map((lesson, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{lesson.lessonName}</td>
-                            <td>{lesson.lessonId}</td>
-                            <td>{lesson.department}</td>
-                            <td>{lesson.grade}</td>
-                            <td>{lesson.season}</td>
-                            <td>
-                                {lesson.instructors.length > 0
-                                    ? lesson.instructors.join(', ')
-                                    : 'Atanmadı'}
-                                <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
-                                    Öğretim Üyesi Ekle
-                                </Button>
-                                <Button size='sm' variant='danger' onClick={() => handleRemoveInstructor(index)}>
-                                    Öğretim Üyesi Kaldır
-                                </Button>
-                            </td>
-
-
-                            <td>
-                                <Button size="sm" variant="warning" onClick={() => handleEdit(index)}>Düzenle</Button>{' '}
-                                <Button size="sm" variant="danger" onClick={() => {
-                                    setDeleteIndex(index);
-                                    setShowDeleteModal(true);
-                                }}>Sil</Button>{' '}
-                            </td>
+            {filteredLessons.length === 0 
+            ? <p className='text-center fs-5 fw-semibold'>Ders bulunamadı.</p> 
+            :<Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ders Adı</th>
+                            <th>Ders Kodu</th>
+                            <th>Bölüm</th>
+                            <th>Sınıf</th>
+                            <th>Dönem</th>
+                            <th>Öğretim Üyesi</th>
+                            <th>İşlemler</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {filteredLessons.map((lesson, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{lesson.lessonName}</td>
+                                <td>{lesson.lessonId}</td>
+                                <td>{lesson.department}</td>
+                                <td>{lesson.grade}</td>
+                                <td>{lesson.season}</td>
+                                <td>
+                                    {lesson.instructors.length > 0
+                                        ? lesson.instructors.join(', ')
+                                        : 'Atanmadı'}
+                                    <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
+                                        Öğretim Üyesi Ekle
+                                    </Button>
+                                    <Button size='sm' variant='danger' onClick={() => handleRemoveInstructor(index)}>
+                                        Öğretim Üyesi Kaldır
+                                    </Button>
+                                </td>
+
+
+                                <td>
+                                    <Button size="sm" variant="warning" onClick={() => handleEdit(index)}>Düzenle</Button>{' '}
+                                    <Button size="sm" variant="danger" onClick={() => {
+                                        setDeleteIndex(index);
+                                        setShowDeleteModal(true);
+                                    }}>Sil</Button>{' '}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            }
+
 
             {/* Düzenleme Modalı */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>

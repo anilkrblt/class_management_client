@@ -16,14 +16,14 @@ let menusStudent = [
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
   { name: "Ders programı", href: "/dersprogramı", icon: <Icon.Calendar2WeekFill size={20} />, disableIcon: <Icon.Calendar2Week /> },
   { name: "Kulüpler", href: "/kulüpler", icon: <Icon.LightningChargeFill size={20} />, disableIcon: <Icon.LightningCharge /> },
-  { name: "Şikayet oluştur", href: "/şikayetoluştur", icon: <Icon.EmojiExpressionlessFill size={20} />, disableIcon: <Icon.EmojiExpressionless /> },
+  { name: "Şikayet oluştur", href: "/şikayetoluştur", icon: <Icon.PencilFill size={20} />, disableIcon: <Icon.Pencil /> }
 ];
 
 let menusInstructor = [
   { name: "Ana sayfa", href: "/anasayfa", icon: <Icon.HouseDoorFill size={20} />, disableIcon: <Icon.HouseDoor /> },
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
   { name: "Ders programı", href: "/dersprogrami", icon: <Icon.Calendar2WeekFill size={20} />, disableIcon: <Icon.Calendar2Week /> },
-  { name: "Şikayet oluştur", href: "/şikayetoluştur" },
+  { name: "Şikayet oluştur", href: "/şikayetoluştur", icon: <Icon.PencilFill size={20} />, disableIcon: <Icon.Pencil /> },
 ];
 
 let menusAdmin = [
@@ -32,7 +32,7 @@ let menusAdmin = [
   { name: "Dersler", href: "/dersler", icon: <Icon.LayersFill size={20} />, disableIcon: <Icon.Layers /> },
   { name: "Sınıf yönetimi", href: "/sınıfyonetimi" },
   { name: "Kulüpler", href: "/kulüpler", icon: <Icon.LightningChargeFill size={20} />, disableIcon: <Icon.LightningCharge /> },
-  { name: "Şikayetler", href: "/şikayetler" },
+  { name: "Şikayetler", href: "/şikayetler", icon: <Icon.PencilFill size={20} />, disableIcon: <Icon.Pencil />  },
 ];
 
 const Navbarx = () => {
@@ -93,7 +93,7 @@ const Navbarx = () => {
   ];
 
   return (
-    <Navbar bg="light" data-bs-theme="light" fixed="top" expand="lg">
+    <Navbar bg="light" data-bs-theme="light" fixed="top" expand="lg" className='shadow-sm'>
       <Container>
         <Navbar.Brand href="/anasayfa">
           <Image

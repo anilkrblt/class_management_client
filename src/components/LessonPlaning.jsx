@@ -105,11 +105,8 @@ const LessonPlaning = () => {
                                 type="time"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
-                                min="08:00"
-                                max="10:00"
                             />
-<input type="time" min="08:00"
-                                max="20:00"/>
+
                         </Form.Group>
                         <Form.Group className="mt-3">
                             <Form.Label>Ders</Form.Label>

@@ -54,7 +54,7 @@ const StudentExams = () => {
       }
       
     return <Container
-    className='bg-light rounded-4 schedule px-2'
+    className='bg-light rounded-4 schedule px-2 shadow'
     >
     
     <h2 className="my-4 text-center">Sınav Programı</h2>

@@ -36,6 +36,7 @@ const ClassChangeCalendar = ({ onDataSubmit, lessonName, } ) => {
 
    const [message, setMessage] = useState (false)
    const [message2, setMessage2] = useState (false)
+   const [newEvent, setNewEvent] = useState (null)
 
   const handleSelectSlot = ({ start, end }) => {
     const now = new Date();
@@ -65,15 +66,15 @@ const ClassChangeCalendar = ({ onDataSubmit, lessonName, } ) => {
     // Yeni etkinlik ekleme
  
   
-    const newEvent = {
+    const newLessonEvent = {
       title: lessonName,
       start,
       end,
-      type: 'Yeni ders zamanı',
+      type: 'Seçilen ders zamanı',
     };
   
-    setEvents([...events, newEvent]);
-  
+  //  setEvents([...events, newEvent]);
+  setNewEvent(newLessonEvent)
     // Üst bileşene veri gönder
     onDataSubmit({
       date: moment(start).format('YYYY-MM-DD'),
@@ -97,7 +98,7 @@ console.log(events)
       {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor.</p>}
       <Calendar
         localizer={localizer}
-        events={events} // Tüm etkinlikleri göster
+        events={[...events, newEvent ]} // Tüm etkinlikleri göster
         step={30}
         views={['day', 'week']}
         defaultView="day"
@@ -117,7 +118,7 @@ console.log(events)
         components={{
           event: ({ event }) => (
             <span>
-              <strong>{event.title}</strong> - {event.type} {/* Etkinlik adı ve türü */}
+              <strong style={{fontSize:"1.5vw"}}>{event.title}</strong> - {event.type} {/* Etkinlik adı ve türü */}
             </span>
           ),
         }}

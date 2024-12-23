@@ -9,12 +9,16 @@ const ClassroomManager = () => {
         examCapacity: '',
         block: 'A',
         type: 'Sınıf',
+        classProperty: '',
+        projection: 'Var',
     });
     const [editIndex, setEditIndex] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteIndex, setDeleteIndex] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -28,7 +32,7 @@ const ClassroomManager = () => {
             return;
         }
         setClassrooms([...classrooms, { ...formData, isClosed: false }]);
-        setFormData({ className: '', capacity: '', examCapacity: '', block: 'A', type: 'Sınıflar' });
+        setFormData({ className: '', capacity: '', examCapacity: '', block: 'A', type: 'Sınıf', classProperty: '', projection: 'Var' });
     };
 
     const handleEdit = (index) => {
@@ -43,7 +47,7 @@ const ClassroomManager = () => {
         setClassrooms(updatedClassrooms);
         setShowEditModal(false);
         setEditIndex(null);
-        setFormData({ className: '', capacity: '', examCapacity: '', block: 'A', type: 'Sınıflar' });
+        setFormData({ className: '', capacity: '', examCapacity: '', block: 'A', type: 'Sınıf', classProperty: '', projection: 'Var' });
     };
 
     const handleDelete = () => {
@@ -57,6 +61,18 @@ const ClassroomManager = () => {
         setClassrooms(updatedClassrooms);
     };
 
+    const toggleProjection = (index) => {
+        const updatedClassrooms = [...classrooms];
+        updatedClassrooms[index].projection =
+            updatedClassrooms[index].projection === 'Var' ? 'Yok' : 'Var';
+        setClassrooms(updatedClassrooms);
+    };
+
+    const filteredClassrooms = classrooms.filter((classroom) =>
+        classroom.className.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+
     return (
         <Container className="mt-4">
             <h4>Sınıf Ekle/Düzenle</h4>
@@ -69,7 +85,7 @@ const ClassroomManager = () => {
                 <Col md={12}>
                     <Form>
                         <Row className="mb-3">
-                            <Col md={4}>
+                            <Col md={2}>
                                 <Form.Group controlId="className">
                                     <Form.Label>Sınıf Adı</Form.Label>
                                     <Form.Control
@@ -105,6 +121,19 @@ const ClassroomManager = () => {
                                     />
                                 </Form.Group>
                             </Col>
+                            <Col md={2}>
+
+                                <Form.Group controlId="editClassProperty">
+                                    <Form.Label>Sınıf Özelliği</Form.Label>
+                                    <Form.Select name="classProperty" value={formData.classProperty} onChange={handleInputChange}>
+                                        <option>Yok</option>
+                                        <option value="Bilgisayar Laboratuvarı">Bilgisayar Laboratuvarı</option>
+                                        <option value="Elektrik Laboratuvarı">Elektrik Laboratuvarı</option>
+                                        <option value="Gıda Laboratuvarı">Gıda Laboratuvarı</option>
+                                    </Form.Select>
+                                </Form.Group>
+
+                            </Col>
                             <Col md={1}>
                                 <Form.Group controlId="block">
                                     <Form.Label>Blok</Form.Label>
@@ -125,7 +154,6 @@ const ClassroomManager = () => {
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-
                             <Col md={1}>
                                 <Button variant="primary" onClick={handleAdd}>
                                     Ekle
@@ -136,68 +164,97 @@ const ClassroomManager = () => {
                 </Col>
             </Row>
 
-            <h4 className="mt-4">Sınıf Listesi</h4>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Sınıf Adı</th>
-                        <th>Kapasite</th>
-                        <th>Sınav Kapasitesi</th>
-                        <th>Blok</th>
-                        <th>Derslik Tipi</th>
-                        <th>İşlemler</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {classrooms.map((classroom, index) => (
-                        <tr key={index} >
-                            <td>{index + 1}</td>
-                            <td>
-                                {classroom.isClosed ? (
-                                    <span style={{ textDecoration: 'line-through red', color: 'black' }}>
-                                        {classroom.className}
-                                    </span>
-                                ) : (
-                                    classroom.className
-                                )}
-                                {classroom.isClosed && (
-                                    <span style={{ color: 'red', fontWeight: 'bold', marginLeft: '10px' }}>
-                                        (SINIF KAPALI)
-                                    </span>
-                                )}
-                            </td>
-                            <td>{classroom.capacity}</td>
-                            <td>{classroom.examCapacity}</td>
-                            <td>{classroom.block}</td>
-                            <td>{classroom.type}</td>
-                            <td>
-                                <Button size="sm" variant="warning" onClick={() => handleEdit(index)}>
-                                    Düzenle
-                                </Button>{' '}
-                                <Button
-                                    size="sm"
-                                    variant="danger"
-                                    onClick={() => {
-                                        setDeleteIndex(index);
-                                        setShowDeleteModal(true);
-                                    }}
-                                >
-                                    Sil
-                                </Button>{' '}
-                                <Button
-                                    size="sm"
-                                    variant={classroom.isClosed ? 'success' : 'primary'}
-                                    onClick={() => handleCloseClassroom(index)}
-                                >
-                                    {classroom.isClosed ? 'Sınıfı Aç' : 'Sınıfı Kapat'}
-                                </Button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
 
+            <Row className="my-3 align-items-center">
+                <Col><h4 className="mt-">Sınıf Listesi</h4></Col>
+                <Col md={3}>
+                    <Form.Group controlId="search">
+                        <Form.Control
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="Sınıf ara..."
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
+
+            {filteredClassrooms.length === 0
+                ? <p className='text-center fs-5 fw-semibold'>Sınıf bulunamadı!</p>
+                : <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Sınıf Adı</th>
+                            <th>Kapasite</th>
+                            <th>Sınav Kapasitesi</th>
+                            <th>Sınıf Özelliği</th>
+                            <th>Projeksiyon</th>
+                            <th>Blok</th>
+                            <th>Derslik Tipi</th>
+                            <th>İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredClassrooms.map((classroom, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>
+                                    {classroom.isClosed ? (
+                                        <span style={{ textDecoration: 'line-through red', color: 'black' }}>
+                                            {classroom.className}
+                                        </span>
+                                    ) : (
+                                        classroom.className
+                                    )}
+                                    {classroom.isClosed && (
+                                        <span style={{ color: 'red', fontWeight: 'bold', marginLeft: '10px' }}>
+                                            (SINIF KAPALI)
+                                        </span>
+                                    )}
+                                </td>
+                                <td>{classroom.capacity}</td>
+                                <td>{classroom.examCapacity}</td>
+                                <td>{classroom.classProperty}</td>
+                                <td>
+                                    {classroom.projection}{' '}
+                                    <Button
+                                        size="sm"
+                                        variant="info"
+                                        onClick={() => toggleProjection(index)}
+                                    >
+                                        Değiştir
+                                    </Button>
+                                </td>
+                                <td>{classroom.block}</td>
+                                <td>{classroom.type}</td>
+                                <td>
+                                    <Button size="sm" variant="warning" onClick={() => handleEdit(index)}>
+                                        Düzenle
+                                    </Button>{' '}
+                                    <Button
+                                        size="sm"
+                                        variant="danger"
+                                        onClick={() => {
+                                            setDeleteIndex(index);
+                                            setShowDeleteModal(true);
+                                        }}
+                                    >
+                                        Sil
+                                    </Button>{' '}
+                                    <Button
+                                        size="sm"
+                                        variant={classroom.isClosed ? 'success' : 'primary'}
+                                        onClick={() => handleCloseClassroom(index)}
+                                    >
+                                        {classroom.isClosed ? 'Sınıfı Aç' : 'Sınıfı Kapat'}
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            }
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Sınıfı Güncelle</Modal.Title>
@@ -230,7 +287,19 @@ const ClassroomManager = () => {
                                 value={formData.examCapacity}
                                 onChange={handleInputChange}
                             />
+
                         </Form.Group>
+
+                        <Form.Group controlId="editClassProperty" className="mt-2">
+                            <Form.Label>Sınıf Özelliği</Form.Label>
+                            <Form.Select name="classProperty" value={formData.classProperty} onChange={handleInputChange}>
+                                <option>Yok</option>
+                                <option value="Bilgisayar Laboratuvarı">Bilgisayar Laboratuvarı</option>
+                                <option value="Elektrik Laboratuvarı">Elektrik Laboratuvarı</option>
+                                <option value="Gıda Laboratuvarı">Gıda Laboratuvarı</option>
+                            </Form.Select>
+                        </Form.Group>
+
                         <Form.Group controlId="editBlock" className="mt-2">
                             <Form.Label>Blok</Form.Label>
                             <Form.Select name="block" value={formData.block} onChange={handleInputChange}>
@@ -259,7 +328,6 @@ const ClassroomManager = () => {
                 </Modal.Footer>
             </Modal>
 
-        
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Sınıf Silme Onayı</Modal.Title>

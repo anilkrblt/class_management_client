@@ -13,8 +13,8 @@ const ClubEventsPage = () => {
 
         <Navbarx />
         <div style={{ marginTop: "120px" }}>
-            <Col className="scrollable bg-light rounded-4 mb-3" style={{ height: "30vh" }} ><ClubEvents /></Col>
-            <Col className="scrollable bg-light rounded-4 " style={{ height: "50vh" }}><ClubEventsOld /></Col>
+            <Col className="scrollable bg-light rounded-4 mb-3 shadow" style={{ height: "30vh" }} ><ClubEvents /></Col>
+            <Col className="scrollable bg-light rounded-4 shadow" style={{ height: "50vh" }}><ClubEventsOld /></Col>
         </div>
     </Container>
 }
