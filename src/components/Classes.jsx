@@ -109,7 +109,7 @@ const Classes = ({ col }) => {
         (filterOptions.classType ? card.classType === filterOptions.classType : true)
     );
 
-    console.log(filterOptions.projection)
+
     const filterText = `
     ${filterOptions.capacity !== ''
             ? `kapasitesi en az ${filterOptions.capacity} kişilik,` : ""}
@@ -214,7 +214,7 @@ const Classes = ({ col }) => {
 
 
     return (
-        <Container className='w-100 bg-light rounded-4 '>
+        <Container className='w-100  '>
 
             <Row className=" pt-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
 
@@ -245,7 +245,7 @@ const Classes = ({ col }) => {
                 {
                     filteredCards.length === 0 ? (
                         <Col className='text-center'>
-                            <p>Seçimlerinize uygun sınıf bulunamadı.</p>
+                            <p className='fw-semibold'>Seçimlerinize uygun sınıf bulunamadı.</p>
                         </Col>
                     ) :
                         filteredCards.map((card) => (

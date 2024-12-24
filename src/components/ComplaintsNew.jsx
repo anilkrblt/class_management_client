@@ -2,7 +2,7 @@ import Button from 'react-bootstrap/Button';
 import React, { useState } from 'react';
 import { ListGroup, Card, Container, Modal } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
-import {  Col, Row } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 
 const ComplaintsNew = () => {
     const [show, setShow] = useState(false);
@@ -11,31 +11,31 @@ const ComplaintsNew = () => {
     function formatToInitials(str) {
         // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
         const map = {
-          'ç': 'c',
-          'ğ': 'g',
-          'ı': 'i',
-          'İ': 'I',
-          'ö': 'o',
-          'ş': 's',
-          'ü': 'u',
-          'Ç': 'c',
-          'Ö': 'o',
-          'Ş': 's',
-          'Ğ': 'g',
-          'Ü': 'u',
+            'ç': 'c',
+            'ğ': 'g',
+            'ı': 'i',
+            'İ': 'I',
+            'ö': 'o',
+            'ş': 's',
+            'ü': 'u',
+            'Ç': 'c',
+            'Ö': 'o',
+            'Ş': 's',
+            'Ğ': 'g',
+            'Ü': 'u',
         };
-      
+
         // Kelimeleri boşluktan ayırıyoruz
         const words = str.split(' ');
-      
+
         // İlk harfleri alıp küçük yaparak dönüştürme
         const initials = words.map(word => {
-          const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
-          return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+            const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
+            return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
         }).join('');
-      
+
         return initials;
-      }
+    }
 
     const complaints = [
         { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
@@ -43,11 +43,6 @@ const ComplaintsNew = () => {
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        { name: "Can Öztürk Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
         { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
@@ -58,7 +53,12 @@ const ComplaintsNew = () => {
         { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
         { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        
+        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
+        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
+        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
+        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
+
     ];
 
     const handleShow = (complaint) => {
@@ -73,53 +73,56 @@ const ComplaintsNew = () => {
 
     return (
         <Container className="bg-light rounded-4  ps-2" >
-            <h2 className="my-3 text-center sticky-top bg-light py-1"  style={{ zIndex: 10 }}>Şikayetler</h2>
-            <ListGroup className="ms-1 ">
-                {complaints.map((item, index) => (
-                   <Card
-                   key={index}
-                   className="py-2 ps-2 my-1"
-                   style={{
-                       backgroundColor: index % 2 === 0 ? "#edfaf9" : "white",
-                   }}
-               >
+            <h2 className="my-3 text-center sticky-top bg-light py-1" style={{ zIndex: 10 }}>Şikayetler</h2>
 
-                   <Row className=" d-flex align-items-center justify-content-around w-100' ">
-                       <Col md={1}>
-                           <Image
-                                 src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
-                                 roundedCircle
-                                
-                                width={50}
-                                className="me-3"
-                            />
-                       </Col>
-                       <Col md={4} className='ms-2'>
-                           <div>
-                               <Card.Title className="text-start">{item.name}</Card.Title>
-                               <Card.Text className="text-start">
-                                   {item.exp}
-                               </Card.Text>
-                           </div>
-                       </Col>
-                       <Col md={2}>
-                           <h3>L208</h3>
-                       </Col>
-                       <Col md={2}>
+            {complaints.length === 0
+                ? <p className='text-center  fw-semibold'>Şu anda çözüm bekleyen şikayet bulunmamakta.</p>
+                : <ListGroup className="ms-1 ">
+                    {complaints.map((item, index) => (
+                        <Card
+                            key={index}
+                            className="py-2 ps-2 my-1"
+                            style={{
+                                backgroundColor: index % 2 === 0 ? "#edfaf9" : "white",
+                            }}
+                        >
 
-                           <Col className='fs-4 fw-bold ms-2'>15</Col>
-                           <Col className='fs-5 text-secondary'>Kasım</Col>
-                       </Col>
-                       <Col md={2}>
-                           <Button variant="danger" onClick={() => handleShow(item)}>İncele</Button>
-                       </Col>
+                            <Row className=" d-flex align-items-center justify-content-around w-100' ">
+                                <Col md={1}>
+                                    <Image
+                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                        roundedCircle
 
-                   </Row>
+                                        width={50}
+                                        className="me-3"
+                                    />
+                                </Col>
+                                <Col md={4} className='ms-2'>
+                                    <div>
+                                        <Card.Title className="text-start">{item.name}</Card.Title>
+                                        <Card.Text className="text-start">
+                                            {item.exp}
+                                        </Card.Text>
+                                    </div>
+                                </Col>
+                                <Col md={2}>
+                                    <h3>L208</h3>
+                                </Col>
+                                <Col md={2}>
 
-               </Card>
-                ))}
-            </ListGroup>
+                                    <Col className='fs-4 fw-bold ms-2'>15</Col>
+                                    <Col className='fs-5 text-secondary'>Kasım</Col>
+                                </Col>
+                                <Col md={2}>
+                                    <Button variant="danger" onClick={() => handleShow(item)}>İncele</Button>
+                                </Col>
 
+                            </Row>
+
+                        </Card>
+                    ))}
+                </ListGroup>
+            }
             {/* Modal */}
             <Modal show={show} onHide={handleClose} centered>
                 <Modal.Header closeButton>
@@ -139,7 +142,7 @@ const ComplaintsNew = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={handleClose}>
-                    {selectedComplaint && ( selectedComplaint.class)} sınıfını kapat
+                        {selectedComplaint && (selectedComplaint.class)} sınıfını kapat
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat

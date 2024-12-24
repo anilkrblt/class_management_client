@@ -11,7 +11,7 @@ const LoginScreen = () => {
         </div>
         
         <h2 className='text-center' style={{color:" #233E90"}}>Sınıf Yönetim Sistemi</h2>
-          <Card className="p-4 shadow-sm rounded-4 mb-5">
+          <Card className="p-4 shadow rounded-4 mb-5">
             <Card.Body>
               <h2 className="text-center mb-4">Giriş Yap</h2>
               <Form>

@@ -199,23 +199,23 @@ code {
 }
 
 .custom-checkbox .form-check-input {
-  background-color: white;
-  border-color: #233E90;
+  background-color: rgb(233, 7, 7);
+  border-color: #31d059;
 }
 
 .custom-checkbox .form-check-input:checked {
-  background-color: #233E90; /* Seçildiğinde kırmızı renk */
+  background-color: #0040ff; /* Seçildiğinde kırmızı renk */
 }
 
 /* custom-calendar.css */
 .rbc-calendar {
-  background-color: #f8fcf8; /* Arka plan rengini değiştir */
+  background-color: white; /* Arka plan rengini değiştir */
   font-family: 'Arial', sans-serif; /* Yazı tipi */
 }
 
 .rbc-header {
-  background-color: #4caf50; /* Başlık arka plan rengi */
-  color: white; /* Başlık yazı rengi */
+  background-color: #004ecc94; /* Başlık arka plan rengi */
+  color: rgb(0, 0, 0); /* Başlık yazı rengi */
 }
 
 .rbc-event {
@@ -225,7 +225,7 @@ code {
 }
 
 .rbc-today {
-  background-color: #eaf8e9; /* Bugünün arka plan rengi */
+  background-color: #ff0000; /* Bugünün arka plan rengi */
 }
 
 .rbc-allday-cell, 
@@ -235,7 +235,7 @@ code {
 
 /* Butonların arka plan rengini değiştir */
 .rbc-toolbar button {
-  background-color: #4caf50; /* Yeşil */
+  background-color: #ecffbc !important; /* Yeşil */
   color: white; /* Yazı rengi */
   border: none; /* Kenar çizgisini kaldır */
   padding: 8px 12px; /* Boşluklar */
@@ -245,17 +245,18 @@ code {
 
 /* Hover durumunda buton rengini değiştir */
 .rbc-toolbar button:hover {
-  background-color: #388e3c; /* Daha koyu yeşil */
+  background-color: #c4d598 !important; /* Daha koyu yeşil */
   cursor: pointer; /* El işareti */
 }
 
 /* Aktif buton rengi */
 .rbc-toolbar button:active {
-  background-color: #2e7d32; /* Çok koyu yeşil */
+  background-color: #c4d598 !important; /* Çok koyu yeşil */
 }
 
 .custom-pagination {
-  max-width: 100%; /* Maksimum genişlik */
-  width: fit-content; /* İçeriğe göre genişlik */
-  margin: 0 auto; /* Ortalamak için */
+  max-width: 100% !important; /* Maksimum genişlik */
+  width: fit-content  !important; /* İçeriğe göre genişlik */
+  margin: 0 auto  !important; /* Ortalamak için */
 }
+

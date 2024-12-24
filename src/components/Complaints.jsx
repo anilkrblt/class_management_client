@@ -74,7 +74,9 @@ const Complaints = () => {
     return (
         <Container className="bg-light rounded-4 ps-2 ">
             <h2 className="my-3 text-center sticky-top bg-light py-1">Şikayetler</h2>
-            <ListGroup className="ms-1">
+            {complaints.length === 0
+                ? <p className='text-center  fw-semibold'>Şu anda çözüm bekleyen şikayet bulunmamakta.</p>
+                : <ListGroup className="ms-1">
                 {complaints.map((item, index) => (
                     <Card
                         key={index}
@@ -101,7 +103,7 @@ const Complaints = () => {
                         </Card.Body>
                     </Card>
                 ))}
-            </ListGroup>
+            </ListGroup> }
 
             {/* Modal */}
             <Modal show={show} onHide={handleClose} centered>

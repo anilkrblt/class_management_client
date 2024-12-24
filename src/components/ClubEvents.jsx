@@ -128,10 +128,11 @@ const ClubEvents = () => {
             </Row>
 
             <Row>
+                {events.length === 0 && <p className="text-center fw-semibold mt-3">Yakında gerçekleşecek etkinlik bulunmamakta.</p>}
                 {events.map((event, index) => (
                     <Col md={4} key={index}>
                         <Card
-                            className="mb-3"
+                            className="mb-3 mt-2"
                             style={{ height: "19vh", cursor: "pointer" }}
                             onClick={() => handleShowModal(event)}
                         >

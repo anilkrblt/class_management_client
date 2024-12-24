@@ -94,7 +94,7 @@ const ClassCalendarStudent = () => {
         localizer={localizer}
         events={events} // Geçmiş etkinlikler filtrelendi
         step={30}
-        views={['week', 'day']}
+        views={{ work_week: true, day: true }}
         onView={(view) => setView(view)}
         defaultView='day'
         defaultDate={new Date()}

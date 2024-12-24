@@ -23,7 +23,7 @@ const StudentHomePage = () => {
     </Helmet>
     <Navbarx />
     <Row style={{ marginTop: "100px" }} className="homepage " >
-      <Col className=" scrollable bg-light rounded-4 mt-4 " md={7} ><Classes col={6} /></Col>
+      <Col className=" scrollable bg-light rounded-4 mt-4 shadow" md={7} ><Classes col={6} /></Col>
       <Col md={5}><StudentExams /></Col>
     </Row>
   </Container>

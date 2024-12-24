@@ -22,33 +22,36 @@ const ComplaintsOld = () => {
         { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204", year: 2024 },
     ];
 
-    // Seçilen yılları tutan state
     const [selectedYears, setSelectedYears] = useState([]);
-
+    const [showAll, setShowAll] = useState(true);
     const [show, setShow] = useState(false);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
 
     // Yıl seçme ya da kaldırma fonksiyonu
     const toggleYearSelection = (year) => {
-        setSelectedYears((prevSelected) =>
-            prevSelected.includes(year)
-                ? prevSelected.filter((y) => y !== year) // Seçiliyse kaldır
-                : [...prevSelected, year] // Seçili değilse ekle
-        );
+        if (year === "all") {
+            // Tümü seçildiğinde diğer tüm yılların işaretini kaldırıyoruz
+            setSelectedYears([]);
+            setShowAll(true);
+        } else {
+            setSelectedYears((prevSelected) =>
+                prevSelected.includes(year)
+                    ? prevSelected.filter((y) => y !== year) // Seçiliyse kaldır
+                    : [...prevSelected, year] // Seçili değilse ekle
+            );
+            setShowAll(false);
+        }
     };
 
     const handleShow = (complaint) => {
         setSelectedComplaint(complaint);
         setShow(true);
-    }
+    };
 
     const handleClose = () => {
         setShow(false);
         setSelectedComplaint(null);
     };
-
-    // Tüm şikayetleri gösteren fonksiyon
-    const showAll = () => setSelectedYears([]);
 
     // Pagination item'larını oluştur
     let items = [];
@@ -65,7 +68,6 @@ const ComplaintsOld = () => {
     }
 
     function formatToInitials(str) {
-        // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
         const map = {
             'ç': 'c',
             'ğ': 'g',
@@ -81,13 +83,11 @@ const ComplaintsOld = () => {
             'Ü': 'u',
         };
 
-        // Kelimeleri boşluktan ayırıyoruz
         const words = str.split(' ');
 
-        // İlk harfleri alıp küçük yaparak dönüştürme
         const initials = words.map(word => {
-            const firstChar = word.charAt(0).toLowerCase(); // İlk harfi alıyoruz
-            return map[firstChar] || firstChar; // Türkçe harfler için dönüşüm yapıyoruz
+            const firstChar = word.charAt(0).toLowerCase();
+            return map[firstChar] || firstChar;
         }).join('');
 
         return initials;
@@ -99,10 +99,18 @@ const ComplaintsOld = () => {
                 <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
                 {/* Yıl seçimi için Pagination */}
                 <div className="d-flex justify-content-left align-items-center">
-                    <Pagination className="mb-3" >{items}</Pagination>
-                    <Button variant="link" onClick={showAll} className="ms-3">
-                        Tümü
-                    </Button>
+                    <Pagination className="mb-3" >
+                        <Pagination.Item
+                            onClick={() => {
+                                setShowAll(true)
+                                setSelectedYears([]);
+                            }}
+                            active={showAll}
+                        >
+                            Tümü
+                        </Pagination.Item>
+                        {items}
+                    </Pagination>
                 </div>
             </div>
 
