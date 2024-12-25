@@ -25,11 +25,12 @@ import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
 import LessonPlaning from './components/LessonPlaning';
 import StudentExams from './components/StudentExams';
 import LoginScreen from './pages/LoginPage2';
-
+import getAllRooms from './utils/ApiService';
 const App = () => {
 
   const { userType, setUserType } = useContext(UserContext);
   console.log(userType)
+  getAllRooms()
   return (
 
     <BrowserRouter>

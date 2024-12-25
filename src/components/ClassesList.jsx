@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { Button, Card, Col, Container, Dropdown, DropdownButton, Form, Modal, OverlayTrigger, ProgressBar, Row, Tooltip } from "react-bootstrap";
 import * as Icon from 'react-bootstrap-icons';
+
+
 const ClassesList = ({setSelectedCard}) => {
+
     const cards = [
         { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik" },
         { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik" },
