@@ -69,7 +69,7 @@ const Classes = ({ col }) => {
         fetchEvents();
     }, []);
 
-    console.log(rooms)
+
 
 
     const handleCardClick = (card) => {

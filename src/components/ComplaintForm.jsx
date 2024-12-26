@@ -6,11 +6,19 @@ const ComplaintForm = () => {
   const [complaintTitle, setComplaintTitle] = useState('');
   const [complaintDescription, setComplaintDescription] = useState('');
   const [complaintType, setComplaintType] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [complaintPlace, setComplaintPlace] = useState('');
   const [images, setImages] = useState([]);
   const [hoverIndex, setHoverIndex] = useState(null); // Hover edilen görüntünün indeksini saklayın
   const [showModal, setShowModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+
+  const [complaintForm, setComplaintForm] = useState({
+    title: "", 
+    type: "",
+    place: "",
+    description: "",
+    images: []
+  });
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -36,7 +44,15 @@ const ComplaintForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (complaintTitle && complaintDescription && complaintType && phoneNumber) {
+    if (complaintTitle && complaintDescription && complaintPlace && complaintType ) {
+      setComplaintForm({
+        title: complaintTitle, 
+        type: complaintType,
+        place: complaintPlace,
+        description: complaintDescription,
+        images: images
+      })
+      
       setShowModal(true);
       setShowAlert(false);
     } else {
@@ -62,13 +78,27 @@ const ComplaintForm = () => {
             onChange={(e) => setComplaintTitle(e.target.value)}
           />
         </Form.Group>
+
+        <Form.Group controlId="complaintType">
+          <Form.Label>Şikayet Türü</Form.Label>
+          <Form.Control
+            as="select"
+            value={complaintType}
+            onChange={(e) => setComplaintType(e.target.type)}
+          >
+            <option value="">Seçiniz</option>
+            <option value="Sınıf arıza bildirimi">Sınıf arıza bildirimi</option>
+            <option value="Ürün">???</option>
+ 
+          </Form.Control>
+        </Form.Group>
         
         <Form.Group controlId="complaintPlace">
           <Form.Label>Şikayet Yeri</Form.Label>
           <Form.Control
             as="select"
-            value={complaintType}
-            onChange={(e) => setComplaintType(e.target.value)}
+            value={complaintPlace}
+            onChange={(e) => setComplaintPlace(e.target.value)}
           >
             <option value="">Seçiniz</option>
             <option value="Hizmet">L208</option>
@@ -89,23 +119,13 @@ const ComplaintForm = () => {
           />
         </Form.Group>
 
-        <Form.Group controlId="phoneNumber">
-          <Form.Label>Telefon Numarası</Form.Label>
-          <Form.Control
-            type="tel"
-            placeholder="Telefon numaranızı girin"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-          />
-        </Form.Group>
-
         <Form.Group controlId="complaintImage">
           <Form.Label>Fotoğraflar (isteğe bağlı)</Form.Label>
           <div className="mb-3">
             <Form.Control
               type="file"
               multiple
-              id="complaintImage"
+            //  id="complaintImage"
               onChange={handleImageChange}
             />
           </div>

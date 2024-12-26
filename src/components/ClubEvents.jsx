@@ -236,7 +236,7 @@ const ClubEvents = () => {
 
                                 </Form.Group>
                             </Col>
-                            <Col md={3}><strong>Yer: </strong>{selectedCard?.title}</Col>
+                            <Col md={3}><strong>Yer: </strong>{selectedCard?.name}</Col>
                         </Row>
 
                         <Row className="align-items-center mt-2">
