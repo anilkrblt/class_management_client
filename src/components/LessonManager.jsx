@@ -77,6 +77,7 @@ const LessonManager = () => {
             return;
         }
         console.log(formData)
+        //createLecture(formData)
         setLessons([...lessons, { ...formData }]);
         setFormData({ lessonName: '', lessonId: '', department: 'Bilgisayar Mühendisliği', grade: '1', season: 'Güz', instructors: [] });
     };

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import StudentHomePage from './pages/StudentHomepage';
@@ -25,12 +25,21 @@ import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
 import LessonPlaning from './components/LessonPlaning';
 import StudentExams from './components/StudentExams';
 import LoginScreen from './pages/LoginPage2';
-import getAllRooms from './utils/ApiService';
+import getAllRooms from './utils/deneme';
+
 const App = () => {
 
   const { userType, setUserType } = useContext(UserContext);
-  console.log(userType)
-  getAllRooms()
+
+  //room sayfası
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const events = await getAllRooms();
+      console.log(events); // Veriyi burada işleyebilirsiniz.
+    };
+
+    fetchEvents();
+  }, []);
   return (
 
     <BrowserRouter>

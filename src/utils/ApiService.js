@@ -10,7 +10,7 @@ const getAllRooms = async () => {
     return response.data;
   } catch (error) {
     console.error("Hata:", error);
-  }
+  } 
 }; 
 export default getAllRooms;
 
