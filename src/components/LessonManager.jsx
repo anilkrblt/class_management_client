@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Modal, Alert, Pagination } from 'react-bootstrap';
+import { addLecture, getAllLectures } from '../utils/LectureApiService';
 
 const LessonManager = () => {
     const [lessons, setLessons] = useState([]);
+    
     const [formData, setFormData] = useState({
         lessonName: '',
         lessonId: '',
@@ -70,6 +72,7 @@ const LessonManager = () => {
     };
 
 
+
     const handleAdd = () => {
         if (!formData.lessonName || !formData.lessonId || formData.instructors.length === 0) {
             setShowAlert(true);
@@ -77,6 +80,8 @@ const LessonManager = () => {
             return;
         }
         console.log(formData)
+        //createLecture(formData)
+        addLecture(formData)
         setLessons([...lessons, { ...formData }]);
         setFormData({ lessonName: '', lessonId: '', department: 'Bilgisayar Mühendisliği', grade: '1', season: 'Güz', instructors: [] });
     };
@@ -103,7 +108,6 @@ const LessonManager = () => {
         }
         setLessons(updatedLessons);
     };
-
 
     const handleConfirmInstructor = () => {
         const updatedLessons = [...lessons];
@@ -137,11 +141,15 @@ const LessonManager = () => {
     };
 
     const filteredLessons = lessons.filter((lesson) => {
-        const matchesSearchTerm = lesson.lessonName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            lesson.lessonId.toLowerCase().includes(searchTerm.toLowerCase());
-
+        const lessonName = lesson.lessonName?.toLowerCase() || ""; // Varsayılan olarak boş string
+        const lessonId = lesson.lessonId?.toLowerCase() || ""; // Varsayılan olarak boş string
+    
+        const matchesSearchTerm = lessonName.includes(searchTerm.toLowerCase()) ||
+            lessonId.includes(searchTerm.toLowerCase());
+    
         return (showAll || selectedDepartments.includes(lesson.department)) && matchesSearchTerm;
     });
+    
 
     const [showInstructorModal, setShowInstructorModal] = useState(false); // Modal kontrolü
     const [currentLessonIndex, setCurrentLessonIndex] = useState(null); // Hangi dersin seçildiği
@@ -294,9 +302,9 @@ const LessonManager = () => {
                         {filteredLessons.map((lesson, index) => (
                             <tr key={index}>
                                 <td>{index + 1}</td>
-                                <td>{lesson.lessonName}</td>
-                                <td>{lesson.lessonId}</td>
-                                <td>{lesson.department}</td>
+                                <td>{lesson.name}</td>
+                                <td>{lesson.code}</td>
+                                <td>{lesson.departmentName}</td>
                                 <td>{lesson.grade}</td>
                                 <td>{lesson.season}</td>
                                 <td>

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Dropdown, DropdownButton, Modal, Button, ProgressBar } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import * as Icon from 'react-bootstrap-icons';
@@ -58,22 +58,19 @@ const Classes = ({ col }) => {
 
     });
 
-    const cards = [
-        { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
-        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
-        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
-        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
-        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false }, { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
-        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
-        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
-        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
-    ];
+    const [rooms, setRooms] = useState([])
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const events = await getAllRooms();
+            setRooms(events) // Veriyi burada işleyebilirsiniz.
+        };
+
+        fetchEvents();
+    }, []);
+
+    console.log(rooms)
+
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -109,10 +106,10 @@ const Classes = ({ col }) => {
     };
 
     // Filtreli sınıflar
-    const filteredCards = cards.filter(card =>
-        card.title.toLowerCase().includes(searchTerm) &&
+    const filteredRooms = rooms.filter(card =>
+        card.name.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
-        (filterOptions.projection ? card.projection === (filterOptions.projection === "true") : true) &&
+        (filterOptions.isProjectorWorking ? card.isProjectorWorking === (filterOptions.isProjectorWorking === "true") : true) &&
         (filterOptions.isActive ? card.isActive === (filterOptions.isActive === "true") : true) &&
         (filterOptions.isEmpty ? card.isEmpty === (filterOptions.isEmpty === "true") : true) &&
         (filterOptions.classType ? card.classType === filterOptions.classType : true)
@@ -254,24 +251,28 @@ const Classes = ({ col }) => {
             <Row>
 
                 {
-                    filteredCards.length === 0 ? (
+                    filteredRooms.length === 0 ? (
                         <Col className='text-center'>
                             <p className='fw-semibold'>Seçimlerinize uygun sınıf bulunamadı.</p>
                         </Col>
                     ) :
-                        filteredCards.map((card) => (
-                            <Col key={card.id} md={col} className="mb-4 ">
+                        //  ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
+                        filteredRooms.map((card) => (
+                            <Col key={card.roomId} md={col} className="mb-4 ">
                                 <Card
                                     className={`py-3 ${card.isActive ? "cursor-pointer" : "hover-disable-card"} 
-                                     ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}`}
+                                   
+            
+                                     `}
 
                                     onClick={() => !card.isActive ? null : handleCardClick(card)}
                                     style={{ height: "20vh" }}
                                 >
                                     <Card.Body>
                                         <Row className='row-cols-auto '>
-                                            <Col md={7}> <Card.Title className="fw-bold ">{card.title}</Card.Title></Col>
-                                            <Col md={2} >
+                                            <Col md={7}> <Card.Title className="fw-bold ">{card.name}</Card.Title></Col>
+
+                                            {card.isProjectorWorking && <Col md={2} >
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Projeksiyon Cihazı</Tooltip>}
@@ -280,7 +281,8 @@ const Classes = ({ col }) => {
                                                         <Icon.Projector size={30} />
                                                     </div>
                                                 </OverlayTrigger>
-                                            </Col>
+                                            </Col>}
+
                                             <Col md={2}>
                                                 <OverlayTrigger
                                                     placement="top"
@@ -347,7 +349,10 @@ const Classes = ({ col }) => {
                                 <option value="">Tümü</option>
                                 <option value="Derslik">Derslik</option>
                                 <option value="Amfi">Amfi</option>
-                                <option value="Laboratuvar">Laboratuvar</option>
+                                <option value="Bilgisayar Laboratuvarı">Bilgisayar Laboratuvarı</option>
+                                <option value="Elektrik Laboratuvarı">Elektrik Laboratuvarı</option>
+                                <option value="Genetik Laboratuvarı">Genetik Laboratuvarı</option>
+                                <option value="Gıda Laboratuvarı">Gıda Laboratuvarı</option>
                             </Form.Control>
                         </Form.Group>
 
@@ -405,7 +410,7 @@ const Classes = ({ col }) => {
             {selectedCard && (
                 <Modal show={showModal} size="lg" onHide={handleCloseModal}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{selectedCard.title}</Modal.Title>
+                        <Modal.Title>{selectedCard.name}</Modal.Title>
                     </Modal.Header>
                     <Modal.Header>
                         {selectedCard.text === "Ders işleniyor" && (
