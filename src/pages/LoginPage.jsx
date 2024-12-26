@@ -22,7 +22,7 @@ const LoginPage = () => {
     <div>
       <img src="./circle-a.svg" color="red"/>
       <svg src="./circle-a.svg" fill="red" />
-      <Image src="https://cdn.auth0.com/avatars/a.png" width={50} color="red" roundedCircle/> 
+      <Image src="https://cdn.auth0.com/avatars/nb.png" width={50} color="red" roundedCircle/> 
       <h2>Login Page</h2>
       <select onChange={(e) => setSelectedUserType(e.target.value)} value={selectedUserType}>
         <option value="student">Student</option>

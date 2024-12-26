@@ -25,6 +25,7 @@ import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
 import LessonPlaning from './components/LessonPlaning';
 import StudentExams from './components/StudentExams';
 import LoginScreen from './pages/LoginPage2';
+import InstructorLessons from './components/InstructorLessons';
 
 const App = () => {
 
@@ -109,7 +110,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<LoginScreen />} />
+        <Route path="*" element={<InstructorLessons />} />
 
         <Route
           path="/profil"

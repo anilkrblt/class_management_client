@@ -64,6 +64,15 @@ const Classes = ({ col }) => {
         { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
         { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
         { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
+        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
+        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false }, { id: 1, title: "D201", text: "Ders işleniyor", text2: "Mukavemet", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 2, title: "D305", text: "Ders işleniyor", text2: "Bilgisayar Ağları", capacity: 35, projection: false, classType: "Derslik", isActive: true, isEmpty: false },
+        { id: 3, title: "D204", text: "Sınıf kapalı", capacity: 0, projection: false, classType: "Laboratuvar", isActive: false, isEmpty: false },
+        { id: 4, title: "D104", text: "Boş", capacity: 50, projection: true, classType: "Laboratuvar", isActive: true, isEmpty: true },
+        { id: 5, title: "D201", text: "Ders işleniyor", text2: "Matematik 2", capacity: 40, projection: true, classType: "Derslik", isActive: true, isEmpty: false },
     ];
 
     const handleCardClick = (card) => {
@@ -216,11 +225,11 @@ const Classes = ({ col }) => {
     return (
         <Container className='w-100  '>
 
-            <Row className=" pt-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
+            <Row className=" pt-2 bg-light" style={{ position: "sticky", top: 0, zIndex: 100 }}>
 
                 <Col>
                     <h2 className='ps-2'>Sınıflar</h2>
-                    
+
                 </Col>
                 <Col>
                     <Row>
@@ -238,10 +247,12 @@ const Classes = ({ col }) => {
                         </Col>
                     </Row>
                 </Col>
+                <p className='ps-4 bg-light' style={{ position: "sticky", top: 0, zIndex: 100 }}>{filterText}</p>
+
             </Row>
 
             <Row>
-                <p className='ps-4'>{filterText}</p>
+
                 {
                     filteredCards.length === 0 ? (
                         <Col className='text-center'>
@@ -321,8 +332,8 @@ const Classes = ({ col }) => {
                                 onChange={handleFilterChange}
                             />
                             <Form.Text className="text-muted">
-                              {filterOptions.capacity &&
-                          <> Kapasite: Minimum {filterOptions.capacity} kişilik</>    } 
+                                {filterOptions.capacity &&
+                                    <> Kapasite: Minimum {filterOptions.capacity} kişilik</>}
                             </Form.Text>
                         </Form.Group>
                         <Form.Group controlId="formClassType">

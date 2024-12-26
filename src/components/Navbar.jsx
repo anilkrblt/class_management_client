@@ -80,14 +80,16 @@ const Navbarx = () => {
   const iconMenus = [
     {
       icon: <Icon.Bell />,
+      disableIcon: <Icon.BellFill/>,
       action: () => setShowNotifications(!showNotifications) // Bildirimleri göster
     },
     {
       icon: <Icon.Person />,
+      disableIcon: <Icon.PersonFill/>,
       action: () => navigate("/profil") // Profil
     },
     {
-      icon: <Icon.BoxArrowRight />,
+      icon: <Icon.BoxArrowRight className='logout'/>,
       action: () => handleLogout() // Çıkış yap
     }
   ];

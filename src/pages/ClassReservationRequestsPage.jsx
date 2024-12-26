@@ -1,13 +1,17 @@
 import { Container } from "react-bootstrap"
 import Navbarx from "../components/Navbar"
 import ClassReservationRequests from "../components/ClassReservationRequests"
+import { Helmet } from 'react-helmet';
 
 const ClassReservationRequestsPage = () => {
     return <Container>
-        <Navbarx/>
-        <div style={{ marginTop: "120px" }} 
-        className="scrollable bg-light rounded-4" >
-            <ClassReservationRequests/>
+        <Helmet>
+            <title>Etkinlik İstekleri</title>
+        </Helmet>
+        <Navbarx />
+        <div style={{ marginTop: "120px" }}
+            className="scrollable bg-light rounded-4" >
+            <ClassReservationRequests />
         </div>
     </Container>
 }
