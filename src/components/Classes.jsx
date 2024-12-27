@@ -256,12 +256,12 @@ const Classes = ({ col }) => {
                             <p className='fw-semibold'>Seçimlerinize uygun sınıf bulunamadı.</p>
                         </Col>
                     ) :
-                        //  ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
+                     
                         filteredRooms.map((card) => (
                             <Col key={card.roomId} md={col} className="mb-4 ">
                                 <Card
                                     className={`py-3 ${card.isActive ? "cursor-pointer" : "hover-disable-card"} 
-                                   
+                                    ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
             
                                      `}
 
@@ -295,8 +295,12 @@ const Classes = ({ col }) => {
                                             </Col>
                                         </Row>
 
-                                        <Card.Text className={`fw-light fw-bold ${card.text === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
+                                        <Card.Text className={`fw-light fw-bold ${!card.isActive === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
                                             {card.text}
+                                        </Card.Text>
+
+                                        <Card.Text className={`fw-light fw-bold ${!card.isActive === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
+                                            {!card.isActive && <span className='fw-light fw-bold text-danger'>Sınıf kapalı</span>}
                                         </Card.Text>
 
                                         <Card.Text className="fw-bolder">{card.text2}</Card.Text>

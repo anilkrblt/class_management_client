@@ -3,8 +3,11 @@ import React, { useState } from 'react';
 import { ListGroup, Card, Container, Modal } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import { Col, Row } from "react-bootstrap";
+import "moment/locale/tr";
+import moment from "moment";
+moment.locale('tr');
 
-const ComplaintsNew = () => {
+const ComplaintsNew = ({complaints}) => {
     const [show, setShow] = useState(false);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
 
@@ -37,30 +40,6 @@ const ComplaintsNew = () => {
         return initials;
     }
 
-    const complaints = [
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201" },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201" },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204" },
-
-    ];
-
     const handleShow = (complaint) => {
         setSelectedComplaint(complaint);
         setShow(true);
@@ -72,11 +51,11 @@ const ComplaintsNew = () => {
     };
 
     return (
-        <Container className="bg-light rounded-4  ps-2" >
+        <Container className="bg-light rounded-4 ps-2 " >
             <h2 className="my-3 text-center sticky-top bg-light py-1" style={{ zIndex: 10 }}>Şikayetler</h2>
 
             {complaints.length === 0
-                ? <p className='text-center  fw-semibold'>Şu anda çözüm bekleyen şikayet bulunmamakta.</p>
+                ? <p className='text-center  fw-semibold'>Şu anda çözüm bekleyen şikayet bulunmamaktadır.</p>
                 : <ListGroup className="ms-1 ">
                     {complaints.map((item, index) => (
                         <Card
@@ -90,7 +69,7 @@ const ComplaintsNew = () => {
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
                                 <Col md={1}>
                                     <Image
-                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.userName)}.png`} // İlk harflerden oluşan URL
                                         roundedCircle
 
                                         width={50}
@@ -99,19 +78,19 @@ const ComplaintsNew = () => {
                                 </Col>
                                 <Col md={4} className='ms-2'>
                                     <div>
-                                        <Card.Title className="text-start">{item.name}</Card.Title>
+                                        <Card.Title className="text-start">{item.userName}</Card.Title>
                                         <Card.Text className="text-start">
-                                            {item.exp}
+                                            {item.content}
                                         </Card.Text>
                                     </div>
                                 </Col>
                                 <Col md={2}>
-                                    <h3>L208</h3>
+                                    <h3>{item.roomName}</h3>
                                 </Col>
                                 <Col md={2}>
 
-                                    <Col className='fs-4 fw-bold ms-2'>15</Col>
-                                    <Col className='fs-5 text-secondary'>Kasım</Col>
+                                <Col className="fs-4 fw-bold ms-2">{moment(item.createdAt).date()}</Col>
+                                <Col className="fs-5 text-secondary"> {moment(item.createdAt).format("MMMM")}</Col>
                                 </Col>
                                 <Col md={2}>
                                     <Button variant="danger" onClick={() => handleShow(item)}>İncele</Button>
@@ -131,18 +110,18 @@ const ComplaintsNew = () => {
                 <Modal.Body>
                     {selectedComplaint && (
                         <>
-                            <p><strong>Adı Soyadı:</strong> {selectedComplaint.name}</p>
-                            <p><strong>Şikayet Türü:</strong> {selectedComplaint.exp}</p>
-                            <p><strong>Şikayet Yeri:</strong> {selectedComplaint.class}</p>
-                            <p><strong>Şikayet Tarihi:</strong></p>
-                            <p><strong>Şikayet Açıklaması:</strong> Türkiye, resmî adıyla Türkiye Cumhuriyeti, topraklarının büyük bölümü Batı Asya'da Anadolu'da, diğer bir bölümü ise Güneydoğu Avrupa'nın uzantısı Doğu Trakya'da olan kıtalararası bir ülkedir. Batıda Bulgaristan ve Yunanistan, doğuda Gürcistan, Ermenistan, İran ve Azerbaycan, güneyde ise Irak ve Suriye ile sınır komşusudur. Güneyini Kıbrıs ve Akdeniz, batısını Ege Denizi, kuzeyini ise Karadeniz çevreler. Marmara Denizi ise İstanbul Boğazı ve Çanakkale Boğazı ile birlikte Anadolu'yu Trakya'dan, yani Asya'yı Avrupa'dan ayırır. Resmî olarak laik bir devlet olan Türkiye'de nüfusun çoğunluğu Müslüman'dır. Ankara, Türkiye'nin başkenti ve ikinci en kalabalık şehri; İstanbul ise, Türkiye'nin en kalabalık şehri, ekonomik ve finansal merkezi ve aynı zamanda Avrupa'nın en kalabalık şehridir.</p>
-                            <p><strong>Fotoğraf:</strong></p>  <Image src="/tu_logo.jpg" />
+                            <p><strong>Adı Soyadı: </strong>{selectedComplaint.userName}</p>
+                            <p><strong>Şikayet Türü: </strong>{selectedComplaint.content}</p>
+                            <p><strong>Şikayet Yeri: </strong>{selectedComplaint.roomName}</p>
+                            <p><strong>Şikayet Tarihi: </strong>{moment(selectedComplaint.createdAt).format("DD MMMM YYYY HH:mm")}</p>
+                            <p><strong>Şikayet Açıklaması: </strong>{selectedComplaint.content}</p>
+                            <p><strong>Fotoğraflar: </strong></p><Image src={selectedComplaint.photos} />
                         </>
                     )}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={handleClose}>
-                        {selectedComplaint && (selectedComplaint.class)} sınıfını kapat
+                        {selectedComplaint && (selectedComplaint.roomName)} sınıfını kapat
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat

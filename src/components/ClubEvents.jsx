@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'moment/locale/tr';
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
-
+import "moment/locale/tr";
 moment.locale('tr');
 
 const events = [
@@ -16,7 +16,8 @@ const events = [
     // Daha fazla etkinlik...
 ];
 
-const ClubEvents = () => {
+
+const ClubEvents = ({ events }) => {
     const { userType } = useContext(UserContext);
 
     const [showModal, setShowModal] = useState(false);
@@ -88,7 +89,7 @@ const ClubEvents = () => {
             const updatedEvent = {
                 eventsName: newEvent.eventsName,  // Önceki değeri koruyoruz.
                 eventsDate: selectedTime?.start,
-                eventsPlace: selectedCard?.title ,  // Eğer selectedCard boşsa boş bir string atayın.
+                eventsPlace: selectedCard?.title,  // Eğer selectedCard boşsa boş bir string atayın.
                 eventsDetails: newEvent.eventsDetails,
                 eventsLink: newEvent.eventsLink,
                 eventsImage: selectedImage || ''  // Eğer resim seçilmemişse boş bir string atayın.
@@ -102,7 +103,7 @@ const ClubEvents = () => {
         else setShowAlert(true);
 
 
-       // setShowNewEventModal(false);
+        // setShowNewEventModal(false);
     };
 
 
@@ -117,14 +118,19 @@ const ClubEvents = () => {
 
     const navigate = useNavigate();
 
+
+    const formatDate = (dateString) => {
+        return moment(dateString, "DD.MM.YYYY").format("D MMMM dddd");
+    };
+
     return (
         <Container className="bg-light rounded-4">
             <Row className="justify-content-start align-items-center">
                 <Col md="auto"><h3 className="sticky-top bg-light">Henüz gerçekleşmeyen kulüp etkinlikleri</h3></Col>
                 <Col md="auto"><Button variant="outline-success" onClick={handleShowNewEventModal}>Yeni etkinlik oluştur</Button></Col>
-              {userType === "admin" &&
-              <Col md="auto"><Button variant="outline-success" onClick={()=>{navigate("/kulüpler-rezervasyon")}}>Etkinlik İstekleri</Button></Col>
-              }  
+                {userType === "admin" &&
+                    <Col md="auto"><Button variant="outline-success" onClick={() => { navigate("/kulüpler-rezervasyon") }}>Etkinlik İstekleri</Button></Col>
+                }
             </Row>
 
             <Row>
@@ -138,30 +144,30 @@ const ClubEvents = () => {
                         >
                             <Row className="ps-2">
                                 <Col>
-                                    <Image src="/ieee.png" style={{ width: "80px" }} />
+                                    <Image src={event.clubLogo} style={{ width: "80px" }} />
                                 </Col>
                                 <Col className="d-flex align-items-center">{event.clubName}</Col>
                             </Row>
                             <Card.Body>
                                 <Row>
                                     <Col md={3} className="fw-bold fs-2 d-flex align-items-center border-end">
-                                        {event.eventsPlace}
+                                        {event.clubRoomName}
                                     </Col>
                                     <Col md={9}>
-                                        <div className="twinkle-star-regular text-center">{event.eventsDate}</div>
+                                        <div className="twinkle-star-regular text-center">{formatDate(event.eventDate)}</div>
                                         <div
                                             className="d-flex twinkle-star-regular"
                                             style={{
                                                 fontSize:
-                                                    event.eventsName.length <= 22
-                                                        ? "30px"
-                                                        : event.eventsName.length <= 30
-                                                            ? "20px"
-                                                            : "15px",
+                                                    event.title.length <= 22
+                                                        ? "1.4wv"
+                                                        : event.title.length <= 30
+                                                            ? "1.4wv"
+                                                            : "1.4wv",
                                                 fontWeight: "500",
                                             }}
                                         >
-                                            {event.eventsName}
+                                            {event.title}
                                         </div>
                                     </Col>
                                 </Row>
@@ -177,21 +183,21 @@ const ClubEvents = () => {
                         <Modal.Title>{<Image src={selectedEvent.clubLogo} style={{ width: "80px" }} />}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <p><strong>Etkinlik adı:</strong> {selectedEvent.eventsName}</p>
-                        <p><strong>Tarih:</strong> {selectedEvent.eventsDate}</p>
-                        <p><strong>Yer:</strong> {selectedEvent.eventsPlace}</p>
+                        <p><strong>Etkinlik adı:</strong> {selectedEvent.title}</p>
+                        <p><strong>Tarih:</strong> {formatDate(selectedEvent.eventDate)}</p>
+                        <p><strong>Yer:</strong> {selectedEvent.clubRoomName}</p>
                         <Row>
                             <Col md="auto">
-                                <Image src='/ieee_afis.jpg' width={300} />
+                                <Image src={selectedEvent.banner} width={300} />
                             </Col>
-                            <Col >  <p><strong>Davet metni: </strong>Türkiye, resmî adıyla Türkiye Cumhuriyeti, topraklarının büyük bölümü Batı Asya'da Anadolu'da, diğer bir bölümü ise Güneydoğu Avrupa'nın uzantısı Doğu Trakya'da olan kıtalararası bir ülkedir. Batıda Bulgaristan ve Yunanistan, doğuda Gürcistan, Ermenistan, İran ve Azerbaycan, güneyde ise Irak ve Suriye ile sınır komşusudur. Güneyini Kıbrıs ve Akdeniz, batısını Ege Denizi, kuzeyini ise Karadeniz çevreler. Marmara Denizi ise İstanbul Boğazı ve Çanakkale Boğazı ile birlikte Anadolu'yu Trakya'dan, yani Asya'yı Avrupa'dan ayırır. Resmî olarak laik bir devlet olan Türkiye'de nüfusun çoğunluğu Müslüman'dır. Ankara, Türkiye'nin başkenti ve ikinci en kalabalık şehri; İstanbul ise, Türkiye'nin en kalabalık şehri, ekonomik ve finansal merkezi ve aynı zamanda Avrupa'nın en kalabalık şehridir.</p></Col>
+                            <Col >  <p><strong>Davet metni: </strong>{selectedEvent.details}</p></Col>
                         </Row>
                     </Modal.Body>
                     <Modal.Footer>
-                        {selectedEvent.eventLink && (
+                        {selectedEvent.katilimLinki && (
                             <Button
                                 variant="success"
-                                onClick={() => handleOpenLink(selectedEvent.eventLink)}
+                                onClick={() => handleOpenLink(selectedEvent.katilimLinki)}
                             >
                                 Etkinliğe Katılım Formu
                             </Button>
@@ -236,7 +242,7 @@ const ClubEvents = () => {
 
                                 </Form.Group>
                             </Col>
-                            <Col md={3}><strong>Yer: </strong>{selectedCard?.name}</Col>
+                            <Col md={3}><strong>Yer: </strong>{selectedCard?.clubRoomName}</Col>
                         </Row>
 
                         <Row className="align-items-center mt-2">

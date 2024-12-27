@@ -1,27 +1,11 @@
 import { useState } from "react";
 import { Alert, Button, Card, Col, Container, Image, ListGroup, Modal, Pagination, Row } from "react-bootstrap";
+import "moment/locale/tr";
+import moment from "moment";
+moment.locale('tr');
 
-const ComplaintsOld = () => {
-    // Şikayetler verisi
-
-    const oldComplaints = [
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201", year: 2022 },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201", year: 2023 },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208", year: 2023 },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201", year: 2024 },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204", year: 2024 },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201", year: 2022 },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201", year: 2023 },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208", year: 2023 },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201", year: 2024 },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204", year: 2024 },
-        { name: "Can Öztürk", exp: "Sınıf arıza bildirimi", class: "L201", year: 2022 },
-        { name: "Zeynep Şentürk", exp: "Sınıf arıza bildirimi", class: "D201", year: 2023 },
-        { name: "Melih Yaşar", exp: "Sınıf arıza bildirimi", class: "L208", year: 2023 },
-        { name: "Sıla Yıldız", exp: "Sınıf arıza bildirimi", class: "L201", year: 2024 },
-        { name: "Ali Duru", exp: "Sınıf arıza bildirimi", class: "D204", year: 2024 },
-    ];
-
+const ComplaintsOld = ({complaints}) => {
+  
     const [selectedYears, setSelectedYears] = useState([]);
     const [showAll, setShowAll] = useState(true);
     const [show, setShow] = useState(false);
@@ -115,8 +99,8 @@ const ComplaintsOld = () => {
             </div>
 
             <ListGroup className="ms-1">
-                {oldComplaints
-                    .filter((item) => selectedYears.length === 0 || selectedYears.includes(item.year)) // Yıl filtresi
+                {complaints
+                    .filter((item) => selectedYears.length === 0 || selectedYears.includes(moment(item.createdAt).year())) // Yıl filtresi
                     .map((item, index) => (
                         <Card
                             key={index}
@@ -129,7 +113,7 @@ const ComplaintsOld = () => {
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
                                 <Col md={1}>
                                     <Image
-                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.userName)}.png`} // İlk harflerden oluşan URL
                                         roundedCircle
 
                                         width={50}
@@ -138,19 +122,19 @@ const ComplaintsOld = () => {
                                 </Col>
                                 <Col md={4} className='ms-2'>
                                     <div>
-                                        <Card.Title className="text-start">{item.name}</Card.Title>
+                                        <Card.Title className="text-start">{item.userName}</Card.Title>
                                         <Card.Text className="text-start">
-                                            {item.exp}
+                                            {item.content}
                                         </Card.Text>
                                     </div>
                                 </Col>
                                 <Col md={2}>
-                                    <h3>L208</h3>
+                                    <h3>{item.roomName}</h3>
                                 </Col>
                                 <Col md={2}>
 
-                                    <Col className='fs-4 fw-bold ms-2'>15</Col>
-                                    <Col className='fs-5 text-secondary'>Kasım</Col>
+                                <Col className="fs-4 fw-bold ms-2">{moment(item.createdAt).date()}</Col>
+                                <Col className="fs-5 text-secondary"> {moment(item.createdAt).format("MMMM")}</Col>
 
                                 </Col>
                                 <Col md={2}>
@@ -169,16 +153,16 @@ const ComplaintsOld = () => {
                 </Modal.Header>
                 <Modal.Body>
                     <Alert variant="success">
-                        Şikayet çözüldü <strong>Sınıf kapatıldı</strong>
+                        Şikayet çözüldü <strong>{selectedComplaint?.solveDescription}</strong>
                     </Alert>
                     {selectedComplaint && (
                         <>
-                            <p><strong>Adı Soyadı:</strong> {selectedComplaint.name}</p>
-                            <p><strong>Şikayet Türü:</strong> {selectedComplaint.exp}</p>
-                            <p><strong>Şikayet Yeri:</strong> {selectedComplaint.class}</p>
-                            <p><strong>Şikayet Tarihi:</strong></p>
-                            <p><strong>Şikayet Açıklaması:</strong> Türkiye, resmî adıyla Türkiye Cumhuriyeti, topraklarının büyük bölümü Batı Asya'da Anadolu'da, diğer bir bölümü ise Güneydoğu Avrupa'nın uzantısı Doğu Trakya'da olan kıtalararası bir ülkedir. Batıda Bulgaristan ve Yunanistan, doğuda Gürcistan, Ermenistan, İran ve Azerbaycan, güneyde ise Irak ve Suriye ile sınır komşusudur. Güneyini Kıbrıs ve Akdeniz, batısını Ege Denizi, kuzeyini ise Karadeniz çevreler. Marmara Denizi ise İstanbul Boğazı ve Çanakkale Boğazı ile birlikte Anadolu'yu Trakya'dan, yani Asya'yı Avrupa'dan ayırır. Resmî olarak laik bir devlet olan Türkiye'de nüfusun çoğunluğu Müslüman'dır. Ankara, Türkiye'nin başkenti ve ikinci en kalabalık şehri; İstanbul ise, Türkiye'nin en kalabalık şehri, ekonomik ve finansal merkezi ve aynı zamanda Avrupa'nın en kalabalık şehridir.</p>
-                            <p><strong>Fotoğraflar:</strong> </p> <Image src="/tu_logo.jpg" />
+                            <p><strong>Adı Soyadı: </strong>{selectedComplaint.userName}</p>
+                            <p><strong>Şikayet Türü: </strong>{selectedComplaint.content}</p>
+                            <p><strong>Şikayet Yeri: </strong>{selectedComplaint.roomName}</p>
+                            <p><strong>Şikayet Tarihi: </strong>{moment(selectedComplaint.createdAt).format("DD MMMM YYYY HH:mm")}</p>
+                            <p><strong>Şikayet Açıklaması: </strong>{selectedComplaint.content}</p>
+                            <p><strong>Fotoğraflar: </strong></p><Image src={selectedComplaint} />
 
                         </>
                     )}

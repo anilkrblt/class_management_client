@@ -1,37 +1,29 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Button, Row, Col, Container, Modal, Image } from 'react-bootstrap';
+import { getAllClubEvents } from '../utils/ClubEventApiService';
+import moment from 'moment';
+import "moment/locale/tr";
+moment.locale('tr');
 
 const ClassReservationRequests = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
 
-    const [requests, setRequests] = useState([
-        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
-        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
-        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
-        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
-        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
-        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
-        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
-        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
-        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
-        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
-        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
-        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
-        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
-        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
-        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
-        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
-        { name: "Can Öztürk", exp: "Ek ders isteği", class: "L201", lesson: "Diferansiyel denklemler" },
-        { name: "Zeynep Şentürk", exp: "Ek ders isteği", class: "D201" },
-        { name: "Melih Yaşar", exp: "Ek ders isteği", class: "L208" },
-        { name: "Sıla Yıldız", exp: "Kulüp toplantısı", class: "L104" },
-        { name: "Ali Duru", exp: "Ek ders isteği", class: "D204" },
-    ]);
+    const [requests, setRequests] = useState([]);
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            const events = await getAllClubEvents();
+            setRequests(events.filter((event) => event.status === "pending"))
+
+        };
+        fetchEvents();
+    }, []);
+
+    const formatDate = (dateString) => {
+        return moment(dateString, "DD.MM.YYYY").format("D MMMM dddd");
+    };
+
 
     function formatToInitials(str) {
         // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
@@ -92,7 +84,7 @@ const ClassReservationRequests = () => {
                         <Row className="d-flex align-items-center justify-content-between w-100">
                             <Col md={1}>
                                 <Image
-                                    src={`https://cdn.auth0.com/avatars/${formatToInitials(item.name)}.png`} // İlk harflerden oluşan URL
+                                    src={`https://cdn.auth0.com/avatars/${formatToInitials(item.fullName)}.png`} // İlk harflerden oluşan URL
                                     roundedCircle
                                     width={50}
                                     className="me-3"
@@ -100,16 +92,16 @@ const ClassReservationRequests = () => {
                             </Col>
                             <Col md={3}>
                                 <Container className="pt-2">
-                                    <h5>{item.name}</h5>
-                                    <p>IEEE</p>
+                                    <h5>{item.fullName}</h5>
+                                    <p>{item.clubName}</p>
                                 </Container>
                             </Col>
                             <Col md={2}>
-                                <h3>{item.class}</h3>
+                                <h3>{item.clubRoomName}</h3>
                             </Col>
                             <Col md={1}>
-                                <Col className="fs-4 fw-bold ms-2">15</Col>
-                                <Col className="fs-5 text-secondary">Kasım</Col>
+                                <Col className="fs-4 fw-bold ms-2">{moment(item.eventDate, "DD.MM.YYYY").date()}</Col>
+                                <Col className="fs-5 text-secondary"> {moment(item.eventDate, "DD.MM.YYYY").format("MMMM")}</Col>
                             </Col>
                             <Col md={2}>
                                 <h5>13:00 - 15:00</h5>
@@ -150,34 +142,35 @@ const ClassReservationRequests = () => {
                         <Row>
                             <Col>
                                 <Row>
-                                    <p><strong>Kulüp:</strong> IEEE</p>
+                                    <p><strong>Kulüp: </strong>{selectedRequest.clubName}</p>
 
                                 </Row>
 
-                                <p><strong>Ad soyad:</strong> {selectedRequest.name}</p>
-                                <p><strong>Öğrenci no:</strong> 1215161445</p>
+                                <p><strong>Ad soyad:</strong> {selectedRequest.fullName}</p>
+                                <p><strong>Öğrenci no: </strong>{selectedRequest.studentNo} </p>
                                 <p><strong>Bölümü: </strong>Elektrik-Elektronik Mühendisliği</p>
 
 
                             </Col>
                             <Col>
-                                <p><strong>Yer: </strong>{selectedRequest.class}</p>
-                                <p><strong>Tarih saat: </strong>15 Kasım 13:00 Cuma</p>
-                                <p><strong>Etkinlik adı: </strong>Python etkinliği</p>
+                                <p><strong>Yer: </strong>{selectedRequest.clubRoomName}</p>
+                                <p><strong>Tarih saat: </strong>{formatDate(selectedRequest.eventDate)}</p>
+                                <p><strong>Etkinlik adı: </strong>{selectedRequest.title}</p>
                                 <p><strong>Katılım formu: </strong>
                                     <Button
                                         variant="link"
-                                        onClick={() => window.open("https://www.google.com/", '_blank', 'noopener,noreferrer')}
+                                        onClick={() => window.open(selectedRequest.katilimLinki, '_blank', 'noopener,noreferrer')}
                                     >
                                         Formu Aç
                                     </Button></p>
                             </Col>
                         </Row>
                         <Row>
-                            <Col md="auto">
-                                <Image src='/ieee_afis.jpg' width={260} />
-                            </Col>
-                            <Col >  <p><strong>Davet metni: </strong>Türkiye, resmî adıyla Türkiye Cumhuriyeti, topraklarının büyük bölümü Batı Asya'da Anadolu'da, diğer bir bölümü ise Güneydoğu Avrupa'nın uzantısı Doğu Trakya'da olan kıtalararası bir ülkedir. Batıda Bulgaristan ve Yunanistan, doğuda Gürcistan, Ermenistan, İran ve Azerbaycan, güneyde ise Irak ve Suriye ile sınır komşusudur. Güneyini Kıbrıs ve Akdeniz, batısını Ege Denizi, kuzeyini ise Karadeniz çevreler. Marmara Denizi ise İstanbul Boğazı ve Çanakkale Boğazı ile birlikte Anadolu'yu Trakya'dan, yani Asya'yı Avrupa'dan ayırır. Resmî olarak laik bir devlet olan Türkiye'de nüfusun çoğunluğu Müslüman'dır. Ankara, Türkiye'nin başkenti ve ikinci en kalabalık şehri; İstanbul ise, Türkiye'nin en kalabalık şehri, ekonomik ve finansal merkezi ve aynı zamanda Avrupa'nın en kalabalık şehridir.</p></Col>
+                            {selectedRequest.banner && <Col md="auto">
+                                <Image src={selectedRequest.banner} width={260} />
+                            </Col>}
+
+                            <Col >  <p><strong>Davet metni: </strong>{selectedRequest.details}</p></Col>
                         </Row>
                     </Modal.Body>
                     <Modal.Footer>

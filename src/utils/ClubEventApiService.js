@@ -3,7 +3,7 @@ const baseUrl = "http://localhost:5132/api";
 
 export const getAllClubEvents = async () => {
     try {
-        const response = await axios.get(`${baseUrl}/xxxx`);
+        const response = await axios.get(`${baseUrl}/reservations/clubreservations`);
         return response.data;
 
     } catch (error) {
