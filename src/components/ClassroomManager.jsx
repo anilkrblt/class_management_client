@@ -10,16 +10,20 @@ import {
   Alert,
 } from "react-bootstrap";
 import { addRoom, deleteRoom, getAllRooms, updateRoom } from "../utils/RoomApiService";
+import { getAllDepartments } from "../utils/DepartmentApiService";
 
 const ClassroomManager = () => {
   const [classrooms, setClassrooms] = useState([]);
   const [formData, setFormData] = useState({
-    className: "",
+    name: "",
     capacity: "",
     examCapacity: "",
-    block: "A",
-    type: "Sınıf",
-    projection: "Var",
+    buildingId: 1,
+    roomType: 0,
+    isProjectorWorking: true,
+    isActive: true,
+    departmentId: 1,
+    equipment: ""
   });
   const [editIndex, setEditIndex] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -27,6 +31,8 @@ const ClassroomManager = () => {
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [departments, setDepartments] = useState("");
+
 
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -48,23 +54,82 @@ const ClassroomManager = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleAdd = () => {
-    if (!formData.className || !formData.capacity || !formData.examCapacity) {
+
+  useEffect(() => {
+    const fetchClassrooms = async () => {
+      try {
+        const data = await getAllDepartments();
+        setDepartments(data); // Dönüştürülmüş veriyi state'e atıyoruz
+      } catch (err) {
+        console.error("Sınıflar yüklenirken hata oluştu:", err);
+      }
+    };
+
+    fetchClassrooms();
+  }, []);
+
+  console.log(departments)
+
+  const buildId = (name) => {
+    switch (name) {
+      case "A Binası":
+        return 1;
+      case "B Binası":
+        return 2;
+
+    }
+  }
+
+  const departmentsId = (name) => {
+    switch (name) {
+      case "Bilgisayar Mühendisliği":
+        return 1;
+      case "Makine Mühendisliği":
+        return 2;
+      case "Elektrik Elektronik Mühendisliği":
+        return 3;
+      case "Biyomedikal Mühendisliği":
+        return 4;
+      case "Endüstri Mühendisliği":
+        return 5;
+
+    }
+  }
+
+  const handleAdd = async () => {
+    if (!formData.name || !formData.capacity || !formData.examCapacity) {
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
       return;
     }
-    addRoom(formData)
-    setClassrooms([...classrooms, { ...formData, isClosed: false }]);
-    setFormData({
-      className: "",
-      capacity: "",
-      examCapacity: "",
-      block: "A",
-      type: "Sınıf",
-      projection: "Var",
-    });
+
+
+
+    try {
+      // Ders ekleme fonksiyonunu çağır
+      await addRoom(formData);
+
+      // Ders başarılı bir şekilde eklendiyse listeye ekle
+      setClassrooms([...classrooms, { ...formData, isActive: true }]);
+
+      // Formu sıfırla
+      setFormData({
+        name: "",
+        capacity: "",
+        examCapacity: "",
+        buildingId: 1,
+        roomType: 0,
+        isProjectorWorking: true,
+        isActive: true,
+        departmentId: 1,
+        equipment: ""
+      });
+
+    } catch (error) {
+      alert("Sınıf eklenirken bir hata oluştu. Lütfen tekrar deneyin.");
+    }
   };
+
 
   const handleEdit = (index) => {
     setEditIndex(index);
@@ -80,50 +145,99 @@ const ClassroomManager = () => {
     setClassrooms(updatedClassrooms);
 
     const roomUpdate = updatedClassrooms[editIndex];
-    updateRoom(roomUpdate)
+    // updateRoom(roomUpdate)
 
     setShowEditModal(false);
     setEditIndex(null);
     setFormData({
 
-      className: "",
+      name: "",
       capacity: "",
       examCapacity: "",
-      block: "A",
-      type: "Sınıf",
-      projection: "Var",
+      buildingId: 1,
+      roomType: 0,
+      isProjectorWorking: true,
+      isActive: true,
+      departmentId: 1,
+      equipment: ""
     });
   };
+  const [deleteRoomId, setDeleteRoomId] = useState(null);
+  console.log("del", deleteRoomId)
+  const handleDelete = async () => {
 
-  const handleDelete = () => {
-    const deletedRoom = classrooms[deleteIndex];
-    setClassrooms(classrooms.filter((_, i) => i !== deleteIndex));
-    deleteRoom(deletedRoom)
 
-    setShowDeleteModal(false);
+    try {
+      await deleteRoom(deleteRoomId)
+      setClassrooms(classrooms.filter((_, i) => i !== deleteIndex));
+      setShowDeleteModal(false);
+    } catch (error) {
+      alert("Ders silinirken bir hata oluştu. Lütfen tekrar deneyin.")
+    }
   };
 
-  const handleCloseClassroom = (index) => {
+  const handleCloseClassroom = async (index) => {
 
     const updatedClassrooms = [...classrooms];
-    updatedClassrooms[index].isClosed = !updatedClassrooms[index].isClosed;
-    const roomUpdate = updatedClassrooms[index];
-    updateRoom(roomUpdate)
-    setClassrooms(updatedClassrooms);
+
+
+
+
+    const changeActive = classrooms[index]
+    const id = classrooms[index].roomId
+
+
+    const data = {
+      name: changeActive.name,
+      capacity: changeActive.capacity,
+      examCapacity: changeActive.examCapacity,
+      isProjectorWorking: changeActive.isProjectorWorking,
+      equipment: "",
+      isActive: !changeActive.isActive,
+      roomType: 1, //room type fonksiyonu yazılacak switch caseli
+      departmentId: departmentsId(changeActive.departmentName),
+      buildingId: buildId(changeActive.buildingName)
+    }
+
+    try {
+      await updateRoom(id, data)
+      updatedClassrooms[index].isActive = !updatedClassrooms[index].isActive;
+      setClassrooms(updatedClassrooms);
+    } catch (error) {
+      alert("hata")
+    }
   };
 
-  const toggleProjection = (index) => {
+  const toggleProjection = async (index) => {
     const updatedClassrooms = [...classrooms];
 
-    updatedClassrooms[index].projection = updatedClassrooms[index].projection === "Var" ? "Yok" : "Var";
-    const roomUpdate = updatedClassrooms[index];
-    updateRoom(roomUpdate)
-    setClassrooms(updatedClassrooms);
+    const changeProjection = classrooms[index]
+    const id = classrooms[index].roomId
 
+
+    const data = {
+      name: changeProjection.name,
+      capacity: changeProjection.capacity,
+      examCapacity: changeProjection.examCapacity,
+      isProjectorWorking: !changeProjection.isProjectorWorking,
+      equipment: "",
+      isActive: changeProjection.isActive,
+      roomType: 1,
+      departmentId: departmentsId(changeProjection.departmentName),
+      buildingId: buildId(changeProjection.buildingName)
+    }
+
+    try {
+      await updateRoom(id, data)
+      updatedClassrooms[index].isProjectorWorking = !updatedClassrooms[index].isProjectorWorking;
+      setClassrooms(updatedClassrooms);
+    } catch (error) {
+      alert("hata")
+    }
   };
 
   const filteredClassrooms = classrooms.filter((classroom) =>
-    classroom.className.toLowerCase().includes(searchQuery.toLowerCase())
+    classroom.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -143,8 +257,8 @@ const ClassroomManager = () => {
                   <Form.Label>Sınıf Adı</Form.Label>
                   <Form.Control
                     type="text"
-                    name="className"
-                    value={formData.className}
+                    name="name"
+                    value={formData.name}
                     onChange={handleInputChange}
                     placeholder="Sınıf adı girin"
                   />
@@ -179,13 +293,13 @@ const ClassroomManager = () => {
                 <Form.Group controlId="block">
                   <Form.Label>Blok</Form.Label>
                   <Form.Select
-                    name="block"
-                    value={formData.block}
+                    name="buildingName"
+                    value={formData.buildingId}
                     onChange={handleInputChange}
                   >
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
+                    <option value={1}>A</option>
+                    <option value={2}>B</option>
+
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -193,16 +307,17 @@ const ClassroomManager = () => {
                 <Form.Group controlId="type">
                   <Form.Label>Derslik Tipi</Form.Label>
                   <Form.Select
-                    name="type"
-                    value={formData.type}
+                    name="roomType"
+                    value={formData.roomType}
                     onChange={handleInputChange}
                   >
-                    <option value="Sınıf">Sınıf</option>
-                    <option value="Amfi">Amfi</option>
-                    <option value="Bilgisayar Laboratuvarı">Bilgisayar Laboratuvarı</option>
-                    <option value="Elektrik Laboratuvarı">Elektrik Laboratuvarı</option>
-                    <option value="Genetik Laboratuvarı">Genetik Laboratuvarı</option>
-                    <option value="Gıda Laboratuvarı">Gıda Laboratuvarı</option>
+                    <option value={0}>Sınıf</option>
+                    <option value={1}>Amfi</option>
+                    <option value={2}>Bilgisayar Laboratuvarı</option>
+                    <option value={3}>Elektrik Laboratuvarı</option>
+                    <option value={4}>Genetik Laboratuvarı</option>
+                    <option value={5}>Gıda Laboratuvarı</option>
+                    <option value={6}>Makine Laboratuvarı</option>
                   </Form.Select>
                 </Form.Group>
               </Col>
@@ -253,19 +368,19 @@ const ClassroomManager = () => {
               <tr key={index}>
                 <td>{index + 1}</td>
                 <td>
-                  {classroom.isClosed ? (
+                  {!classroom.isActive ? (
                     <span
                       style={{
                         textDecoration: "line-through red",
                         color: "black",
                       }}
                     >
-                      {classroom.className}
+                      {classroom.name}
                     </span>
                   ) : (
-                    classroom.className
+                    classroom.name
                   )}
-                  {classroom.isClosed && (
+                  {!classroom.isActive && (
                     <span
                       style={{
                         color: "red",
@@ -280,17 +395,40 @@ const ClassroomManager = () => {
                 <td>{classroom.capacity}</td>
                 <td>{classroom.examCapacity}</td>
                 <td>
-                  {classroom.projection}{" "}
+                  {classroom.isProjectorWorking === true ? "Var" : "Yok"
+
+                  }{" "}
                   <Button
                     size="sm"
                     variant="info"
-                    onClick={() => toggleProjection(index)}
+                    onClick={() => { toggleProjection(index); }}
                   >
                     Değiştir
                   </Button>
                 </td>
-                <td>{classroom.block}</td>
-                <td>{classroom.type}</td>
+                <td>{classroom.buildingName}</td>
+                <td>
+                  {(() => {
+                    switch (classroom.roomType) {
+                      case 0:
+                        return <p>Derslik</p>;
+                      case 1:
+                        return <p>Amfi</p>;
+                      case 2:
+                        return <p>Bilgisayar Laboratuvarı</p>;
+                      case 3:
+                        return <p>Elektrik Laboratuvarı</p>;
+                      case 4:
+                        return <p>Genetik Laboratuvarı</p>;
+                      case 5:
+                        return <p>Gıda Laboratuvarı</p>;
+                      case 6:
+                        return <p>Makine Laboratuvarı</p>;
+
+                    }
+                  })()}
+                </td>
+
                 <td>
                   <Button
                     size="sm"
@@ -304,6 +442,7 @@ const ClassroomManager = () => {
                     variant="danger"
                     onClick={() => {
                       setDeleteIndex(index);
+                      setDeleteRoomId(classroom.roomId)
                       setShowDeleteModal(true);
                     }}
                   >
@@ -311,10 +450,10 @@ const ClassroomManager = () => {
                   </Button>{" "}
                   <Button
                     size="sm"
-                    variant={classroom.isClosed ? "success" : "primary"}
+                    variant={!classroom.isActive ? "success" : "primary"}
                     onClick={() => handleCloseClassroom(index)}
                   >
-                    {classroom.isClosed ? "Sınıfı Aç" : "Sınıfı Kapat"}
+                    {!classroom.isActive ? "Sınıfı Aç" : "Sınıfı Kapat"}
                   </Button>
                 </td>
               </tr>
@@ -332,8 +471,8 @@ const ClassroomManager = () => {
               <Form.Label>Sınıf Adı</Form.Label>
               <Form.Control
                 type="text"
-                name="className"
-                value={formData.className}
+                name="name"
+                value={formData.name}
                 onChange={handleInputChange}
               />
             </Form.Group>
@@ -361,27 +500,27 @@ const ClassroomManager = () => {
               <Form.Label>Blok</Form.Label>
               <Form.Select
                 name="block"
-                value={formData.block}
+                value={formData.buildingId}
                 onChange={handleInputChange}
               >
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
+                <option value={1}>A</option>
+                <option value={2}>B</option>
               </Form.Select>
             </Form.Group>
             <Form.Group controlId="editType" className="mt-2">
               <Form.Label>Derslik Tipi</Form.Label>
               <Form.Select
-                name="type"
-                value={formData.type}
+                name="roomType"
+                value={formData.roomType}
                 onChange={handleInputChange}
               >
-                <option value="Sınıf">Sınıf</option>
-                <option value="Amfi">Amfi</option>
-                <option value="Bilgisayar Laboratuvarı">Bilgisayar Laboratuvarı</option>
-                <option value="Elektrik Laboratuvarı">Elektrik Laboratuvarı</option>
-                <option value="Genetik Laboratuvarı">Genetik Laboratuvarı</option>
-                <option value="Gıda Laboratuvarı">Gıda Laboratuvarı</option>
+                <option value={0}>Sınıf</option>
+                <option value={1}>Amfi</option>
+                <option value={2}>Bilgisayar Laboratuvarı</option>
+                <option value={3}>Elektrik Laboratuvarı</option>
+                <option value={4}>Genetik Laboratuvarı</option>
+                <option value={5}>Gıda Laboratuvarı</option>
+                <option value={6}>Makine Laboratuvarı</option>
               </Form.Select>
             </Form.Group>
           </Form>

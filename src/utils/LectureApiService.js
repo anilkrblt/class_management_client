@@ -41,11 +41,11 @@ export const updateLecture = async (lecture) => {
 };
 
 export const deleteLecture = async (lecture) => {
-    const lectureId = lecture.code;
+
    
 
     try {
-        await axios.delete(`${baseUrl}/lectures/${lectureId}`);
+        await axios.delete(`${baseUrl}/lectures/${lecture}`);
     
         
     } catch (error) {

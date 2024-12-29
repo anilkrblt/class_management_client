@@ -10,12 +10,6 @@ import { UserContext } from "./UserContext";
 import "moment/locale/tr";
 moment.locale('tr');
 
-const events = [
-    { clubName: "IEEE", clubLogo: "/ieee.png", eventsDate: "20 Aralık Cuma 12:00", eventsPlace: "L208", eventsName: "Python etkinliği", eventLink: "https://www.google.com/", eventsDetails: "Bu etkinlikte Python hakkında temel bilgiler verilecektir." },
-    { clubName: "IEEE", clubLogo: "/ieee.png", eventsDate: "20 Aralık Cuma 12:00", eventsPlace: "L208", eventsName: "Veri Bilimi", eventsDetails: "Veri bilimi projelerine giriş.", eventLink: "https://www.example.com/" },
-    // Daha fazla etkinlik...
-];
-
 
 const ClubEvents = ({ events }) => {
     const { userType } = useContext(UserContext);
@@ -82,14 +76,14 @@ const ClubEvents = ({ events }) => {
 
         if (newEvent.eventsName &&
             selectedTime &&
-            selectedCard?.title &&
+            selectedCard?.name &&
             newEvent.eventsDetails &&
             newEvent.eventsLink
         ) {
             const updatedEvent = {
                 eventsName: newEvent.eventsName,  // Önceki değeri koruyoruz.
                 eventsDate: selectedTime?.start,
-                eventsPlace: selectedCard?.title,  // Eğer selectedCard boşsa boş bir string atayın.
+                eventsPlace: selectedCard?.name,  // Eğer selectedCard boşsa boş bir string atayın.
                 eventsDetails: newEvent.eventsDetails,
                 eventsLink: newEvent.eventsLink,
                 eventsImage: selectedImage || ''  // Eğer resim seçilmemişse boş bir string atayın.
@@ -242,7 +236,7 @@ const ClubEvents = ({ events }) => {
 
                                 </Form.Group>
                             </Col>
-                            <Col md={3}><strong>Yer: </strong>{selectedCard?.clubRoomName}</Col>
+                            <Col md={3}><strong>Yer: </strong>{selectedCard?.name}</Col>
                         </Row>
 
                         <Row className="align-items-center mt-2">

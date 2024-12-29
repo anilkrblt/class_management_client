@@ -1,22 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Modal, Alert, Pagination } from 'react-bootstrap';
-import { addLecture, getAllLectures } from '../utils/LectureApiService';
+import { addLecture, deleteLecture, getAllLectures } from '../utils/LectureApiService';
+import { getAllInstructors } from '../utils/InstructorsApiService';
+
 
 const LessonManager = () => {
     const [lessons, setLessons] = useState([]);
-    
+    useEffect(() => {
+        const fetchLectures = async () => {
+            const lectures = await getAllLectures();
+            setLessons(lectures)
+        };
+
+        fetchLectures();
+    }, []);
+
+    const [instructors, setInstructors] = useState([])
+    useEffect(() => {
+        const fetchInstructors = async () => {
+            const instructor = await getAllInstructors();
+            setInstructors(instructor)
+        };
+
+        fetchInstructors();
+    }, []);
+
+
+
     const [formData, setFormData] = useState({
-        lessonName: '',
-        lessonId: '',
+        name: '',
+        code: '',
         department: 'Bilgisayar Mühendisliği',
         grade: '1',
-        season: 'Güz',
+        term: 'Güz',
         instructors: [],
     });
     const [editIndex, setEditIndex] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteIndex, setDeleteIndex] = useState(null);
+    const [deleteLectureCode, setDeleteLectureCode] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const [selectedDepartments, setSelectedDepartments] = useState([]);
     const [showAll, setShowAll] = useState(true);
@@ -24,6 +47,7 @@ const LessonManager = () => {
 
     const [showRemoveModal, setShowRemoveModal] = useState(false);
     const [selectedLesson, setSelectedLesson] = useState(null);
+    const [showMessage, setShowMessage] = useState(false)
 
     const toggleDepartmentSelection = (department) => {
         const updatedDepartments = selectedDepartments.includes(department)
@@ -36,10 +60,10 @@ const LessonManager = () => {
 
     const departments = [
         "Bilgisayar Mühendisliği",
-        "Makine Mühendisliği",
         "Elektrik-Elektronik Mühendisliği",
+        "Genetik ve Biyomühendislik",
         "Gıda Mühendisliği",
-        "Genetik Mühendisliği"
+        "Makine Mühendisliği",
     ];
 
 
@@ -73,18 +97,52 @@ const LessonManager = () => {
 
 
 
-    const handleAdd = () => {
-        if (!formData.lessonName || !formData.lessonId || formData.instructors.length === 0) {
+    const handleAdd = async () => {
+    
+        if (!formData.name || !formData.code || formData.instructors.length === 0) {
             setShowAlert(true);
             setTimeout(() => setShowAlert(false), 3000);
             return;
         }
-        console.log(formData)
-        //createLecture(formData)
-        addLecture(formData)
-        setLessons([...lessons, { ...formData }]);
-        setFormData({ lessonName: '', lessonId: '', department: 'Bilgisayar Mühendisliği', grade: '1', season: 'Güz', instructors: [] });
+
+        // Seçili instructors listesinden id'leri ekle
+        const instructorsWithIds = formData.instructors.map((instructorName) => {
+            const matchingInstructor = instructors.find(
+                (instructor) => instructor.instructorName === instructorName
+            );
+            return matchingInstructor ? { instructorId: matchingInstructor.instructorId, instructorName: instructorName } : null;
+        }).filter(Boolean); // Geçersiz (null) değerleri kaldır
+
+        // Güncellenmiş formData ile işlemleri sürdür
+        const updatedFormData = {
+            ...formData,
+            instructors: instructorsWithIds
+        };
+
+ 
+
+  
+       try {
+        // Ders ekleme fonksiyonunu çağır
+        await addLecture(updatedFormData);
+
+        // Ders başarılı bir şekilde eklendiyse listeye ekle
+        setLessons([...lessons, updatedFormData]);
+
+        // Formu sıfırla
+        setFormData({
+            name: '',
+            code: '',
+            department: 'Bilgisayar Mühendisliği',
+            grade: '1',
+            term: 'Güz',
+            instructors: []
+        });
+    } catch (error) {
+        alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.");
+    }
     };
+
 
     const handleAddInstructor = (index) => {
         setCurrentLessonIndex(index);
@@ -100,7 +158,7 @@ const LessonManager = () => {
         const updatedLessons = [...lessons];
 
         const lessonIndex = updatedLessons.findIndex(
-            lesson => lesson.lessonId === selectedLesson.lessonId);
+            lesson => lesson.code === selectedLesson.code);
 
 
         if (lessonIndex !== -1) {
@@ -110,14 +168,26 @@ const LessonManager = () => {
     };
 
     const handleConfirmInstructor = () => {
+        setShowMessage(false)
         const updatedLessons = [...lessons];
-        if (!updatedLessons[currentLessonIndex].instructors.includes(selectedInstructor)) {
-            updatedLessons[currentLessonIndex].instructors.push(selectedInstructor);
+
+        // `selectedInstructor`'dan sadece name ve instructorId alınarak ekleniyor
+        const instructorToAdd = {
+            instructorId: selectedInstructor.instructorId,
+            instructorName: selectedInstructor.instructorName
+        };
+
+        // Eğer bu eğitmen zaten ekli değilse, yeni eğitmeni ekleyin
+        if (!updatedLessons[currentLessonIndex].instructors.some(instructor => instructor.instructorId === selectedInstructor.instructorId)) {
+            updatedLessons[currentLessonIndex].instructors.push(instructorToAdd);
             setLessons(updatedLessons);
+            setShowInstructorModal(false);
+   
         } else {
-            alert("Bu öğretim üyesi zaten ekli!");
+            setShowMessage(true)
         }
-        setShowInstructorModal(false);
+
+
     };
 
     const handleEdit = (index) => {
@@ -132,33 +202,47 @@ const LessonManager = () => {
         setLessons(updatedLessons);
         setShowEditModal(false);
         setEditIndex(null);
-        setFormData({ lessonName: '', lessonId: '', department: 'Bilgisayar Mühendisliği', grade: '1', season: 'Güz', instructors: [] });
+        setFormData({ name: '', code: '', department: 'Bilgisayar Mühendisliği', grade: '1', term: 'Güz', instructors: [] });
     };
 
-    const handleDelete = () => {
-        setLessons(lessons.filter((_, i) => i !== deleteIndex));
-        setShowDeleteModal(false);
-    };
+    const handleDelete = async () => {
+
+        console.log("index",deleteIndex);
+        console.log("lecture", deleteLectureCode);
+        
+        
+       
+  
+        try {
+            
+            await deleteLecture(deleteLectureCode);
+    
+            setLessons(lessons.filter((_, i) => i !== deleteIndex));
+           
+            setShowDeleteModal(false);
+            console.log("Ders listesi güncellendi.");
+        } catch (error) {
+            alert("Ders silinirken bir hata oluştu. Lütfen tekrar deneyin.");
+    }; }
 
     const filteredLessons = lessons.filter((lesson) => {
         const lessonName = lesson.lessonName?.toLowerCase() || ""; // Varsayılan olarak boş string
         const lessonId = lesson.lessonId?.toLowerCase() || ""; // Varsayılan olarak boş string
-    
+
         const matchesSearchTerm = lessonName.includes(searchTerm.toLowerCase()) ||
             lessonId.includes(searchTerm.toLowerCase());
-    
+
         return (showAll || selectedDepartments.includes(lesson.department)) && matchesSearchTerm;
     });
-    
+
 
     const [showInstructorModal, setShowInstructorModal] = useState(false); // Modal kontrolü
     const [currentLessonIndex, setCurrentLessonIndex] = useState(null); // Hangi dersin seçildiği
     const [selectedInstructor, setSelectedInstructor] = useState(''); // Modal'da seçilen öğretim üyesi
 
-    const instructors = ["Altan Mesut", "Emir Öztürk", "Aydın Carus"]; // Öğretim üyeleri listesi
 
 
-
+    console.log(lessons)
 
 
     return (
@@ -178,8 +262,8 @@ const LessonManager = () => {
                                     <Form.Label className='ms-1'>Ders Adı</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name="lessonName"
-                                        value={formData.lessonName}
+                                        name="name"
+                                        value={formData.name}
                                         onChange={handleInputChange}
                                         placeholder="Ders adı girin"
                                     />
@@ -190,8 +274,8 @@ const LessonManager = () => {
                                     <Form.Label className='ms-1'>Ders Kodu</Form.Label>
                                     <Form.Control
                                         type="text"
-                                        name="lessonId"
-                                        value={formData.lessonId}
+                                        name="code"
+                                        value={formData.code}
                                         onChange={handleInputChange}
                                         placeholder="Ders kodu girin"
                                     />
@@ -221,7 +305,7 @@ const LessonManager = () => {
                             <Col md={2}>
                                 <Form.Group controlId="season">
                                     <Form.Label className='ms-1'>Dönem</Form.Label>
-                                    <Form.Select name="season" value={formData.season} onChange={handleInputChange}>
+                                    <Form.Select name="term" value={formData.term} onChange={handleInputChange}>
                                         <option value="Güz">Güz</option>
                                         <option value="Bahar">Bahar</option>
                                     </Form.Select>
@@ -237,8 +321,8 @@ const LessonManager = () => {
                                     >
                                         <option>Seçin</option>
                                         {instructors.map(instructor => (
-                                            <option key={instructor} value={instructor}>
-                                                {instructor}
+                                            <option key={instructor.instructorId} value={instructor.id}>
+                                                {instructor.instructorName}
                                             </option>
                                         ))}
                                     </Form.Select>
@@ -283,9 +367,9 @@ const LessonManager = () => {
                     />
                 </Col>
             </Row>
-            {filteredLessons.length === 0 
-            ? <p className='text-center fs-5 fw-semibold'>Ders bulunamadı.</p> 
-            :<Table striped bordered hover>
+            {filteredLessons.length === 0
+                ? <p className='text-center fs-5 fw-semibold'>Ders bulunamadı.</p>
+                : <Table striped bordered hover>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -304,12 +388,12 @@ const LessonManager = () => {
                                 <td>{index + 1}</td>
                                 <td>{lesson.name}</td>
                                 <td>{lesson.code}</td>
-                                <td>{lesson.departmentName}</td>
+                                <td>{lesson.department}</td>
                                 <td>{lesson.grade}</td>
-                                <td>{lesson.season}</td>
+                                <td>{lesson.term}</td>
                                 <td>
                                     {lesson.instructors.length > 0
-                                        ? lesson.instructors.join(', ')
+                                        ? lesson.instructors.map(ins => ins.instructorName)
                                         : 'Atanmadı'}
                                     <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
                                         Öğretim Üyesi Ekle
@@ -323,7 +407,9 @@ const LessonManager = () => {
                                 <td>
                                     <Button size="sm" variant="warning" onClick={() => handleEdit(index)}>Düzenle</Button>{' '}
                                     <Button size="sm" variant="danger" onClick={() => {
+                                        console.log(index)
                                         setDeleteIndex(index);
+                                        setDeleteLectureCode(lesson.code)
                                         setShowDeleteModal(true);
                                     }}>Sil</Button>{' '}
                                 </td>
@@ -345,10 +431,44 @@ const LessonManager = () => {
                             <Form.Label>Ders Adı</Form.Label>
                             <Form.Control
                                 type="text"
-                                name="lessonName"
-                                value={formData.lessonName}
+                                name="name"
+                                value={formData.name}
                                 onChange={handleInputChange}
                             />
+                            <Form.Group controlId="lessonId">
+                                <Form.Label className='ms-1'>Ders Kodu</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="code"
+                                    value={formData.code}
+                                    onChange={handleInputChange}
+                                    placeholder="Ders kodu girin"
+                                />
+                            </Form.Group>
+                            <Form.Group controlId="department">
+                                <Form.Label className='ms-1'>Bölüm</Form.Label>
+                                <Form.Select name="department" value={formData.department} onChange={handleInputChange}>
+                                    {departments.map(department => (
+                                        <option key={department} value={department}>{department}</option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+                            <Form.Group controlId="grade">
+                                <Form.Label className='ms-1'>Sınıf</Form.Label>
+                                <Form.Select name="grade" value={formData.grade} onChange={handleInputChange}>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                </Form.Select>
+                            </Form.Group>
+                            <Form.Group controlId="season">
+                                <Form.Label className='ms-1'>Dönem</Form.Label>
+                                <Form.Select name="term" value={formData.term} onChange={handleInputChange}>
+                                    <option value="Güz">Güz</option>
+                                    <option value="Bahar">Bahar</option>
+                                </Form.Select>
+                            </Form.Group>
                         </Form.Group>
                         {/* Diğer alanlar */}
                     </Form>
@@ -378,6 +498,7 @@ const LessonManager = () => {
                     <Modal.Title>Öğretim Üyesi Ekle</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
+                    {showMessage && <p className='fw-semibold text-danger'>Bu öğretim üyesi zaten ekli!</p>}
                     <Form.Group controlId="selectInstructor">
                         <Form.Label>Öğretim Üyesi Seçin</Form.Label>
                         <Form.Select
@@ -385,15 +506,15 @@ const LessonManager = () => {
                             onChange={(e) => setSelectedInstructor(e.target.value)}
                         >
                             {instructors.map((instructor) => (
-                                <option key={instructor} value={instructor}>
-                                    {instructor}
+                                <option key={instructor.instructorId} value={instructor.instructorId}>
+                                    {instructor.instructorName}
                                 </option>
                             ))}
                         </Form.Select>
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowInstructorModal(false)}>
+                    <Button variant="secondary" onClick={() => {setShowInstructorModal(false);  setShowMessage(false)}}>
                         Kapat
                     </Button>
                     <Button variant="primary" onClick={handleConfirmInstructor}>
@@ -420,7 +541,7 @@ const LessonManager = () => {
                                 {selectedLesson.instructors.map((instructor, idx) => (
                                     <tr key={idx}>
                                         <td>{idx + 1}</td>
-                                        <td>{instructor}</td>
+                                        <td>{instructor.instructorName}</td>
                                         <td>
                                             <Button
                                                 size="sm"

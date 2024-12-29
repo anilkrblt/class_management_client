@@ -35,32 +35,18 @@ function transformToFirstFormat(rooms) {
 // GET fonksiyonu
 export const getAllRooms = async () => {
   try {
-    const response = await axios.get(`${baseUrl}/rooms`);
-    const data = response.data; // API'den gelen orijinal data
-
-    // Dizi mi kontrolü
-    if (Array.isArray(data)) {
-      // 2. şekilde gelen veriyi 1. şekle dönüştürüyoruz
-      const transformedData = transformToFirstFormat(data);
-
-      console.log("Dönüştürülen veri:", transformedData);
-      return transformedData;
-    } else {
-      console.error("Beklenmedik veri formatı:", data);
-      return [];
-    }
+      const response = await axios.get(`${baseUrl}/rooms`);
+      return response.data;
   } catch (error) {
-    console.error("Hata:", error);
-    return [];
+      console.error("Hata:", error);
+      return [];
   }
 };
 
-export const updateRoom = async (room) => {
-    const roomId = room.roomId;
-    const response = await axios.put(`${baseUrl}/rooms/${roomId}`, room);
-    const data = response.data;
+export const updateRoom = async (roomId, data) => {
     try {
-        console.log(data)
+      const response = await axios.put(`${baseUrl}/rooms/${roomId}`, data);
+        console.log(response)
         
     } catch (error) {
         
@@ -69,23 +55,31 @@ export const updateRoom = async (room) => {
 
 export const deleteRoom = async (room) => {
 
-    try {
-        console.log(room.roomId)
-        
-    } catch (error) {
-        
-    }
+  try {
+      await axios.delete(`${baseUrl}/rooms/${room}`);
+  
+      
+  } catch (error) {
+      console.error("Hata:", error);
+  }
 };
 
 
 export const addRoom = async (room) => {
 
-    try {
-        console.log(room)
-        
-    } catch (error) {
-        
-    }
+  try {
+    const response = await axios.post(`${baseUrl}/rooms`, room);
+
+    console.log('Lecture added successfully:', response.data);
+
+    return response.data; // Gerekirse yanıtı döndürün
+} catch (error) {
+    // Hataları yakalayın ve işlem yapın
+    console.error('Error adding lecture:', error);
+
+    // Hata mesajını döndürmek isterseniz:
+    throw error;
+}
 };
 
 
