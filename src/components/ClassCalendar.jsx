@@ -1,23 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect } from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'moment/locale/tr'; // Türkçe lokali içe aktar
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Container } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
-
+import { RRule } from "rrule";
+import { getLecturesByRoomId } from '../utils/LectureApiService';
 // Moment.js'i Türkçe kullanacak şekilde ayarla
 moment.locale('tr');
 
 // Moment.js'yi takvime bağlamak için
 const localizer = momentLocalizer(moment);
 
-const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSelectedEvent  } ) => {
+const ClassCalendar = ({ roomId, onDataSubmit, lessonName, selectedEvent, setSelectedEvent , events1 } ) => {
 
   const [view, setView] = useState('day');
  const [message, setMessage] = useState (false)
  const [message2, setMessage2] = useState (false)
 
+   const [lectures, setLectures] = useState([])
+
+     const [clubs, setClubs] = useState([])
+  useEffect(() => {
+    const fetchEvents = async () => {
+        const events = await getLecturesByRoomId(roomId);
+        setLectures(events.lectures) 
+        setClubs(events.clubEvents)
+    };
+
+    fetchEvents();
+}, []);
+
+  
+const lectureEvent = Array.isArray(lectures)
+? lectures.map((item) => ({
+  title: item.lectureName,
+  start: new Date(`${item.date.split("T")[0]}T${item.startTime}`),
+  end: new Date(`${item.date.split("T")[0]}T${item.endTime}`),
+  departmentName: item.departmentName,
+  eventType: item.teacherName
+}))
+: []
 
   const handleSelectSlot = ({ start, end }) => {
     const now = new Date();
@@ -31,7 +55,7 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
     setMessage(false)
   
     // Çakışma kontrolü
-    const hasConflict = events.some(event => {
+    const hasConflict = lectureEvent.some(event => {
       return (
         (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
         (end > event.start && end <= event.end) || // Bitiş zamanı başka bir etkinlik arasında mı?
@@ -82,24 +106,31 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
   minTime.setHours(8, 0, 0); // Minimum saati 08:00 olarak ayarla
   maxTime.setHours(22, 0, 0); // Maksimum saati 22:00 olarak ayarla
 
+  const clubEvent = Array.isArray(clubs)
+    ? clubs.map((item) => ({
+      title: item.clubName,
+      start: new Date(`${item.eventDate.split("T")[0]}T${item.startTime}`),
+      end: new Date(`${item.eventDate.split("T")[0]}T${item.endTime}`),
+      clubTitle: item.title,
+      eventType: "Kulüp etkinliği"
+    }))
+    : []
   const EventComponent = ({ event }) => {
     // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
     if (view === 'day') {
       return (
         <Container className="d-flex flex-column align-items-center">
           <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size="2.1vw" />
-            <strong className="ms-2" style={{fontSize:"2.1vw"}}>{event.title}</strong>
+            <Icon.Stack size="1.7vw" />
+            <strong className="ms-2" style={{ fontSize: "1.7vw" }}>{event.title}</strong>
           </div>
-          <div className="mb-2 d-flex align-items-center">
-
-            <Icon.PcDisplay size="2.1vw" />
-            <span className='ms-2' style={{fontSize:"2vw"}}>{event.type}</span>
-          </div>
-          <div className="d-flex align-items-center">
-            <Icon.PersonFill className="me-1" size="1.8vw" />
-            <span className='fw-semibold' style={{fontSize:"1.5vw"}}>{event.message}</span>
-          </div>
+          {event.clubTitle && <div className="d-flex align-items-center">
+            <Icon.LightningChargeFill className="me-1" size="1.2vw" />
+            <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.clubTitle}</span>
+          </div>}
+          {event.eventType && <div className="d-flex align-items-center mt-2">
+            <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.eventType}</span>
+          </div>}
         </Container>
       );
     }
@@ -123,7 +154,7 @@ const ClassCalendar = ({ onDataSubmit, lessonName, events, selectedEvent, setSel
 
       <Calendar
         localizer={localizer}
-        events={[...events, selectedEvent]} // Tüm etkinlikleri göster
+        events={[...clubEvent, ...lectureEvent, selectedEvent]} // Tüm etkinlikleri göster
         step={30}
         views={{ work_week: true, day: true }}
         onView={(view) => setView(view)}

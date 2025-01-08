@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import StudentHomePage from './pages/StudentHomepage';
@@ -25,12 +25,42 @@ import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
 import LessonPlaning from './components/LessonPlaning';
 import StudentExams from './components/StudentExams';
 import LoginScreen from './pages/LoginPage2';
+
 import InstructorLessons from './components/InstructorLessons';
+
+import getAllRooms from './utils/deneme';
+import { getAllLectures, updateLecture } from './utils/LectureApiService';
+import { getAllComplaints } from './utils/ComplaintApiService';
+import InstructorLessonsPage from './pages/InstructorLessonsPage';
+import ComplaintsStudentPage from './pages/ComplaintsStudentPage';
+import CreateExam from './components/CreateExam';
+import CreateExamPage from './pages/CreateExamPage';
+
 
 const App = () => {
 
   const { userType, setUserType } = useContext(UserContext);
-  console.log(userType)
+
+  //room sayfası
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const events = await getAllRooms();
+      console.log(events); // Veriyi burada işleyebilirsiniz.
+    };
+
+    fetchEvents();
+  }, []);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      const events = await getAllComplaints();
+      console.log(events); // Veriyi burada işleyebilirsiniz.
+    };
+
+    fetchEvents();
+  }, []);
+
+  
   return (
 
     <BrowserRouter>
@@ -95,6 +125,14 @@ const App = () => {
           }
         />
         <Route
+          path="/şikayetleriniz"
+          element={
+            <PrivateRoute allowedRoles={['student', 'instructor']}>
+              <ComplaintsStudentPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/dersprogrami"
           element={
             <PrivateRoute allowedRoles={['instructor', 'admin']}>
@@ -110,7 +148,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<InstructorLessons />} />
+        <Route path="*" element={<CreateExam />} />
 
         <Route
           path="/profil"
@@ -128,11 +166,20 @@ const App = () => {
             </PrivateRoute>
           }
         />
-       <Route
+        <Route
           path="/kulüpler-rezervasyon"
           element={
-            <PrivateRoute allowedRoles={[ "admin"]}>
+            <PrivateRoute allowedRoles={["admin"]}>
               <ClassReservationRequestsPage />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/sınavolustur"
+          element={
+            <PrivateRoute allowedRoles={[ "admin"]}>
+              <CreateExamPage />
             </PrivateRoute>
           }
         />

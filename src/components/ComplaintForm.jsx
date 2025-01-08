@@ -1,24 +1,84 @@
-import React, { useState } from 'react';
-import { Form, Button, Modal, Alert, Image } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Button, Modal, Alert, Image, Col, Row } from 'react-bootstrap';
 import * as Icon from 'react-bootstrap-icons';
+import { getAllRooms } from '../utils/RoomApiService';
+import { createComplaint } from '../utils/ComplaintApiService';
+import { useNavigate } from 'react-router-dom';
+
+let complaints = [
+  "Sınıf arıza bildirimi",
+  "Temizlik şikayeti",
+  "Çöp kutularının eksikliği",
+  "Laboratuvar eksiklikleri",
+  "Yemekhane yemek şikayeti",
+  "Isıtma problemi",
+  "İnternet erişim problemi",
+  "Okulun genel tadilat ihtiyacı",
+  "OBS ile ilgili şikayetler",
+  "Ders seçimiyle ilgili şikayetler",
+  "Ders programı sorunu",
+  "Sınav programı sorunu",
+  "Ders notlarının zamanında paylaşılmaması",
+  "Teknolojik araç eksikliği",
+  "Sınav tarihlerinin geç duyurulması",
+  "Proje tarihlerinin geç duyurulması",
+  "Etkinlik eksikliği",
+  "Öğrenci kulüplerinin aktif olmaması",
+  "Kütüphane çalışma saatlerinin kısıtlı olması",
+  "Ders işlenişiyle ilgili şikayet",
+  "Ders materyallerinin güncel olmaması",
+  "Okulda mobbing veya ayrımcılık",
+  "Okul saatlerinin düzensizliği",
+  "Okul yönetimiyle iletişim sorunu",
+  "Okulda aşırı sıcaklık veya soğukluk",
+  "Kantin ile ilgili sorunlar",
+  "Bahçe düzenleme eksikliği",
+  "Okulda su kesintisi yaşanması",
+  "Tuvalet kağıdı ve sabun eksikliği",
+  "Okul giriş-çıkış güvenlik önlemlerinin eksikliği",
+  "Okul gezilerinin düzenlenmemesi"
+];
 
 const ComplaintForm = () => {
-  const [complaintTitle, setComplaintTitle] = useState('');
-  const [complaintDescription, setComplaintDescription] = useState('');
-  const [complaintType, setComplaintType] = useState('');
-  const [complaintPlace, setComplaintPlace] = useState('');
   const [images, setImages] = useState([]);
-  const [hoverIndex, setHoverIndex] = useState(null); // Hover edilen görüntünün indeksini saklayın
+  const [hoverIndex, setHoverIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-
+  const navigate = useNavigate();
   const [complaintForm, setComplaintForm] = useState({
-    title: "", 
     type: "",
-    place: "",
-    description: "",
+    title: "",
+    roomId: "",
+    content: "",
     images: []
   });
+  const [rooms, setRooms] = useState([]);
+
+  console.log(complaintForm)
+
+  useEffect(() => {
+    const fetchClassrooms = async () => {
+      try {
+        const data = await getAllRooms();
+        setRooms(data);
+      } catch (err) {
+        console.error("Sınıflar yüklenirken hata oluştu:", err);
+      }
+    };
+
+    fetchClassrooms();
+  }, []);
+
+
+
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setComplaintForm(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
@@ -42,17 +102,17 @@ const ComplaintForm = () => {
     setImages(updatedImages);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (complaintTitle && complaintDescription && complaintPlace && complaintType ) {
-      setComplaintForm({
-        title: complaintTitle, 
-        type: complaintType,
-        place: complaintPlace,
-        description: complaintDescription,
-        images: images
-      })
-      
+    const { type, title, roomId, content } = complaintForm;
+    if (type && title && roomId && content) {
+      const data = { ...complaintForm, userName:"Ali Veli", userId: 1 }
+
+      try {
+          await createComplaint(data)
+      } catch (error) {
+        alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.")
+      }
       setShowModal(true);
       setShowAlert(false);
     } else {
@@ -62,50 +122,61 @@ const ComplaintForm = () => {
 
   return (
     <div className="container my-5">
-      <h2>Şikayet Oluştur</h2>
+      <Row className='align-items-center'>
+        <Col md="auto"><h2>Şikayet Oluştur</h2></Col>
+        <Col md="auto">
+        <Button variant='outline-success' onClick={() => { navigate("/şikayetleriniz") }}>Şikayetlerim</Button>
+        </Col>
+      </Row>
+       
       {showAlert && (
         <Alert variant="danger">
           Lütfen tüm alanları doldurduğunuzdan emin olun!
         </Alert>
       )}
       <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="complaintTitle">
-          <Form.Label>Şikayet Başlığı</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Şikayet başlığını girin"
-            value={complaintTitle}
-            onChange={(e) => setComplaintTitle(e.target.value)}
-          />
-        </Form.Group>
 
         <Form.Group controlId="complaintType">
           <Form.Label>Şikayet Türü</Form.Label>
           <Form.Control
             as="select"
-            value={complaintType}
-            onChange={(e) => setComplaintType(e.target.type)}
+            name="type"
+            value={complaintForm.type}
+            onChange={handleInputChange}
           >
-            <option value="">Seçiniz</option>
-            <option value="Sınıf arıza bildirimi">Sınıf arıza bildirimi</option>
-            <option value="Ürün">???</option>
- 
+            <option>Seçiniz</option>
+            {complaints.map((complaint, index) => (
+              <option key={index} value={complaint}>{complaint}</option>
+            ))}
           </Form.Control>
         </Form.Group>
-        
+
         <Form.Group controlId="complaintPlace">
           <Form.Label>Şikayet Yeri</Form.Label>
           <Form.Control
             as="select"
-            value={complaintPlace}
-            onChange={(e) => setComplaintPlace(e.target.value)}
+            name="roomId"
+            value={complaintForm.roomId}
+            onChange={handleInputChange}
           >
-            <option value="">Seçiniz</option>
-            <option value="Hizmet">L208</option>
-            <option value="Ürün">D201</option>
+            <option>Seçiniz</option>
             <option value="Kutuphane">Kütüphane</option>
             <option value="Yemekhane">Yemekhane</option>
+            {rooms.map((room) => (
+              <option key={room.roomId} value={room.roomId}>{room.name}</option>
+            ))}
           </Form.Control>
+        </Form.Group>
+
+        <Form.Group controlId="complaintTitle">
+          <Form.Label>Şikayet Başlığı</Form.Label>
+          <Form.Control
+            type="text"
+            name="title"
+            placeholder="Şikayet başlığını girin"
+            value={complaintForm.title}
+            onChange={handleInputChange}
+          />
         </Form.Group>
 
         <Form.Group controlId="complaintDescription">
@@ -113,9 +184,10 @@ const ComplaintForm = () => {
           <Form.Control
             as="textarea"
             rows={4}
+            name="content"
             placeholder="Şikayetinizi açıklayın"
-            value={complaintDescription}
-            onChange={(e) => setComplaintDescription(e.target.value)}
+            value={complaintForm.content}
+            onChange={handleInputChange}
           />
         </Form.Group>
 
@@ -125,7 +197,6 @@ const ComplaintForm = () => {
             <Form.Control
               type="file"
               multiple
-            //  id="complaintImage"
               onChange={handleImageChange}
             />
           </div>
@@ -171,8 +242,8 @@ const ComplaintForm = () => {
           )}
         </Form.Group>
 
-        <Button variant="primary" type="submit" className="my-3">
-          Şikayet Gönder
+        <Button variant="success" type="submit" className="my-3">
+          Şikayeti Gönder
         </Button>
       </Form>
 

@@ -14,7 +14,7 @@ const Complaints = () => {
     useEffect(() => {
         const fetchComplaints = async () => {
             const complaint = await getAllComplaints();
-            setComplaints(complaint.filter((event) => event.status === "Pending"))
+            setComplaints(complaint.filter((event) => event.status === "pending"))
         };
 
         fetchComplaints();

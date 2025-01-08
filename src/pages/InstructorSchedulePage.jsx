@@ -14,7 +14,7 @@ const InstructorSchedulePage = () => {
             className="bg-light rounded-4 shadow pt-2 mb-5 pb-3 px-5"
             style={{ marginTop: "120px" }}
         >
-            <h3>Haftalık ders programı</h3>
+            <h3>Haftalık ders programıss</h3>
             <InstructorSchedule />
         </div>
     </Container>

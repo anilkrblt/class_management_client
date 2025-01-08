@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap";
 import { addRoom, deleteRoom, getAllRooms, updateRoom } from "../utils/RoomApiService";
 import { getAllDepartments } from "../utils/DepartmentApiService";
+import { getAllBuildings } from "../utils/BuildingApiService";
 
 const ClassroomManager = () => {
   const [classrooms, setClassrooms] = useState([]);
@@ -25,13 +26,15 @@ const ClassroomManager = () => {
     departmentId: 1,
     equipment: ""
   });
+
   const [editIndex, setEditIndex] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
+
   const [searchQuery, setSearchQuery] = useState("");
-  const [departments, setDepartments] = useState("");
+  const [departments, setDepartments] = useState([]);
 
 
   useEffect(() => {
@@ -50,8 +53,10 @@ const ClassroomManager = () => {
   console.log(classrooms);
 
   const handleInputChange = (e) => {
+
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: name === "buildingId" ? Number(value) : value, });
+    console.log("name", name, "value", value)
   };
 
 
@@ -61,7 +66,21 @@ const ClassroomManager = () => {
         const data = await getAllDepartments();
         setDepartments(data); // Dönüştürülmüş veriyi state'e atıyoruz
       } catch (err) {
-        console.error("Sınıflar yüklenirken hata oluştu:", err);
+        console.error("Bölümler yüklenirken hata oluştu:", err);
+      }
+    };
+
+    fetchClassrooms();
+  }, []);
+
+  const [buildings, setBuildings] = useState([])
+  useEffect(() => {
+    const fetchClassrooms = async () => {
+      try {
+        const data = await getAllBuildings();
+        setBuildings(data); // Dönüştürülmüş veriyi state'e atıyoruz
+      } catch (err) {
+        console.error("Bölümler yüklenirken hata oluştu:", err);
       }
     };
 
@@ -69,7 +88,6 @@ const ClassroomManager = () => {
   }, []);
 
   console.log(departments)
-
   const buildId = (name) => {
     switch (name) {
       case "A Binası":
@@ -80,6 +98,15 @@ const ClassroomManager = () => {
     }
   }
 
+  const build2Id = (id) => {
+    switch (id) {
+      case 1:
+        return "A Binası";
+      case 2:
+        return "B Binası";
+
+    }
+  }
   const departmentsId = (name) => {
     switch (name) {
       case "Bilgisayar Mühendisliği":
@@ -96,21 +123,32 @@ const ClassroomManager = () => {
     }
   }
 
+  console.log(formData)
+
   const handleAdd = async () => {
     if (!formData.name || !formData.capacity || !formData.examCapacity) {
       setShowAlert(true);
       setTimeout(() => setShowAlert(false), 3000);
       return;
     }
-
-
-
+ /*
+    if (classrooms.some(classroom => classroom.name.includes(formData.name))){
+      setShowAlert2(true);
+      setTimeout(() => setShowAlert2(false), 3000);
+      return
+    }
+      */
+    const data = { ...formData }
     try {
-      // Ders ekleme fonksiyonunu çağır
-      await addRoom(formData);
-
+      await addRoom(data);
       // Ders başarılı bir şekilde eklendiyse listeye ekle
-      setClassrooms([...classrooms, { ...formData, isActive: true }]);
+      setClassrooms([...classrooms, {
+        ...formData, isActive: true,
+        buildingName: buildings.find((item) => item.buildingId === Number(formData.buildingId)).name,
+        departmentName: departments.find((item) =>
+          item.departmentId === Number(formData.departmentId)).name,
+        roomType: Number(formData.roomType)
+      }]);
 
       // Formu sıfırla
       setFormData({
@@ -130,25 +168,68 @@ const ClassroomManager = () => {
     }
   };
 
-
+console.log(classrooms)
   const handleEdit = (index) => {
+
+    console.log(classrooms[index])
+
     setEditIndex(index);
-    setFormData(classrooms[index]);
+    console.log(classrooms[index])
+    setFormData({
+      ...classrooms[index], buildingId: buildings.find((item) => item.name === classrooms[index].buildingName).buildingId
+      , departmentId: departments.find((item) =>
+        item.name === classrooms[index].departmentName).departmentId
+    });
 
     setShowEditModal(true);
   };
 
-  console.log(classrooms)
-  const handleUpdate = () => {
+const [showAlert3 , setShowAlert3] = useState(false)
+  const handleUpdate = async () => {
+
+/*
+    if (classrooms.some(classroom => classroom.name.includes(formData.name))){
+      setShowAlert3(true);
+      setTimeout(() => setShowAlert3(false), 3000);
+      return
+    }
+*/
+
     const updatedClassrooms = [...classrooms];
-    updatedClassrooms[editIndex] = formData;
-    setClassrooms(updatedClassrooms);
+    const changeActive = classrooms[editIndex]
+    const id = classrooms[editIndex].roomId
 
-    const roomUpdate = updatedClassrooms[editIndex];
-    // updateRoom(roomUpdate)
 
-    setShowEditModal(false);
-    setEditIndex(null);
+    const data = {
+      name: formData.name,
+      capacity: formData.capacity,
+      examCapacity: formData.examCapacity,
+      isProjectorWorking: changeActive.isProjectorWorking,
+      equipment: "",
+      isActive: changeActive.isActive,
+      roomType: formData.roomType, //room type fonksiyonu yazılacak switch caseli
+      departmentId: formData.departmentId,
+      buildingId: formData.buildingId
+    }
+    console.log(data)
+
+    try {
+      await updateRoom(id, data)
+      updatedClassrooms[editIndex] = {
+        ...formData, departmentName: departments.find((item) =>
+          item.departmentId === Number(formData.departmentId)).name,
+        buildingName: buildings.find((item) => item.buildingId === Number(formData.buildingId)).name,
+        roomType: Number(formData.roomType)
+      };
+      console.log(updatedClassrooms)
+      setClassrooms(updatedClassrooms,);
+      setShowEditModal(false);
+      setEditIndex(null);
+    } catch (error) {
+      alert("Sınıf güncellenirken bir hata oluştu. Lütfen tekrar deneyin.")
+    }
+
+
     setFormData({
 
       name: "",
@@ -162,10 +243,14 @@ const ClassroomManager = () => {
       equipment: ""
     });
   };
-  const [deleteRoomId, setDeleteRoomId] = useState(null);
-  console.log("del", deleteRoomId)
-  const handleDelete = async () => {
 
+
+  const [deleteRoomId, setDeleteRoomId] = useState(null);
+
+
+
+
+  const handleDelete = async () => {
 
     try {
       await deleteRoom(deleteRoomId)
@@ -184,6 +269,7 @@ const ClassroomManager = () => {
 
 
     const changeActive = classrooms[index]
+
     const id = classrooms[index].roomId
 
 
@@ -194,9 +280,10 @@ const ClassroomManager = () => {
       isProjectorWorking: changeActive.isProjectorWorking,
       equipment: "",
       isActive: !changeActive.isActive,
-      roomType: 1, //room type fonksiyonu yazılacak switch caseli
-      departmentId: departmentsId(changeActive.departmentName),
-      buildingId: buildId(changeActive.buildingName)
+      roomType: changeActive.roomType, //room type fonksiyonu yazılacak switch caseli
+      departmentId: departments.find((item) =>
+        item.name === changeActive.departmentName).departmentId,
+      buildingId: buildings.find((item) => item.name === changeActive.buildingName).buildingId
     }
 
     try {
@@ -214,7 +301,7 @@ const ClassroomManager = () => {
     const changeProjection = classrooms[index]
     const id = classrooms[index].roomId
 
-
+    console.log(changeProjection)
     const data = {
       name: changeProjection.name,
       capacity: changeProjection.capacity,
@@ -222,9 +309,10 @@ const ClassroomManager = () => {
       isProjectorWorking: !changeProjection.isProjectorWorking,
       equipment: "",
       isActive: changeProjection.isActive,
-      roomType: 1,
-      departmentId: departmentsId(changeProjection.departmentName),
-      buildingId: buildId(changeProjection.buildingName)
+      roomType: changeProjection.roomType,
+      departmentId: departments.find((item) =>
+        item.name === changeProjection.departmentName).departmentId,
+      buildingId: buildings.find((item) => item.name === changeProjection.buildingName).buildingId
     }
 
     try {
@@ -240,19 +328,31 @@ const ClassroomManager = () => {
     classroom.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const [addLessonSectionShow, setAddLessonSectionShow] = useState(false)
+
+
   return (
     <Container className="mt-4">
-      <h4>Sınıf Ekle/Düzenle</h4>
+
+      <Row>
+        <Col md="auto"><h4>Sınıf Ekle/Düzenle</h4></Col>
+        <Col md="auto"><Button
+          variant={`${addLessonSectionShow ? "success" : "outline-success"}`}
+          onClick={() => setAddLessonSectionShow(!addLessonSectionShow)}>Yeni sınıf ekle</Button></Col>
+      </Row>
+
       {showAlert && (
-        <Alert variant="danger" onClose={() => setShowAlert(false)} dismissible>
+        <Alert variant="danger" className="mt-2" onClose={() => setShowAlert(false)} dismissible>
           Lütfen tüm alanları doldurun!
         </Alert>
       )}
-      <Row>
+
+
+      {addLessonSectionShow && <Row className="mt-1">
         <Col md={12}>
           <Form>
-            <Row className="mb-3">
-              <Col md={2}>
+            <Row className="mb-3 justify-content-center">
+              <Col md={3}>
                 <Form.Group controlId="className">
                   <Form.Label>Sınıf Adı</Form.Label>
                   <Form.Control
@@ -288,50 +388,59 @@ const ClassroomManager = () => {
                   />
                 </Form.Group>
               </Col>
-
-              <Col md={1}>
+            </Row>
+            <Row className="mb-3 justify-content-center"> 
+              <Col md={2}>
                 <Form.Group controlId="block">
                   <Form.Label>Blok</Form.Label>
-                  <Form.Select
-                    name="buildingName"
-                    value={formData.buildingId}
-                    onChange={handleInputChange}
-                  >
-                    <option value={1}>A</option>
-                    <option value={2}>B</option>
+                  <Form.Select name="buildingId" value={formData.buildingId} onChange={handleInputChange}>
 
+                    {buildings.map(build => (
+                      <option key={build.buildingId} value={build.buildingId}>{build.name}</option>
+                    ))}
                   </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={2}>
                 <Form.Group controlId="type">
-                  <Form.Label>Derslik Tipi</Form.Label>
+                  <Form.Label>Sınıf Tipi</Form.Label>
                   <Form.Select
                     name="roomType"
                     value={formData.roomType}
                     onChange={handleInputChange}
                   >
-                    <option value={0}>Sınıf</option>
-                    <option value={1}>Amfi</option>
+                    <option value={0}>Derslik</option>
+                    <option value={5}>Amfi</option>
                     <option value={2}>Bilgisayar Laboratuvarı</option>
-                    <option value={3}>Elektrik Laboratuvarı</option>
-                    <option value={4}>Genetik Laboratuvarı</option>
-                    <option value={5}>Gıda Laboratuvarı</option>
+                    <option value={1}>Elektrik Laboratuvarı</option>
+                    <option value={3}>Genetik Laboratuvarı</option>
+                    <option value={4}>Gıda Laboratuvarı</option>
                     <option value={6}>Makine Laboratuvarı</option>
+                  </Form.Select>
+                </Form.Group>
+                </Col>
+                <Col md={3}>
+                <Form.Group controlId="department">
+                  <Form.Label className='ms-1'>Bölüm</Form.Label>
+                  <Form.Select name="departmentId" value={formData.departmentId} onChange={handleInputChange}>
+
+                    {departments.map(department => (
+                      <option key={department.departmentId} value={department.departmentId}>{department.name}</option>
+                    ))}
                   </Form.Select>
                 </Form.Group>
               </Col>
               <Col md={1}>
-                <Button variant="primary" onClick={handleAdd}>
+                <Button variant="success" className="mt-4" onClick={handleAdd}>
                   Ekle
                 </Button>
               </Col>
             </Row>
           </Form>
         </Col>
-      </Row>
+      </Row>}
 
-      <Row className="my-3 align-items-center">
+      <Row className="my-2 align-items-center">
         <Col>
           <h4 className="mt-">Sınıf Listesi</h4>
         </Col>
@@ -359,7 +468,7 @@ const ClassroomManager = () => {
               <th>Sınav Kapasitesi</th>
               <th>Projeksiyon</th>
               <th>Blok</th>
-              <th>Derslik Tipi</th>
+              <th>Sınıf Tipi</th>
               <th>İşlemler</th>
             </tr>
           </thead>
@@ -412,18 +521,19 @@ const ClassroomManager = () => {
                     switch (classroom.roomType) {
                       case 0:
                         return <p>Derslik</p>;
-                      case 1:
+                      case 5:
                         return <p>Amfi</p>;
                       case 2:
                         return <p>Bilgisayar Laboratuvarı</p>;
-                      case 3:
+                      case 1:
                         return <p>Elektrik Laboratuvarı</p>;
-                      case 4:
+                      case 3:
                         return <p>Genetik Laboratuvarı</p>;
-                      case 5:
+                      case 4:
                         return <p>Gıda Laboratuvarı</p>;
                       case 6:
                         return <p>Makine Laboratuvarı</p>;
+
 
                     }
                   })()}
@@ -466,6 +576,7 @@ const ClassroomManager = () => {
           <Modal.Title>Sınıfı Güncelle</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+       
           <Form>
             <Form.Group controlId="editClassName">
               <Form.Label>Sınıf Adı</Form.Label>
@@ -498,29 +609,36 @@ const ClassroomManager = () => {
 
             <Form.Group controlId="editBlock" className="mt-2">
               <Form.Label>Blok</Form.Label>
-              <Form.Select
-                name="block"
-                value={formData.buildingId}
-                onChange={handleInputChange}
-              >
-                <option value={1}>A</option>
-                <option value={2}>B</option>
+              <Form.Select name="buildingId" value={formData.buildingId} onChange={handleInputChange}>
+
+                {buildings.map(build => (
+                  <option key={build.buildingId} value={build.buildingId}>{build.name}</option>
+                ))}
               </Form.Select>
             </Form.Group>
             <Form.Group controlId="editType" className="mt-2">
-              <Form.Label>Derslik Tipi</Form.Label>
+              <Form.Label>Sınıf Tipi</Form.Label>
               <Form.Select
                 name="roomType"
                 value={formData.roomType}
                 onChange={handleInputChange}
               >
-                <option value={0}>Sınıf</option>
-                <option value={1}>Amfi</option>
+                <option value={0}>Derslik</option>
+                <option value={5}>Amfi</option>
                 <option value={2}>Bilgisayar Laboratuvarı</option>
-                <option value={3}>Elektrik Laboratuvarı</option>
-                <option value={4}>Genetik Laboratuvarı</option>
-                <option value={5}>Gıda Laboratuvarı</option>
+                <option value={1}>Elektrik Laboratuvarı</option>
+                <option value={3}>Genetik Laboratuvarı</option>
+                <option value={4}>Gıda Laboratuvarı</option>
                 <option value={6}>Makine Laboratuvarı</option>
+              </Form.Select>
+            </Form.Group>
+            <Form.Group controlId="department">
+              <Form.Label className='ms-1'>Bölüm</Form.Label>
+              <Form.Select name="departmentId" value={formData.departmentId} onChange={handleInputChange}>
+
+                {departments.map(department => (
+                  <option key={department.departmentId} value={department.departmentId}>{department.name}</option>
+                ))}
               </Form.Select>
             </Form.Group>
           </Form>

@@ -2,13 +2,18 @@ import { useState } from "react";
 import { Card, Col, Container, Image, Modal, Row, Button } from "react-bootstrap";
 import "moment/locale/tr";
 import moment from "moment";
+import { baseUrl2 } from "../utils/ClubEventApiService";
 moment.locale('tr');
 
-const ClubEventsOld = ({events}) => {
-      const formatDate = (dateString) => {
-           return moment(dateString, "DD.MM.YYYY").format("D MMMM dddd");
-       };
+const ClubEventsOld = ({ events }) => {
+    const formatDate = (dateString) => {
+        return moment(dateString, "DD.MM.YYYY").format("D MMMM dddd");
+    };
 
+    function getStartTime(eventTime) {
+        const startTime = eventTime.split(' - ')[0]; // Başlangıç saatini ayır
+        return moment(startTime, "HH:mm:ss").format("HH:mm"); // Formatla ve döndür
+    }
     return (
         <Container className="bg-light rounded-4">
             <h3 className="sticky-top bg-light">Gerçekleşen kulüp etkinlikleri</h3>
@@ -21,7 +26,7 @@ const ClubEventsOld = ({events}) => {
                         >
                             <Row className="ps-2">
                                 <Col>
-                                    <Image src={event.clubLogo} style={{ width: "80px" }} />
+                                    <Image src={`${baseUrl2}${event.clubLogo}`} style={{ width: "80px" }} />
                                 </Col>
                                 <Col className="d-flex align-items-center">{event.clubName}</Col>
                             </Row>
@@ -31,7 +36,7 @@ const ClubEventsOld = ({events}) => {
                                         {event.clubRoomName}
                                     </Col>
                                     <Col md={9}>
-                                        <div className="twinkle-star-regular text-center">{formatDate(event.eventDate)}</div>
+                                        <div className="twinkle-star-regular text-center">{formatDate(event.eventDate)} {getStartTime(event.eventTime)}</div>
                                         <div
                                             className="twinkle-star-regular"
                                             style={{
@@ -39,8 +44,8 @@ const ClubEventsOld = ({events}) => {
                                                     event.title.length <= 22
                                                         ? "30px"
                                                         : event.title.length <= 30
-                                                        ? "20px"
-                                                        : "15px",
+                                                            ? "20px"
+                                                            : "15px",
                                                 fontWeight: "500",
                                             }}
                                         >
@@ -54,7 +59,7 @@ const ClubEventsOld = ({events}) => {
                 ))}
             </Row>
 
-          
+
         </Container>
     );
 };

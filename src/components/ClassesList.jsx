@@ -26,6 +26,26 @@ const ClassesList = ({ setSelectedCard }) => {
         classType: ''
     });
 
+    const typeCode2Name = (typeName) =>{
+      
+        switch (typeName) {
+            case 0:
+              return "Derslik"
+            case 5:
+              return "Amfi"
+            case 2:
+              return "Bilgisayar Lab."
+            case 1:
+              return "Elektrik Lab."
+            case 3:
+              return "Genetik Lab."
+            case 4:
+              return "Gıda Lab."
+            case 6:
+              return "Makine Lab."
+          }
+
+}
 
     const filteredCards = rooms.filter(card =>
         card.name.toLowerCase().includes(searchTerm) &&
@@ -62,12 +82,6 @@ const ClassesList = ({ setSelectedCard }) => {
         <Row className="bg-light mb-3 py-2 " style={{ position: "sticky", top: 0, zIndex: 100 }}>
 
             <Col>
-                <DropdownButton title="Tüm sınıflar">
-                    <Dropdown.Item eventKey="1">Derslikler</Dropdown.Item>
-                    <Dropdown.Item eventKey="2">Laboratuvarlar</Dropdown.Item>
-                </DropdownButton>
-            </Col>
-            <Col>
                 <Row>
                     <Col md={10}>
                         <Form.Control
@@ -101,9 +115,9 @@ const ClassesList = ({ setSelectedCard }) => {
                             >
                                 <Card.Body>
                                     <Row className='row-cols-auto justify-content-around'>
-                                        <Col md={2}> <Card.Title className="fw-bold ">{card.name}</Card.Title></Col>
+                                        <Col md={3}> <Card.Title className="fw-bold ">{card.name}</Card.Title></Col>
                                         <Col md={3}>Kapasite: <b>{card.capacity}</b></Col>
-                                        <Col md={3}>{card.roomType}</Col>
+                                        <Col md={3}>{typeCode2Name(card.roomType)}</Col>
                                         {card.isProjectorWorking && <Col md={1} className="d-flex justify-content-end">
                                             <OverlayTrigger
                                                 placement="top"

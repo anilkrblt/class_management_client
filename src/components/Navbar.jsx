@@ -30,7 +30,7 @@ let menusAdmin = [
   { name: "Ana sayfa", href: "/anasayfa", icon: <Icon.HouseDoorFill size={20} />, disableIcon: <Icon.HouseDoor /> },
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
   { name: "Dersler", href: "/dersler", icon: <Icon.LayersFill size={20} />, disableIcon: <Icon.Layers /> },
-  { name: "Sınıf yönetimi", href: "/sınıfyonetimi" },
+  { name: "Sınıf yönetimi", href: "/sınıfyonetimi", icon: <Icon.ClipboardCheckFill size={20} />, disableIcon: <Icon.ClipboardCheck />},
   { name: "Kulüpler", href: "/kulüpler", icon: <Icon.LightningChargeFill size={20} />, disableIcon: <Icon.LightningCharge /> },
   { name: "Şikayetler", href: "/şikayetler", icon: <Icon.PencilFill size={20} />, disableIcon: <Icon.Pencil />  },
 ];

@@ -14,12 +14,12 @@ const ClubEventsPage = () => {
         const fetchEvents = async () => {
           const events = await getAllClubEvents();
         setOldEvents(events.filter((event) => event.status === "outdated")) 
-          setEvents(events)
+        setEvents(events.filter((event) => event.status === "approved")) 
         };
     
         fetchEvents();
       }, []);
-
+  console.log(oldEvents)
     return <Container>
 
         <Helmet>

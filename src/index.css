@@ -40,8 +40,8 @@ code {
 }
 
 .schedule {
-  width: 85%;
-  height: 95%;
+  width: 95%;
+  height: 94%;
 }
 
 
@@ -262,4 +262,5 @@ code {
   width: fit-content  !important; /* İçeriğe göre genişlik */
   margin: 0 auto  !important; /* Ortalamak için */
 }
+
 

@@ -1,44 +1,22 @@
 import Button from 'react-bootstrap/Button';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ListGroup, Card, Container, Modal } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import { Col, Row } from "react-bootstrap";
 import "moment/locale/tr";
 import moment from "moment";
-import { updateComplaint } from '../utils/ComplaintApiService';
+import { deleteComplaint, updateComplaint } from '../utils/ComplaintApiService';
 moment.locale('tr');
 
-const ComplaintsNew = ({complaints}) => {
+const ComplaintsUnresolvedStudent = ({complaints}) => {
     const [show, setShow] = useState(false);
-    const [showResolveModal, setShowResolveModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // Yeni Onay Modalı
     const [selectedComplaint, setSelectedComplaint] = useState(null);
-    const [responseText, setResponseText] = useState("");
+    const [unresolvedComplaints, setUnresolvedComplaints] = useState([])
 
-    function formatToInitials(str) {
-        const map = {
-            'ç': 'c',
-            'ğ': 'g',
-            'ı': 'i',
-            'İ': 'I',
-            'ö': 'o',
-            'ş': 's',
-            'ü': 'u',
-            'Ç': 'c',
-            'Ö': 'o',
-            'Ş': 's',
-            'Ğ': 'g',
-            'Ü': 'u',
-        };
-
-        const words = str.split(' ');
-
-        const initials = words.map(word => {
-            const firstChar = word.charAt(0).toLowerCase();
-            return map[firstChar] || firstChar;
-        }).join('');
-
-        return initials;
-    }
+    useEffect(() => {
+        setUnresolvedComplaints(complaints);
+    }, [complaints]);
 
     const handleShow = (complaint) => {
         setSelectedComplaint(complaint);
@@ -50,42 +28,43 @@ const ComplaintsNew = ({complaints}) => {
         setSelectedComplaint(null);
     };
 
-    const handleResolveComplaint = () => {
-        setShowResolveModal(true);
+
+
+
+
+
+    const handleDeleteComplaint = () => {
+        setShowDeleteModal(true); // Silme onay modalını aç
     }
 
-    const handleResolveClose = () => {
-        setShowResolveModal(false);
-        setResponseText("");
+    const handleDeleteClose = () => {
+        setShowDeleteModal(false); // Onay modalını kapat
     }
 
-    const handleResponseChange = (e) => {
-        setResponseText(e.target.value);
-    }
-
-    const handleCloseRoom = (roomName) =>{
-       
-    }
-    const handleSubmitResponse = async () => {
-        const data= { status: "approved", solveDescription: responseText}
-        const id = selectedComplaint.requestId
-        console.log(data)
+    const handleConfirmDelete = async () => {
+        const id = selectedComplaint.requestId;
         try {
-            await updateComplaint(id,data)
+            await deleteComplaint(id);
+            setUnresolvedComplaints((prevComplaints) =>
+                prevComplaints.filter((complaint) => complaint.requestId !== id)
+            );
+            setShow(false)
+            setSelectedComplaint(null);
+            setShowDeleteModal(false); // Modalı kapat
         } catch (error) {
-            alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.")
+            alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.");
         }
-        handleResolveClose();
     }
 
     return (
         <Container className="bg-light rounded-4 ps-2 " >
-            <h2 className="my-3 text-center sticky-top bg-light py-1" style={{ zIndex: 10 }}>Şikayetler</h2>
+            <h2 className="my-3 text-center sticky-top bg-light py-1" style={{ zIndex: 10 }}>Çözüm Bekleyen Şikayetleriniz</h2>
 
-            {complaints.length === 0
+            {unresolvedComplaints.length === 0
                 ? <p className='text-center  fw-semibold'>Şu anda çözüm bekleyen şikayet bulunmamaktadır.</p>
                 : <ListGroup className="ms-1 ">
-                    {complaints.map((item, index) => (
+
+                    {unresolvedComplaints.map((item, index) => (
                         <Card
                             key={index}
                             className="py-2 ps-2 my-1"
@@ -94,19 +73,11 @@ const ComplaintsNew = ({complaints}) => {
                             }}
                         >
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
-                                <Col md={1}>
-                                    <Image
-                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.userName)}.png`} // İlk harflerden oluşan URL
-                                        roundedCircle
-                                        width={50}
-                                        className="me-3"
-                                    />
-                                </Col>
-                                <Col md={4} className='ms-2'>
+                                <Col md={5} className='ms-2'>
                                     <div>
-                                        <Card.Title className="text-start">{item.userName}</Card.Title>
+                                        <Card.Title className="text-start">{item.type}</Card.Title>
                                         <Card.Text className="text-start">
-                                            {item.type}
+                                            {item.title}
                                         </Card.Text>
                                     </div>
                                 </Col>
@@ -144,11 +115,8 @@ const ComplaintsNew = ({complaints}) => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={()=>handleCloseRoom(selectedComplaint?.roomName)}>
-                        {selectedComplaint && (selectedComplaint.roomName)} sınıfını kapat
-                    </Button>
-                    <Button onClick={handleResolveComplaint}>
-                        Şikayeti çöz
+                    <Button variant='danger' onClick={handleDeleteComplaint}>
+                        Şikayeti sil
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat
@@ -156,27 +124,21 @@ const ComplaintsNew = ({complaints}) => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Şikayet Çözüm Modal */}
-            <Modal show={showResolveModal} onHide={handleResolveClose} centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Şikayete Geri Dönüş</Modal.Title>
-                </Modal.Header>
 
+            {/* Şikayet Silme Onay Modalı */}
+            <Modal show={showDeleteModal} onHide={handleDeleteClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Şikayet Silme Onayı</Modal.Title>
+                </Modal.Header>
                 <Modal.Body>
-                    <textarea 
-                        value={responseText}
-                        onChange={handleResponseChange}
-                        className="form-control"
-                        rows="5"
-                        placeholder="Şikayet hakkında geri dönüş yazınız."
-                    />
+                    <p>Bu şikayeti silmek istediğinizden emin misiniz?</p>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={handleResolveClose}>
-                        İptal
+                    <Button variant="secondary" onClick={handleDeleteClose}>
+                        Hayır
                     </Button>
-                    <Button onClick={handleSubmitResponse}>
-                        Geri Dönüşü Gönder
+                    <Button variant="danger" onClick={handleConfirmDelete}>
+                        Evet, Sil
                     </Button>
                 </Modal.Footer>
             </Modal>
@@ -184,4 +146,4 @@ const ComplaintsNew = ({complaints}) => {
     );
 };
 
-export default ComplaintsNew;
+export default ComplaintsUnresolvedStudent;

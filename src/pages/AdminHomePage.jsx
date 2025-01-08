@@ -7,6 +7,7 @@ import Classes from "../components/Classes"
 import Complaints from "../components/Complaints";
 import { locale } from "moment";
 import { Helmet } from 'react-helmet';
+import ClubRequestHomepage from "../components/ClubRequestHomepage";
 
 const AdminHomePage = () => {
     const { userType, setUserType } = useContext(UserContext);
@@ -26,6 +27,7 @@ const AdminHomePage = () => {
 
             <Col md={4} className=" scrollable bg-light rounded-4 mt-4 shadow ">
                 <Complaints />
+                <ClubRequestHomepage/>
 
             </Col>
         </Row>

@@ -26,7 +26,7 @@ const StudentHomePage = () => {
           <Classes col={6} />
         </Col>
         <Col md={5}>
-          <StudentExams />
+          <Schedule />
         </Col>
       </Row>
     </Container>

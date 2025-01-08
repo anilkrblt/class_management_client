@@ -4,7 +4,7 @@ import "moment/locale/tr";
 import moment from "moment";
 moment.locale('tr');
 
-const ComplaintsOld = ({ complaints }) => {
+const ComplaintsStudentSolved = ({ complaints }) => {
 
     const [selectedYears, setSelectedYears] = useState([]);
     const [showAll, setShowAll] = useState(true);
@@ -80,7 +80,7 @@ const ComplaintsOld = ({ complaints }) => {
     return (
         <Container className="bg-light rounded-4  ps-2">
             <div className=" text-center sticky-top bg-light" style={{ zIndex: 10 }}>
-                <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
+                <h2 className="my-3 text-center">Çözülen Şikayetleriniz</h2>
                 {/* Yıl seçimi için Pagination */}
                 <div className="d-flex justify-content-left align-items-center">
                     <Pagination className="mb-3" >
@@ -111,20 +111,12 @@ const ComplaintsOld = ({ complaints }) => {
                         >
 
                             <Row className=" d-flex align-items-center justify-content-around w-100' ">
-                                <Col md={1}>
-                                    <Image
-                                        src={`https://cdn.auth0.com/avatars/${formatToInitials(item.userName)}.png`} // İlk harflerden oluşan URL
-                                        roundedCircle
-
-                                        width={50}
-                                        className="me-3"
-                                    />
-                                </Col>
-                                <Col md={4} className='ms-2'>
+                                
+                                <Col md={5} className='ms-2'>
                                     <div>
-                                        <Card.Title className="text-start">{item.userName}</Card.Title>
+                                        <Card.Title className="text-start">{item.type}</Card.Title>
                                         <Card.Text className="text-start">
-                                            {item.type}
+                                            {item.title}
                                         </Card.Text>
                                     </div>
                                 </Col>
@@ -153,7 +145,10 @@ const ComplaintsOld = ({ complaints }) => {
                 </Modal.Header>
                 <Modal.Body>
                     <Alert variant="success">
-                        Şikayet çözüldü <strong>{selectedComplaint?.solveDescription}</strong>
+                 
+                        Şikayet çözüldü.
+                        
+                       {selectedComplaint?.solveDescription && <><br/> Yetkilinin açıklaması: <strong>{selectedComplaint?.solveDescription}</strong></>}
                     </Alert>
                     {selectedComplaint && (
                         <>
@@ -177,4 +172,4 @@ const ComplaintsOld = ({ complaints }) => {
     );
 };
 
-export default ComplaintsOld;
+export default ComplaintsStudentSolved;

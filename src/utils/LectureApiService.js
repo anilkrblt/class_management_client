@@ -11,6 +11,47 @@ export const getAllLectures = async () => {
     }
 };
 
+export const getLecturesByRoomId = async (id) => {
+    try {
+        const response = await axios.get(`${baseUrl}/rooms/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Hata:", error);
+        return [];
+    }
+};
+
+export const getLecturesByStudentId = async (id) => {
+    try {
+        const response = await axios.get(`${baseUrl}/students/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Hata:", error);
+        return [];
+    }
+};
+
+export const getLecturesByInstructorId = async (id) => {
+    try {
+        const response = await axios.get(`${baseUrl}/instructors/${id}/lectures`);
+        return response.data;
+    } catch (error) {
+        console.error("Hata:", error);
+        return [];
+    }
+};
+
+export const getScheduleByInstructorId = async (id) => {
+    try {
+        const response = await axios.get(`${baseUrl}/instructors/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Hata:", error);
+        return [];
+    }
+};
+
+
 export const addLecture = async (lecture) => {
 
     try {
@@ -28,21 +69,20 @@ export const addLecture = async (lecture) => {
     }
 };
 
-export const updateLecture = async (lecture) => {
-    const lectureId = lecture.code;
-    const response = await axios.put(`${baseUrl}/lectures/${lectureId}`, lecture);
-    const data = response.data;
+export const updateLecture = async (lectureId, data) => {
+
     try {
-        console.log(data)
-        
-    } catch (error) {
-        console.error("Hata:", error);
-    }
+        const response = await axios.put(`${baseUrl}/lectures/${lectureId}`, data,
+            
+        );
+          console.log(response)
+          
+      } catch (error) {
+          
+      }
 };
 
 export const deleteLecture = async (lecture) => {
-
-   
 
     try {
         await axios.delete(`${baseUrl}/lectures/${lecture}`);
@@ -53,5 +93,22 @@ export const deleteLecture = async (lecture) => {
     }
 };
 
+export const addInstructor = async (instructorId,lectureCode) => {
+    try {
+        const response = await axios.post(`${baseUrl}/lectures/api/lecture/assign?instructorId=${instructorId}&lectureCode=${lectureCode}`);
+        console.log('Lecture added successfully:', response.data);
+    } catch (error) {
+        alert("Hata!" ,error)
+    }
+}
+
+export const deleteInstructor = async (instructorId,lectureCode) => {
+    try {
+        const response = await axios.post(`${baseUrl}/lectures/api/lecture/assign?instructorId=${instructorId}` ,lectureCode);
+        console.log('Lecture added successfully:', response.data);
+    } catch (error) {
+        alert("Hata!" ,error)
+    }
+}
 
 

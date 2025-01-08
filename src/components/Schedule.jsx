@@ -1,40 +1,62 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ListGroup, Card, Container, Accordion } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
 import * as Icon from 'react-bootstrap-icons';
-
+import { useState } from "react";
+import { getLecturesByStudentId } from "../utils/LectureApiService";
+let id= 1
 const Schedule = () => {
-  const schedule = [
-    {
-      logo: "/tu_logo.jpg",
-      day: "Pazartesi",
-      lessons: [
-        { class: "L208", lesson: "Makine Öğrenmesi", hours: "13:00 - 14:00" },
-        { class: "L208", lesson: "Makine Öğrenmesi", hours: "14:00 - 15:00" },
-        { class: "L208", lesson: "Makine Öğrenmesi", hours: "14:00 - 15:00" }
-      ],
-    },
-    {
-      logo: "/tu_logo.jpg",
-      day: "Salı",
-      lessons: { class: "L210", lesson: "Yapay Zeka", hours: "14:00 - 15:00" },
-    },
-    {
-      logo: "/tu_logo.jpg",
-      day: "Çarşamba",
-      lessons: [],
-    },
-    {
-      logo: "/tu_logo.jpg",
-      day: "Perşembe",
-      lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
-    },
-    {
-      logo: "/tu_logo.jpg",
-      day: "Cuma",
-      lessons: { class: "L305", lesson: "Veri Yapıları", hours: "10:00 - 11:00" },
-    },
-  ];
+
+  const [schedule, setSchedule] = useState([])
+
+    useEffect(() => {
+      const fetchClassrooms = async () => {
+        try {
+          const data = await getLecturesByStudentId(id);
+          setSchedule(data.schedule);
+        } catch (err) {
+          console.error("Dersler yüklenirken hata oluştu:", err);
+        }
+      };
+  
+      fetchClassrooms();
+    }, []);
+
+// Günlerin Türkçe çevirisi
+const dayMapping = {
+  Monday: "Pazartesi",
+  Tuesday: "Salı",
+  Wednesday: "Çarşamba",
+  Thursday: "Perşembe",
+  Friday: "Cuma",
+
+};
+
+// Dönüşüm işlemi
+const scheduleMap = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday"
+].map((day) => {
+  const lessonsForDay = schedule
+    .filter((item) => item.dayOfWeek === day)
+    .map((lesson) => ({
+      class: lesson.roomName,
+      lesson: lesson.lectureName,
+      hours: `${lesson.startTime.slice(0, 5)} - ${lesson.endTime.slice(0, 5)}`,
+    }));
+
+  return {
+    logo: "/tu_logo.jpg",
+    day: dayMapping[day],
+    lessons: lessonsForDay,
+  };
+});
+
+console.log(scheduleMap);
+
 
   function turkishToLatin(str) {
     const map = {
@@ -55,14 +77,13 @@ const Schedule = () => {
     return str.replace(/[çğıİöşüÇÖŞĞÜ]/g, match => map[match] || match).toLowerCase();
   }
   
-
   return (
-    <Container className="bg-light rounded-4 schedule px-2 shadow">
-      <h2 className="my-4 text-center">Ders Programı</h2>
+    <Container className="bg-light rounded-4 schedule px-2 shadow my-4">
+      <h2 className=" text-center">Ders Programı</h2>
       <ListGroup className="ms-1">
 
         <Accordion className="custom-accordion">
-          {schedule.map((item, index) => (
+          {scheduleMap.map((item, index) => (
             item.lessons.length > 1
               ? <Accordion.Item eventKey={index.toString()} key={index} className="border-0">
                 <Card
@@ -113,7 +134,7 @@ const Schedule = () => {
                     <Card.Text className="text-start align-items-center justify-content-between">
                       {item.lessons.length !== 0 ? (
                         <>
-                          <Icon.Building /> {item.lessons.class} <Icon.JournalText/> {item.lessons.lesson} <Icon.Clock/> {item.lessons.hours}
+                          <Icon.Building /> {item.lessons[0].class} <Icon.JournalText/> {item.lessons[0].lesson} <Icon.Clock/> {item.lessons[0].hours}
                          
                         </>
                       ) : (
@@ -132,6 +153,7 @@ const Schedule = () => {
 
 
   );
+
 };
 
 export default Schedule;

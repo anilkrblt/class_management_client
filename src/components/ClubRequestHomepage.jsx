@@ -1,11 +1,13 @@
+import Button from 'react-bootstrap/Button';
 import React, { useEffect, useState } from 'react';
-import { Card, Button, Row, Col, Container, Modal, Image } from 'react-bootstrap';
-import { baseUrl2, changeRequest, getAllClubEvents } from '../utils/ClubEventApiService';
+import { ListGroup, Card, Container, Modal, Row, Col } from 'react-bootstrap';
+import Image from 'react-bootstrap/Image';
+import { getAllComplaints } from '../utils/ComplaintApiService';
 import moment from 'moment';
-import "moment/locale/tr";
-moment.locale('tr');
+import * as Icon from 'react-bootstrap-icons';
+import { baseUrl2, changeRequest, getAllClubEvents } from '../utils/ClubEventApiService';
 
-const ClassReservationRequests = () => {
+const ClubRequestHomepage = () => {
     const [showModal, setShowModal] = useState(false);
     const [selectedRequest, setSelectedRequest] = useState(null);
 
@@ -101,16 +103,16 @@ const ClassReservationRequests = () => {
 
     return (
         <Container className='rounded-4 bg-light pb-2'>
-            <h2 className="my-3 text-center sticky-top bg-light" style={{ zIndex: 10 }}>Kulüp Rezervasyon İstekleri</h2>
+            <h3 className="my-3 text-center sticky-top bg-light" style={{ zIndex: 10 }}>Kulüp Rezervasyon İstekleri</h3>
             {requests.length > 0 ? (
                 requests.map((item, index) => (
                     <Card
                         key={index}
-                        className="my-2 ps-5"
+                        className="my-2 ps-3 pb-1 d-flex justify-content-between"
                         style={{ backgroundColor: index % 2 === 0 ? '#fff9ed' : 'white' }}
                     >
-                        <Row className="d-flex align-items-center justify-content-between w-100">
-                            <Col md={1}>
+                        <Row className="align-items-center">
+                            <Col md={2}>
                                 <Image
                                     src={`https://cdn.auth0.com/avatars/${formatToInitials(item.fullName)}.png`} // İlk harflerden oluşan URL
                                     roundedCircle
@@ -118,42 +120,29 @@ const ClassReservationRequests = () => {
                                     className="me-3"
                                 />
                             </Col>
-                            <Col md={3}>
-                                <Container className="pt-2">
+                            <Col md={7}>
+                                <Col className="pt-2">
                                     <h5>{item.fullName}</h5>
                                     <p>{item.clubName}</p>
-                                </Container>
+                                </Col>
                             </Col>
-                            <Col md={2}>
-                                <h3>{item.clubRoomName}</h3>
-                            </Col>
+                        
+                           
                             <Col md={1}>
-                                <Col className="fs-4 fw-bold ms-2 ps-1">{moment(item.eventDate, "DD.MM.YYYY").date()}</Col>
-                                <Col className="fs-5 text-secondary"> {moment(item.eventDate, "DD.MM.YYYY").format("MMMM")}</Col>
-                            </Col>
-                            <Col md={2}>
-                                <h5>{formatEventTime(item.eventTime)}</h5>
-                            </Col>
-                            <Col md={3}>
-                                <Row>
+                                
                                     <Col>
                                         <Button variant="secondary" onClick={() => handleShowModal(item)}>
                                             İncele
                                         </Button>
                                     </Col>
-                                    <Col>
-                                        <Button variant="success" onClick={() => handleRequestAccepted(item)}>
-                                            Onayla
-                                        </Button>
-                                    </Col>
-                                    <Col>
-                                        <Button variant="danger" onClick={() => handleRequestCanceled(item)}>
-                                            Reddet
-                                        </Button>
-                                    </Col>
-                                </Row>
+                        
                             </Col>
                         </Row>
+                        <Row>
+                           
+                            <Col md="auto"> <Icon.Building /> <span className='fw-semibold'>{item.clubRoomName}</span></Col>
+                             <Col md="auto"><Icon.Calendar/> {formatDate(item.eventDate)}</Col>
+                              <Col  md="auto"><Icon.Clock/> {formatEventTime(item.eventTime)}</Col>  </Row>
                     </Card>
                 ))
             ) : (
@@ -184,6 +173,7 @@ const ClassReservationRequests = () => {
                                 <p><strong>Yer: </strong>{selectedRequest.clubRoomName}</p>
                                 <p><strong>Tarih saat: </strong>{formatDate(selectedRequest.eventDate)} {formatEventTime(selectedRequest.eventTime)}</p>
                                 <p><strong>Etkinlik adı: </strong>{selectedRequest.title}</p>
+                                
                                 <p><strong>Katılım formu: </strong>
                                     <Button
                                         variant="link"
@@ -211,5 +201,4 @@ const ClassReservationRequests = () => {
         </Container>
     );
 };
-
-export default ClassReservationRequests;
+export default ClubRequestHomepage;

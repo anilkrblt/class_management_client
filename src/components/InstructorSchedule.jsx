@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import { RRule } from "rrule";
@@ -7,54 +7,43 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import ClassCalendar from "./ClassCalendar";
 import ClassChangeCalendar from "./ClassChangeCalendar";
 import ClassesList from "./ClassesList";
+import { getLecturesByRoomId, getLecturesByStudentId, getScheduleByInstructorId } from "../utils/LectureApiService";
+import { addExtraLecture, changeLectureRoomTime, deleteLectureSession } from "../utils/InstructorsApiService";
 
 // Localizer ayarı
 const localizer = momentLocalizer(moment);
-
-// RRule ile tekrar eden etkinlikleri oluşturma fonksiyonu
-const generateRecurringEvents = (title, start, end, rule, location) => {
-  const rrule = new RRule({
-    ...rule,
-    dtstart: new Date(start), // Tarihi doğru biçimde dönüştürün
-  });
-
-  return rrule.all().map(date => ({
-    title,
-    start: new Date(date),
-    end: new Date(
-      moment(date)
-        .add(moment(end).diff(moment(start), "minutes"), "minutes")
-        .toISOString()
-    ),
-    location,
-  }));
-};
+let instructorid = 1
 
 const InstructorSchedule = ({ lesson }) => {
-  // Etkinlik tanımları
-  const [baseEvents, setBaseEvents] = useState([
-    {
-      title: "Makine Öğrenmesi",
-      start: moment().day(2).hour(13).minute(30).toDate(),
-      end: moment().day(2).hour(15).minute(30).toDate(),
-      rule: { freq: RRule.WEEKLY, interval: 1, count: 12 },
-      location: "A Blok 101",
-    },
-    {
-      title: "Mobil Uygulama Geliştirme",
-      start: moment().day(1).hour(10).minute(30).toDate(),
-      end: moment().day(1).hour(16).minute(30).toDate(),
-      rule: { freq: RRule.WEEKLY, interval: 1, count: 12 },
-      location: "B Blok 202",
-    },
-    {
-      title: "Kriptoloji",
-      start: moment().day(2).hour(9).minute(30).toDate(),
-      end: moment().day(2).hour(12).minute(0).toDate(),
-      rule: { freq: RRule.WEEKLY, interval: 1, count: 12 },
-      location: "C Blok 303",
-    },
-  ])
+
+  const [schedule, setSchedule] = useState([])
+  useEffect(() => {
+    const fetchEvents = async () => {
+      // const events = await getLecturesByStudentId(instructorid);
+      const events = await getScheduleByInstructorId(instructorid);
+      setSchedule(events.schedule) // Veriyi burada işleyebilirsiniz.
+    };
+
+    fetchEvents();
+  }, []);
+
+
+  console.log(schedule)
+
+
+  const scheduleEvent = Array.isArray(schedule)
+    ? schedule.map((item) => ({
+      title: item.lectureName,
+      start: new Date(`${item.date.split("T")[0]}T${item.startTime}`),
+      end: new Date(`${item.date.split("T")[0]}T${item.endTime}`),
+      departmentName: item.departmentName,
+      roomName: item.roomName,
+      eventType: item.teacherName,
+      lectureCode: item.lectureCode,
+      lectureSessionId: item.lectureSessionId
+    }))
+    : []
+
   const [lessonDetails, setLessonDetails] = useState({
     title: '',
     date: '',
@@ -64,10 +53,7 @@ const InstructorSchedule = ({ lesson }) => {
     location: ''
 
   });
-  // Tüm tekrar eden etkinlikleri oluştur
-  const [events, setEvents] = useState(baseEvents.flatMap(event =>
-    generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location,)
-  ))
+
 
 
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -77,7 +63,7 @@ const InstructorSchedule = ({ lesson }) => {
   const [showExtraLessonModal, setShowExtraLessonModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
-
+const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
 
@@ -126,13 +112,27 @@ const InstructorSchedule = ({ lesson }) => {
   };
 
 
-  const handleSave = () => {
+  const handleSave = async () => {
 
 
     if (selectedEvent && selectedCard) {
 
-      // `baseEvents` üzerinde değişiklik yapmadan yeni bir liste oluştur
-      const updatedEvents = baseEvents.map(event =>
+      console.log(selectedEvent)
+         
+      const changeLectureDetails ={
+        date: lessonDetails.date,
+        startTime: lessonDetails.startTime,
+        endTime: lessonDetails.startTime,
+        roomName: selectedCard.name
+        }
+
+      try {
+          await changeLectureRoomTime(selectedEvent.lectureSessionId, changeLectureDetails)
+      } catch (error) {
+        alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.")
+      }
+
+      const updatedEvents = schedule.map(event =>
         event.title === selectedEvent.title
           ? {
             ...event,
@@ -144,14 +144,7 @@ const InstructorSchedule = ({ lesson }) => {
       );
       console.log(updatedEvents);
 
-      // State'i güncelle
-      setBaseEvents(updatedEvents); //? şüpheli
-      setEvents(updatedEvents.flatMap(event =>
-        generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
-      ));
       setShowChangeClassModal(false); // Modal'ı kapat
-      console.log(updatedEvents);
-
     }
     else {
       setShowMessage(true)
@@ -168,43 +161,9 @@ const InstructorSchedule = ({ lesson }) => {
 
     })
   };
-  console.log(baseEvents);
 
 
-  const [showConfirmCancelModal, setShowConfirmCancelModal] = useState(false); // Onay modali için state
 
-  // Onay modali açma
-  const handleConfirmCancelLesson = () => {
-    setShowModal(false)
-    setShowConfirmCancelModal(true);
-  };
-
-  // Onay modali kapatma
-  const handleCloseConfirmCancelModal = () => {
-    setShowConfirmCancelModal(false);
-  };
-
-  // Ders iptal etme işlemi
-  const handleCancelLessonConfirmed = () => {
-    if (selectedEvent) {
-      const updatedEvents = events.filter(
-        event =>
-          !(
-            event.title === selectedEvent.title &&
-            event.start.getTime() === selectedEvent.start.getTime() &&
-            event.end.getTime() === selectedEvent.end.getTime()
-          )
-      );
-
-      setEvents(updatedEvents);
-      setShowModal(false); // Ana modalı kapat
-      setShowConfirmCancelModal(false); // Onay modalını kapat
-      setSelectedEvent(null); // Seçimi sıfırla
-    }
-  };
-
-
-  console.log(events)
 
 
   const handleOpenExtraLessonModal = () => {
@@ -216,29 +175,42 @@ const InstructorSchedule = ({ lesson }) => {
     setShowExtraLessonModal(false);
   };
 
-  const handleExtraLesson = () => {
+  const handleExtraLesson = async () => {
     if (selectedEvent) {
-      // `baseEvents` üzerinde değişiklik yapmadan yeni bir liste oluştur
-      console.log(selectedEvent)
-      const updatedEvents = [...baseEvents, {
-        title: selectedEvent.title,
-        start: moment(`${lessonDetails.date}T${lessonDetails.startTime}`).toDate(),
-        end: moment(`${lessonDetails.date}T${lessonDetails.endTime}`).toDate(),
-        location: selectedCard.title,
-        rule: { freq: RRule.DAILY, interval: 1, count: 1 },
-        text: "Ek ders"
-      }]
+
+      const data = {
+        roomId: selectedCard.name,
+        startTime: lessonDetails.startTime,
+        endTime: lessonDetails.endTime,
+        day: moment(lessonDetails.date).format("dddd"),
+        selectedCard: selectedCard
+      }
+      console.log(lessonDetails.date)
+      console.log(data)
+
+      const extraLesson = {
+        instructorId: instructorid,
+        lectureCode: selectedEvent.lectureCode,
+        startTime: lessonDetails.startTime,
+        endTime: lessonDetails.endTime,
+        eventDate: lessonDetails.date,
+        roomName: selectedCard.name
+      }
+
+
+      try {
+        await addExtraLecture(extraLesson)
+
+      } catch (error) {
+        alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.")
+      }
+
+      //  console.log(selectedEvent)
 
       // State'i güncelle
-      //  setBaseEvents(updatedEvents);
-      console.log("Güncellenmiş Etkinlikler:", updatedEvents);
+
+      // console.log("Güncellenmiş Etkinlikler:", updatedEvents);
       // setShowChangeClassModal(false); // Modal'ı kapat
-
-      setEvents(updatedEvents.flatMap(event =>
-        generateRecurringEvents(event.title, event.start, event.end, event.rule, event.location)
-      ));
-      console.log(events);
-
 
       handleCloseExtraLessonModal(
 
@@ -246,6 +218,18 @@ const InstructorSchedule = ({ lesson }) => {
       )
     }
   }
+
+ const handleDelete = async () => {
+  try {
+    await deleteLectureSession(selectedEvent.lectureSessionId)
+    setShowDeleteModal(false)
+      setShowModal(false)
+
+  } catch (error) {
+    alert("Ders silinirken hata oluştu.")
+  }
+ }
+
 
   const [showComponent, setShowComponent] = useState(false);
 
@@ -263,15 +247,12 @@ const InstructorSchedule = ({ lesson }) => {
     // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
 
     return (
-      <Container className="d-flex flex-column align-items-center">
+      <Container className="d-flex flex-column align-items-center ">
         <div className="d-flex align-items-center ">
-          <span className=" fw-bolder lh-sm" style={{ fontSize: "1.8vw" }}>{event.title}</span>
+          <span className="fw-bolder lh-sm" style={{ fontSize: "1.1vw" }}>{event.title}</span>
         </div>
-        <div className=" d-flex align-items-center mt-2">
-          <span className='fw-semibold' style={{ fontSize: "1.5vw" }}>{event.location}</span>
-        </div>
-        <div className=" d-flex align-items-center mt-2">
-          <span className='fs-5 fw-medium'>{event.text}</span>
+        <div className=" d-flex align-items-center">
+          <span className='fw-semibold' style={{ fontSize: "1.1vw" }}>{event.roomName}</span>
         </div>
 
 
@@ -280,14 +261,15 @@ const InstructorSchedule = ({ lesson }) => {
     );
 
 
-
   };
+
+  console.log(selectedEvent)
 
   return (
     <>
       <Calendar
         localizer={localizer}
-        events={events}
+        events={[...scheduleEvent]}
         startAccessor="start"
         endAccessor="end"
         defaultView="work_week"
@@ -330,21 +312,10 @@ const InstructorSchedule = ({ lesson }) => {
         <Modal.Body>
           <p><strong>Başlangıç:</strong> {moment(selectedEvent?.start).format("DD MMMM YYYY, HH:mm")}</p>
           <p><strong>Bitiş:</strong> {moment(selectedEvent?.end).format("DD MMMM YYYY, HH:mm")}</p>
-          <p><strong>Sınıf:</strong> {selectedEvent?.location}</p>
-          <Row className="d-flex justify-content-center">
-            <Col md="auto">
-              <Button onClick={handleOpenChangeClassModal}>Sınıfı değiştir</Button>
-            </Col>
-            <Col md="auto">
-              <Button onClick={handleConfirmCancelLesson}>İptal et</Button>
-            </Col>
-            <Col md="auto">
-              <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
-            </Col>
-          </Row>
-
-
-
+          <p><strong>Sınıf:</strong> {selectedEvent?.roomName}</p>
+          <Button onClick={handleOpenChangeClassModal}>Tarih ve sınıfı değiştir</Button>
+          <Button onClick={()=> setShowDeleteModal(true)}>İptal et</Button>
+          <Button onClick={handleOpenExtraLessonModal}>Ek ders yap</Button>
 
         </Modal.Body>
         <Modal.Footer>
@@ -357,19 +328,19 @@ const InstructorSchedule = ({ lesson }) => {
       {/* Sınıf Değiştirme Modalı */}
       <Modal size="xl" show={showChangeClassModal} onHide={handleCloseChangeClassModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Sınıfı Değiştir</Modal.Title>
+          <Modal.Title>Tarih ve Sınıfı Değiştir</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Row>
             <Col md="6">
               <div className="d-flex flex-wrap">
                 {showMessage && <div className="px-2" style={{ flex: "0 0 100%" }}>
-                  <p className="text-danger">Lütfen sınıf ve zaman seçiniz.</p>
+                  <p className="text-danger">Lütfen sınıf ve tarih seçiniz.</p>
                 </div>}
                 <br />
                 {selectedCard && (
                   <div className="px-2" style={{ flex: "0 0 50%" }}>
-                    <p>Seçilen sınıf: {selectedCard.title}</p>
+                    <p>Seçilen sınıf: {selectedCard.name}</p>
                   </div>
                 )}
                 {lessonDetails.startTime && (
@@ -381,7 +352,7 @@ const InstructorSchedule = ({ lesson }) => {
                       <p>Seçilen bitiş saati: {lessonDetails.endTime}</p>
                     </div>
                     <div className="px-2" style={{ flex: "0 0 50%" }}>
-                      <p>Seçilen gün: {moment(lessonDetails.date).format("dddd")}</p>
+                      <p>Seçilen gün: {moment(lessonDetails.date).format("D MMMM dddd")}</p>
                     </div>
                   </>
                 )}
@@ -392,7 +363,7 @@ const InstructorSchedule = ({ lesson }) => {
 
             <Col md="6">
 
-              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} selectedCard={selectedCard} />
             </Col>
           </Row>
         </Modal.Body>
@@ -421,7 +392,7 @@ const InstructorSchedule = ({ lesson }) => {
                 <br />
                 {selectedCard && (
                   <div className="px-2" style={{ flex: "0 0 50%" }}>
-                    <p>Seçilen sınıf: {selectedCard.title}</p>
+                    <p>Seçilen sınıf: {selectedCard.name}</p>
                   </div>
                 )}
                 {lessonDetails.startTime && (
@@ -444,7 +415,7 @@ const InstructorSchedule = ({ lesson }) => {
 
             <Col md="6">
 
-              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} />
+              <ClassChangeCalendar onDataSubmit={handleDataFromChild} lessonName={selectedEvent?.title} selectedCard={selectedCard} />
             </Col>
           </Row>
         </Modal.Body>
@@ -458,24 +429,22 @@ const InstructorSchedule = ({ lesson }) => {
         </Modal.Footer>
       </Modal>
 
-      {/* Ders iptali için onay modali */}
-      <Modal show={showConfirmCancelModal} onHide={handleCloseConfirmCancelModal}>
+ <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Dersi İptal Et</Modal.Title>
+          <Modal.Title>Ders İptal Onayı</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Bu dersi iptal etmek istediğinizden emin misiniz?
+          <p>Bu dersi iptal etmek istediğinizden emin misiniz?</p>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseConfirmCancelModal}>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Hayır
           </Button>
-          <Button variant="danger" onClick={handleCancelLessonConfirmed}>
-            Evet, İptal Et
+          <Button variant="danger" onClick={() => handleDelete()}>
+            Evet
           </Button>
         </Modal.Footer>
       </Modal>
-
     </>
   );
 };

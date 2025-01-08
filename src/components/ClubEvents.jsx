@@ -8,6 +8,8 @@ import 'moment/locale/tr';
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import "moment/locale/tr";
+import * as Icon from 'react-bootstrap-icons';
+import { baseUrl, baseUrl2, createClubEvent } from "../utils/ClubEventApiService";
 moment.locale('tr');
 
 
@@ -15,6 +17,7 @@ const ClubEvents = ({ events }) => {
     const { userType } = useContext(UserContext);
 
     const [showModal, setShowModal] = useState(false);
+    const [showModal2, setShowModal2] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [showNewEventModal, setShowNewEventModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
@@ -40,6 +43,12 @@ const ClubEvents = ({ events }) => {
         setShowModal(false);
         setSelectedEvent(null);
     };
+
+
+
+
+    const handleClose = () => setShowModal2(false);
+
 
     const handleOpenLink = (link) => {
         window.open(link, "_blank", "noopener,noreferrer");
@@ -70,28 +79,50 @@ const ClubEvents = ({ events }) => {
     };
 
 
-    const handleSaveNewEvent = () => {
+    const handleSaveNewEvent = async () => {
         setShowAlert(false)
         console.log(selectedCard);
 
         if (newEvent.eventsName &&
             selectedTime &&
             selectedCard?.name &&
-            newEvent.eventsDetails &&
-            newEvent.eventsLink
+            newEvent.eventsDetails 
+            
         ) {
+            console.log(selectedTime)
+            const selectedDate = new Date(selectedTime.start);
+            const selectedEnd = new Date(selectedTime.end);
+
+            const formattedDate = moment(selectedDate).toISOString();
+            const start = moment(selectedDate).format('HH:mm:ss');
+            const end = moment(selectedEnd).format('HH:mm:ss');
+
+
+
             const updatedEvent = {
-                eventsName: newEvent.eventsName,  // Önceki değeri koruyoruz.
-                eventsDate: selectedTime?.start,
-                eventsPlace: selectedCard?.name,  // Eğer selectedCard boşsa boş bir string atayın.
-                eventsDetails: newEvent.eventsDetails,
-                eventsLink: newEvent.eventsLink,
-                eventsImage: selectedImage || ''  // Eğer resim seçilmemişse boş bir string atayın.
+                studentId: 3,
+                clubName: "Bilgisayar Kulübü",
+                roomName: selectedCard.name,
+                startTime: start,
+                endTime: end,
+                eventTime: formattedDate,
+                title: newEvent.eventsDetails,
+                details: newEvent.eventsDetails,
+                link: newEvent.eventsLink,
+                banner: selectedImage,
+                status: "pending",
+
             };
 
+            try {
+                await createClubEvent(updatedEvent)
+                setShowNewEventModal(false)
+                setShowModal2(true)
+            } catch (error) {
+                alert("Bir hata oluştu.")
+            }
             setNewEvent(updatedEvent)
-            console.log(updatedEvent)
-            //updatedevent admine gönderilecek
+
         }
 
         else setShowAlert(true);
@@ -108,7 +139,9 @@ const ClubEvents = ({ events }) => {
     const start = moment(selectedTime?.start).format('DD MMMM dddd HH:mm'); // 19 Aralık Perşembe 05:00
     const end = moment(selectedTime?.end).format('HH:mm'); // 07:30
 
-    const formattedDate = `${start} - ${end}`;
+    const formattedDate = selectedTime
+        ? `${moment(selectedTime?.start).format('DD MMMM dddd HH:mm')} - ${moment(selectedTime?.end).format('HH:mm')}`
+        : '';  // Eğer selectedTime boşsa, boş bir string döndür
 
     const navigate = useNavigate();
 
@@ -117,6 +150,23 @@ const ClubEvents = ({ events }) => {
         return moment(dateString, "DD.MM.YYYY").format("D MMMM dddd");
     };
 
+    function getStartTime(eventTime) {
+        const startTime = eventTime.split(' - ')[0]; // Başlangıç saatini ayır
+        return moment(startTime, "HH:mm:ss").format("HH:mm"); // Formatla ve döndür
+    }
+
+    function getEndTime(eventTime) {
+        const endTime = eventTime.split(' - ')[1]; // Bitiş saatini ayır
+        return moment(endTime, "HH:mm:ss").format("HH:mm"); // Formatla ve döndür
+    }
+
+    function formatEventTime(eventTime) {
+        const [startTime, endTime] = eventTime.split(' - '); // Zamanı ayır
+        const formattedStart = moment(startTime, "HH:mm:ss").format("HH:mm"); // Başlangıç zamanını formatla
+        const formattedEnd = moment(endTime, "HH:mm:ss").format("HH:mm"); // Bitiş zamanını formatla
+        return `${formattedStart} - ${formattedEnd}`; // Formatlanmış zamanları birleştir
+    }
+console.log(selectedCard)
     return (
         <Container className="bg-light rounded-4">
             <Row className="justify-content-start align-items-center">
@@ -138,7 +188,7 @@ const ClubEvents = ({ events }) => {
                         >
                             <Row className="ps-2">
                                 <Col>
-                                    <Image src={event.clubLogo} style={{ width: "80px" }} />
+                                    <Image src={`${baseUrl2}${event.clubLogo}`} style={{ width: "80px" }} />
                                 </Col>
                                 <Col className="d-flex align-items-center">{event.clubName}</Col>
                             </Row>
@@ -148,7 +198,7 @@ const ClubEvents = ({ events }) => {
                                         {event.clubRoomName}
                                     </Col>
                                     <Col md={9}>
-                                        <div className="twinkle-star-regular text-center">{formatDate(event.eventDate)}</div>
+                                        <div className="twinkle-star-regular text-center">{formatDate(event.eventDate)} {getStartTime(event.eventTime)}</div>
                                         <div
                                             className="d-flex twinkle-star-regular"
                                             style={{
@@ -174,15 +224,15 @@ const ClubEvents = ({ events }) => {
             {selectedEvent && (
                 <Modal size="xl" show={showModal} onHide={handleCloseModal} centered>
                     <Modal.Header closeButton>
-                        <Modal.Title>{<Image src={selectedEvent.clubLogo} style={{ width: "80px" }} />}</Modal.Title>
+                        <Modal.Title>{<Image src={`${baseUrl2}${selectedEvent.clubLogo}`} style={{ width: "80px" }} />}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <p><strong>Etkinlik adı:</strong> {selectedEvent.title}</p>
-                        <p><strong>Tarih:</strong> {formatDate(selectedEvent.eventDate)}</p>
+                        <p><strong>Tarih:</strong> {formatDate(selectedEvent.eventDate)}{" "}{formatEventTime(selectedEvent.eventTime)}</p>
                         <p><strong>Yer:</strong> {selectedEvent.clubRoomName}</p>
                         <Row>
                             <Col md="auto">
-                                <Image src={selectedEvent.banner} width={300} />
+                                <Image src={`${baseUrl2}${selectedEvent.banner}`} width={300} />
                             </Col>
                             <Col >  <p><strong>Davet metni: </strong>{selectedEvent.details}</p></Col>
                         </Row>
@@ -212,7 +262,7 @@ const ClubEvents = ({ events }) => {
                     <Form>
                         {showAlert && (
                             <Alert variant="danger">
-                                Lütfen tüm alanları doldurduğunuzdan emin olun!
+                                Lütfen tüm zorunlu alanları doldurduğunuzdan emin olun!
                             </Alert>
                         )}
                         <Row className="align-items-center">
@@ -279,7 +329,7 @@ const ClubEvents = ({ events }) => {
 
                         <Form.Group controlId="formEventImage">
                             <Row className="d-flex justify-content-start w-50 align-items-center mt-2">
-                                <Col md={3}> <Form.Label><strong>Etkinlik afişi:</strong></Form.Label></Col>
+                                <Col md={3}> <Form.Label><strong>Etkinlik afişi: (Zorunlu değil)</strong></Form.Label></Col>
                                 <Col md={9}> <Form.Control
                                     type="file"
                                     accept="image/*"
@@ -300,9 +350,9 @@ const ClubEvents = ({ events }) => {
                         </Form.Group>
                     </Form>
                 </Modal.Body>
-                <Row>
+                <Row className="px-1">
                     <Col md={6} className="scrollable"> <ClassesList setSelectedCard={setSelectedCard} /></Col>
-                    <Col md={6}> <ClubEventCreateCalendar setSelectedTime={setSelectedTime} /> </Col>
+                    <Col md={6}> <ClubEventCreateCalendar setSelectedTime={setSelectedTime} selectedCard= {selectedCard} /> </Col>
                 </Row>
 
 
@@ -316,6 +366,27 @@ const ClubEvents = ({ events }) => {
                 </Modal.Footer>
             </Modal>
 
+            <Modal show={showModal2} onHide={handleClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Bilgi</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <Row className=" justify-content-start align-items-center ps-5">
+                        <Col md={3}>
+                            <Icon.CheckCircleFill fill="#198754" size={80} />
+                        </Col>
+                        <Col md={7}>
+                            <h5>Talebiniz bize ulaşmıştır.</h5>
+                        </Col>
+                    </Row>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Kapat
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 };

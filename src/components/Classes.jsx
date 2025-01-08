@@ -7,9 +7,22 @@ import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { UserContext } from './UserContext';
 import ClassCalendarStudent from './ClassCalendarStudent';
 import getAllRooms from '../utils/ApiService';
-
+import { getLecturesByInstructorId } from '../utils/LectureApiService';
+let instructorId = 1
 const Classes = ({ col }) => {
 
+
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('tr-TR', {
+        hour: '2-digit',
+        minute: '2-digit',
+
+      });
+
+   //   const formattedDate = formatter.format(date);
+
+      
+    
     const { userType } = useContext(UserContext);
 
     const [events, setEvents] = useState([
@@ -69,8 +82,59 @@ const Classes = ({ col }) => {
         fetchEvents();
     }, []);
 
+    const [lectures, setLectures] = useState([]);
+    useEffect(() => {
+        if (userType === "instructor") {
+            const fetchEvents = async () => {
+                const events = await getLecturesByInstructorId(instructorId);
+                setLectures(events); // Veriyi burada işleyebilirsiniz.
+            };
+    
+            fetchEvents();
+        }
+    }, []); 
 
+    const typeCode2Name = (typeName) =>{
+      
+            switch (typeName) {
+                case 0:
+                  return "Derslik"
+                case 5:
+                  return "Amfi"
+                case 2:
+                  return "Bilgisayar Laboratuvarı"
+                case 1:
+                  return "Elektrik Laboratuvarı"
+                case 3:
+                  return "Genetik Laboratuvarı"
+                case 4:
+                  return "Gıda Laboratuvarı"
+                case 6:
+                  return "Makine Laboratuvarı"
+              }
+    
+    }
 
+    const typeName2Code =(typeCode) =>{
+      
+        switch (typeCode) {
+            case "Derslik":
+              return 0
+            case "Amfi":
+              return 5
+            case "Bilgisayar Laboratuvarı":
+              return 2
+            case "Elektrik Laboratuvarı":
+              return 1
+            case "Genetik Laboratuvarı":
+              return 3
+            case "Gıda Laboratuvarı":
+              return 4
+            case "Makine Laboratuvarı":
+              return 6
+          }
+
+}
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -109,10 +173,10 @@ const Classes = ({ col }) => {
     const filteredRooms = rooms.filter(card =>
         card.name.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
-        (filterOptions.isProjectorWorking ? card.isProjectorWorking === (filterOptions.isProjectorWorking === "true") : true) &&
+        (filterOptions.projection ? card.isProjectorWorking === (filterOptions.projection === "true") : true) &&
         (filterOptions.isActive ? card.isActive === (filterOptions.isActive === "true") : true) &&
         (filterOptions.isEmpty ? card.isEmpty === (filterOptions.isEmpty === "true") : true) &&
-        (filterOptions.classType ? card.classType === filterOptions.classType : true)
+        (filterOptions.classType ? typeCode2Name(card.roomType) === filterOptions.classType : true)
     );
 
 
@@ -256,12 +320,12 @@ const Classes = ({ col }) => {
                             <p className='fw-semibold'>Seçimlerinize uygun sınıf bulunamadı.</p>
                         </Col>
                     ) :
-                     
+
                         filteredRooms.map((card) => (
                             <Col key={card.roomId} md={col} className="mb-4 ">
                                 <Card
                                     className={`py-3 ${card.isActive ? "cursor-pointer" : "hover-disable-card"} 
-                                    ${(card.isEmpty && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
+                                    ${(!card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00") && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
             
                                      `}
 
@@ -283,7 +347,17 @@ const Classes = ({ col }) => {
                                                 </OverlayTrigger>
                                             </Col>}
 
-                                            <Col md={2}>
+                                            {card.roomType===1 &&  <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Elektrik Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.LightningFill size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+                                            {card.roomType===2 &&  <Col md={2}>
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
@@ -292,7 +366,9 @@ const Classes = ({ col }) => {
                                                         <Icon.PcDisplay size={20} />
                                                     </div>
                                                 </OverlayTrigger>
-                                            </Col>
+                                            </Col>}
+                                            
+                                           
                                         </Row>
 
                                         <Card.Text className={`fw-light fw-bold ${!card.isActive === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
@@ -305,8 +381,14 @@ const Classes = ({ col }) => {
 
                                         <Card.Text className="fw-bolder">{card.text2}</Card.Text>
 
+                                     
 
-
+                            {card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName ? <>
+                            <Card.Text className='fw-light fw-bold'>Ders işleniyor</Card.Text>
+                            {card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName}
+                            </>
+                            : <Card.Text className='text-success fw-light fw-bold'>Boş</Card.Text>
+                        }
                                     </Card.Body>
                                 </Card>
                             </Col>
@@ -417,6 +499,13 @@ const Classes = ({ col }) => {
                         <Modal.Title>{selectedCard.name}</Modal.Title>
                     </Modal.Header>
                     <Modal.Header>
+                        {selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName &&
+                        <>
+                      <span className='fw-semibold'>İşlenen ders: </span>{" "}{selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName} 
+                        {selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.endTime}
+                        </> }
+
+
                         {selectedCard.text === "Ders işleniyor" && (
                             <>
                                 {selectedCard.text2} - Bilgisayar Mühendisliği - <b>13:00</b>
@@ -436,16 +525,18 @@ const Classes = ({ col }) => {
                         </Button>}
                         {showAddLesson && (
                             <Form className="mt-3">
+
                                 <Form.Group controlId="formLesson">
                                     <Form.Label>Ders</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="title"
+                                   <Form.Select name="title"
                                         value={lessonDetails.title}
-                                        onChange={handleLessonDetailsChange}
-                                    />
+                                        onChange={handleLessonDetailsChange}>
+                                            <option>Seçin</option>
+                                   {lectures.map(lecture => (
+                  <option key={lecture.name} value={lecture.name}>{lecture.name}</option>
+                ))}
+                                   </Form.Select>
                                 </Form.Group>
-
                                 <Row>
                                     <Col>
                                         <Form.Group controlId="formDate">
@@ -495,12 +586,13 @@ const Classes = ({ col }) => {
                             </Form>
                         )}
                         {userType === "student"
-                            ? <ClassCalendarStudent />
+                            ? <ClassCalendarStudent roomId= {selectedCard.roomId}/>
                             : <ClassCalendar
+                                roomId = {selectedCard.roomId}
                                 onDataSubmit={handleDataFromChild}
                                 lessonName={lessonDetails.title}
                                 lesson={lessonDetails}
-                                events={events}
+                                events1={events}
                                 setEvents={setEvents}
                                 selectedEvent={selectedEvent}
                                 setSelectedEvent={setSelectedEvent} />}
