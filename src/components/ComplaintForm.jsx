@@ -104,6 +104,7 @@ const ComplaintForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
     const { type, title, roomId, content } = complaintForm;
     if (type && title && roomId && content) {
       const data = { ...complaintForm, userName:"Ali Veli", userId: 1 }
