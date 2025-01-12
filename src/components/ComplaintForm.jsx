@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Button, Modal, Alert, Image, Col, Row } from 'react-bootstrap';
-import * as Icon from 'react-bootstrap-icons';
-import { getAllRooms } from '../utils/RoomApiService';
-import { createComplaint } from '../utils/ComplaintApiService';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Form, Button, Modal, Alert, Image, Col, Row } from "react-bootstrap";
+import * as Icon from "react-bootstrap-icons";
+import { getAllRooms } from "../utils/RoomApiService";
+import { createComplaint } from "../utils/ComplaintApiService";
+import { useNavigate } from "react-router-dom";
 
 let complaints = [
   "Sınıf arıza bildirimi",
@@ -36,7 +36,7 @@ let complaints = [
   "Okulda su kesintisi yaşanması",
   "Tuvalet kağıdı ve sabun eksikliği",
   "Okul giriş-çıkış güvenlik önlemlerinin eksikliği",
-  "Okul gezilerinin düzenlenmemesi"
+  "Okul gezilerinin düzenlenmemesi",
 ];
 
 const ComplaintForm = () => {
@@ -50,11 +50,11 @@ const ComplaintForm = () => {
     title: "",
     roomId: "",
     content: "",
-    images: []
+    images: [],
   });
   const [rooms, setRooms] = useState([]);
 
-  console.log(complaintForm)
+  console.log(complaintForm);
 
   useEffect(() => {
     const fetchClassrooms = async () => {
@@ -69,53 +69,64 @@ const ComplaintForm = () => {
     fetchClassrooms();
   }, []);
 
-
-
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setComplaintForm(prevState => ({
+    setComplaintForm((prevState) => ({
       ...prevState,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     const newImages = [];
+
     files.forEach((file) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        newImages.push(reader.result);
+        newImages.push({ file, preview: reader.result });
         if (newImages.length === files.length) {
           setImages((prevImages) => [...prevImages, ...newImages]);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(file); // Dosyayı Base64 formatına dönüştür
     });
-    e.target.value = '';
   };
 
   const handleImageRemove = (index) => {
     const updatedImages = [...images];
-    updatedImages.splice(index, 1);
+    updatedImages.splice(index, 1); // İlgili index'i kaldır
     setImages(updatedImages);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const { type, title, roomId, content } = complaintForm;
+
     if (type && title && roomId && content) {
-      const data = { ...complaintForm, userName:"Ali Veli", userId: 1 }
+      const formData = new FormData();
+
+      formData.append("Type", type);
+      formData.append("Title", title);
+      formData.append("RoomId", roomId);
+      formData.append("Content", content);
+      formData.append("UserName", "Ali Veli");
+      formData.append("UserId", 1);
+
+      // FormData'ya sadece dosyaları ekle
+      images.forEach((img) => {
+        formData.append("PhotoFiles", img.file);
+      });
 
       try {
-          await createComplaint(data)
+        await createComplaint(formData); // API çağrısını yapın
+        setShowModal(true);
+        setShowAlert(false);
       } catch (error) {
-        alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.")
+        console.error("Bir hata oluştu:", error);
+        alert("Bir hata oluştu. Lütfen tekrar deneyiniz.");
       }
-      setShowModal(true);
-      setShowAlert(false);
     } else {
       setShowAlert(true);
     }
@@ -123,20 +134,28 @@ const ComplaintForm = () => {
 
   return (
     <div className="container my-5 p-3">
-      <Row className='align-items-center'>
-        <Col md="auto"><h2>Şikayet Oluştur</h2></Col>
+      <Row className="align-items-center">
         <Col md="auto">
-        <Button variant='outline-success' onClick={() => { navigate("/şikayetleriniz") }}>Şikayetlerim</Button>
+          <h2>Şikayet Oluştur</h2>
+        </Col>
+        <Col md="auto">
+          <Button
+            variant="outline-success"
+            onClick={() => {
+              navigate("/şikayetleriniz");
+            }}
+          >
+            Şikayetlerim
+          </Button>
         </Col>
       </Row>
-       
+
       {showAlert && (
         <Alert variant="danger">
           Lütfen tüm alanları doldurduğunuzdan emin olun!
         </Alert>
       )}
       <Form onSubmit={handleSubmit}>
-
         <Form.Group controlId="complaintType">
           <Form.Label>Şikayet Türü</Form.Label>
           <Form.Control
@@ -147,7 +166,9 @@ const ComplaintForm = () => {
           >
             <option>Seçiniz</option>
             {complaints.map((complaint, index) => (
-              <option key={index} value={complaint}>{complaint}</option>
+              <option key={index} value={complaint}>
+                {complaint}
+              </option>
             ))}
           </Form.Control>
         </Form.Group>
@@ -164,7 +185,9 @@ const ComplaintForm = () => {
             <option value="Kutuphane">Kütüphane</option>
             <option value="Yemekhane">Yemekhane</option>
             {rooms.map((room) => (
-              <option key={room.roomId} value={room.roomId}>{room.name}</option>
+              <option key={room.roomId} value={room.roomId}>
+                {room.name}
+              </option>
             ))}
           </Form.Control>
         </Form.Group>
@@ -195,11 +218,7 @@ const ComplaintForm = () => {
         <Form.Group controlId="complaintImage">
           <Form.Label>Fotoğraflar (isteğe bağlı)</Form.Label>
           <div className="mb-3">
-            <Form.Control
-              type="file"
-              multiple
-              onChange={handleImageChange}
-            />
+            <Form.Control type="file" multiple onChange={handleImageChange} />
           </div>
           {images.length > 0 && (
             <div className="d-flex flex-wrap align-items-center">
@@ -211,10 +230,10 @@ const ComplaintForm = () => {
                   onMouseLeave={() => setHoverIndex(null)}
                 >
                   <Image
-                    src={img}
+                    src={img.preview}
                     rounded
                     style={{
-                      maxWidth: '100px',
+                      maxWidth: "100px",
                     }}
                   />
                   {hoverIndex === index && (
@@ -224,8 +243,8 @@ const ComplaintForm = () => {
                     >
                       <Icon.Trash3
                         style={{
-                          fontSize: '24px',
-                          color: 'white',
+                          fontSize: "24px",
+                          color: "white",
                         }}
                       />
                     </div>
@@ -233,9 +252,11 @@ const ComplaintForm = () => {
                 </div>
               ))}
               <Button
-                className='image-add'
+                className="image-add"
                 variant="outline-warning"
-                onClick={() => document.getElementById('complaintImage').click()}
+                onClick={() =>
+                  document.getElementById("complaintImage").click()
+                }
               >
                 +
               </Button>
@@ -254,7 +275,8 @@ const ComplaintForm = () => {
           <Modal.Title>Şikayetiniz Gönderildi</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Şikayetiniz başarıyla gönderildi. En kısa sürede geri dönüş yapılacaktır.
+          Şikayetiniz başarıyla gönderildi. En kısa sürede geri dönüş
+          yapılacaktır.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
