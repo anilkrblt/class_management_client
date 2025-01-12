@@ -187,7 +187,7 @@ const ClassReservationRequests = () => {
                                 <p><strong>Katılım formu: </strong>
                                     <Button
                                         variant="link"
-                                        onClick={() => window.open(selectedRequest.katilimLinki, '_blank', 'noopener,noreferrer')}
+                                        onClick={() => window.open(`https://${selectedRequest.katilimLinki}`, '_blank', 'noopener,noreferrer')}
                                     >
                                         Formu Aç
                                     </Button></p>

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Form, Button, Modal, Alert, Image, Col, Row } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 import { getAllRooms } from "../utils/RoomApiService";
 import { createComplaint } from "../utils/ComplaintApiService";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 let complaints = [
   "Sınıf arıza bildirimi",
@@ -40,6 +41,8 @@ let complaints = [
 ];
 
 const ComplaintForm = () => {
+  const {userId , userName} = useContext(UserContext);
+
   const [images, setImages] = useState([]);
   const [hoverIndex, setHoverIndex] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -53,7 +56,7 @@ const ComplaintForm = () => {
     images: [],
   });
   const [rooms, setRooms] = useState([]);
-
+console.log(userName)
   console.log(complaintForm);
 
   useEffect(() => {
@@ -111,8 +114,8 @@ const ComplaintForm = () => {
       formData.append("Title", title);
       formData.append("RoomId", roomId);
       formData.append("Content", content);
-      formData.append("UserName", "Ali Veli");
-      formData.append("UserId", 1);
+      formData.append("UserName", userName);
+      formData.append("UserId", Number(userId));
 
       // FormData'ya sadece dosyaları ekle
       images.forEach((img) => {

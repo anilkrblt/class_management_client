@@ -1,29 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import {
-  Card,
-  Col,
-  Container,
-  Image,
-  Modal,
-  Row,
-  Button,
-  Form,
-  Alert,
+import {Card,Col,Container,Image,Modal,Row,Button,Form,Alert,
 } from "react-bootstrap";
 import ClassesList from "./ClassesList";
-import ClassCalendarStudent from "./ClassCalendarStudent";
 import ClubEventCreateCalendar from "./ClubEventCreateCalendar";
 import moment from "moment";
 import "moment/locale/tr";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import "moment/locale/tr";
 import * as Icon from "react-bootstrap-icons";
-import {
-  baseUrl,
-  baseUrl2,
-  createClubEvent,
-} from "../utils/ClubEventApiService";
+import {baseUrl2} from "../utils/ClubEventApiService";
 import axios from "axios";
 moment.locale("tr");
 
@@ -37,8 +23,6 @@ const ClubEvents = ({ events }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showAlert, setShowAlert] = useState(false);
   const [previewImage, setPreviewImage] = useState(null);
-  const formData = new FormData();
-
   const [selectedTime, setSelectedTime] = useState(null);
   const [newEvent, setNewEvent] = useState({
     eventsName: "",
@@ -62,7 +46,7 @@ const ClubEvents = ({ events }) => {
   const handleClose = () => setShowModal2(false);
 
   const handleOpenLink = (link) => {
-    window.open(link, "_blank", "noopener,noreferrer");
+    window.open(`https://${link}`, "_blank"); 
   };
 
   const handleShowNewEventModal = () => {
@@ -128,16 +112,16 @@ const ClubEvents = ({ events }) => {
       formData.append("StartTime", start);
       formData.append("EndTime", end);
       formData.append("EventTime", formattedDate);
-      formData.append("Title", newEvent.eventsDetails);
+      formData.append("Title", newEvent.eventsName);
       formData.append("Details", newEvent.eventsDetails);
-      formData.append("Link", newEvent.eventsLink || ""); // Link opsiyonel olabilir
+      formData.append("Link", newEvent.eventsLink || ""); 
       formData.append("Status", "pending");
 
       // Eğer bir dosya seçildiyse FormData'ya ekle
       if (selectedImage) {
-        formData.append("BannerFile", selectedImage); // Backend ile aynı isimde olmalı
+        formData.append("BannerFile", selectedImage); 
       }
-      console.log(previewImage);
+ 
       try {
         // Axios ile POST isteği
         const response = await axios.post(
@@ -214,9 +198,10 @@ const ClubEvents = ({ events }) => {
           </h3>
         </Col>
         <Col md="auto">
-          <Button variant="outline-success" onClick={handleShowNewEventModal}>
+
+        {userType !== "admin" && <Button variant="outline-success" onClick={handleShowNewEventModal}>
             Yeni etkinlik oluştur
-          </Button>
+          </Button>}    
         </Col>
         {userType === "admin" && (
           <Col md="auto">
@@ -317,6 +302,7 @@ const ClubEvents = ({ events }) => {
             </p>
             <Row>
               <Col md="auto">
+              
                 <Image src={`${baseUrl2}${selectedEvent.banner}`} width={300} />
               </Col>
               <Col>

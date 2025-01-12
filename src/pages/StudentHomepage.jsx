@@ -9,8 +9,8 @@ import { Helmet } from "react-helmet";
 import StudentExams from "../components/StudentExams";
 
 const StudentHomePage = () => {
-  const { userType, setUserType } = useContext(UserContext);
-
+  const { userType, setUserType, userName } = useContext(UserContext);
+console.log(userName)
   useEffect(() => {
     setUserType("student");
   }, [setUserType]);

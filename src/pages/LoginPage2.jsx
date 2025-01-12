@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Container, Row, Col, Form, Button, Card, Image } from 'react-bootstrap';
+import { Container, Row, Col, Form, Button, Card, Image, Alert } from 'react-bootstrap';
 import { LoginApiService } from '../utils/LoginApiService';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../components/UserContext';
@@ -10,8 +10,9 @@ const LoginScreen = () => {
     password: '',
   });
 
+  const [showAlert , setShowAlert] = useState(false)
   const [user, setUser] = useState(null); // user'ı başlangıçta null yapıyoruz
-    const { userType, setUserType, setUserId } = useContext(UserContext);
+    const { userType, setUserType, setUserId, setNotifications, setUserName } = useContext(UserContext);
   const navigate = useNavigate();
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -48,14 +49,16 @@ const LoginScreen = () => {
 
         setUserType(role.toLowerCase())
         setUserId(user.user.id) 
-        
+        setUserName(user.user.instructorName|| user.user.fullName)
+        console.log(user.notifications)
+        setNotifications(user.notifications)
         navigate("/anasayfa")
 
       } else {
         console.error('Token bulunamadı');
       }
     } catch (error) {
-      alert('Giriş bilgileri hatalı. Lütfen tekrar deneyin.');
+      setShowAlert(true)
     }
   };
 
@@ -77,6 +80,8 @@ const LoginScreen = () => {
           <Card className="p-4 shadow rounded-4 mb-5">
             <Card.Body>
               <h2 className="text-center mb-4">Giriş Yap</h2>
+
+              {showAlert && <Alert variant='danger'>Kullanıcı adı veya şifre hatalı!</Alert>}
               <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                   <Form.Label>E-posta</Form.Label>

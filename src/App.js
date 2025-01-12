@@ -34,6 +34,7 @@ import InstructorLessonsPage from "./pages/InstructorLessonsPage";
 import ComplaintsStudentPage from "./pages/ComplaintsStudentPage";
 import CreateExam from "./components/CreateExam";
 import CreateExamPage from "./pages/CreateExamPage";
+import StudentSchedule from "./components/StudentSchedule";
 
 const App = () => {
   const { userType, setUserType } = useContext(UserContext);
@@ -146,7 +147,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<ErrorPage />} />
+        <Route path="*" element={<LoginScreen />} />
 
         <Route
           path="/profil"

@@ -1,17 +1,11 @@
 import React, { useState } from "react";
 import CreateExamCalendar from "./CreateExamCalendar";
-import { Button, Container, Accordion, Card, Row, Col } from "react-bootstrap";
-import { createExams } from "../utils/CreateExams";
+import { Button, Container, Accordion, Card, Row, Col, Form } from "react-bootstrap";
+import { createExams, createExamSession } from "../utils/CreateExams";
 
 const CreateExam = () => {
   const [selectedDates, setSelectedDates] = useState([]);
   const [exams, setExams] = useState({});
-
-  const createExamsSchedule = async () => {
-    const x = await createExams(selectedDates);
-    setExams(x);
-    console.log(x);
-  };
 
   // DepartmentName'e göre grupla
   const groupByDepartment = (data) => {
@@ -39,21 +33,117 @@ const CreateExam = () => {
 
   const groupedExams = exams.planning ? groupByDepartment(exams.planning) : {};
 
+
   const [showCalendar, setShowCalendar] = useState(false)
 
+  const [formData, setFormData] = useState({
+    year: '',
+    term: '',
+    type: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log('Form submitted with data:', formData);
+    // Burada veriyi bir API'ye gönderebilir veya başka işlemler yapabilirsiniz
+  };
+
+  // Sınav takvimi oluşturma işlemi
+  const createExamsSchedule = async () => {
+    const dataToSend = {
+      ...formData, // form verilerini ekliyoruz
+      year: Number(formData.year),
+      dates: selectedDates, // seçilen tarihleri ekliyoruz
+    };
+    console.log(dataToSend)
+    const y = { ...formData, year: Number(formData.year), }
+    await createExamSession(y)
+    const x = await createExams(dataToSend); // createExams fonksiyonuna göndermek
+    setShowCalendar(false)
+    setExams(x); // gelen sonucu set ediyoruz
+    console.log(x);
+  };
+
   return (
-    <Container>
-      <h3>Sınav Takvimi Oluştur</h3>
-      <Button onClick={()=>setShowCalendar(!showCalendar)}>Sınav takvimi oluştur</Button>
-      {showCalendar && <>
-        <Button onClick={createExamsSchedule}>Sınav takvimi oluştur</Button>
-        <CreateExamCalendar
-          selectedDates={selectedDates}
-          setSelectedDates={setSelectedDates}
-        />
+    <Container><Row className="justify-content-start d-flex">
+      <Col md="auto">  <h3>Sınav Takvimi Oluştur</h3>
+      </Col>
+<Col md="auto"><Button variant={showCalendar ? "primary" : "outline-primary"} onClick={() => setShowCalendar(!showCalendar)}>Sınav dönemi seç</Button>
+</Col>
+  
+    </Row>
+    
 
-      </>}
+      {showCalendar && (
+        <>
+         
+          <Row>
+            <Form onSubmit={handleSubmit}>
+              <Row>
+                <Col> <Form.Group controlId="year">
+                  <Form.Label>Yıl</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="year"
+                    value={formData.year}
+                    onChange={handleChange}>
+                    <option value="">Seçiniz...</option>
+                    <option value={2024}>2024</option>
+                    <option value={2025}>2025</option>
+                    <option value={2026}>2026</option>
+                  </Form.Control>
+                </Form.Group></Col>
 
+                <Col> <Form.Group controlId="term">
+                  <Form.Label>Yıl Dönemi</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="term"
+                    value={formData.term}
+                    onChange={handleChange}>
+                    <option value="">Seçiniz...</option>
+                    <option value="güz">Güz</option>
+                    <option value="bahar">Bahar</option>
+                  </Form.Control>
+                </Form.Group></Col>
+
+                <Col> <Form.Group controlId="type">
+                  <Form.Label>Sınav Tipi</Form.Label>
+                  <Form.Control
+                    as="select"
+                    name="type"
+                    value={formData.type}
+                    onChange={handleChange}>
+                    <option value="">Seçiniz...</option>
+                    <option value="vize">Vize</option>
+                    <option value="final">Final</option>
+                  </Form.Control>
+                </Form.Group></Col>
+<Col>
+<Button variant="outline-success" onClick={createExamsSchedule}>Oluştur</Button>
+</Col>
+              </Row>
+
+            </Form>
+          </Row>
+<div className="mt-2">
+ <CreateExamCalendar
+            selectedDates={selectedDates}
+            setSelectedDates={setSelectedDates}
+          />
+
+</div>
+         
+        </>
+      )}
 
       {Object.keys(exams).length === 0 ? (
         <p>Sınav takvimi henüz oluşturulmadı.</p>
@@ -82,17 +172,13 @@ const CreateExam = () => {
                                   backgroundColor: idx % 2 === 0 ? "#e6f7e4" : "transparent",
                                 }}
                               >
-
                                 <Card.Body>
                                   <Row className="justify-content-between text-center">
-                                    <Col md={2} >{plan.lectureCode}</Col>
-                                    <Col md={4}  >{plan.lectureName}</Col>
-
-                                    <Col md={2}  >{plan.date}</Col>
-                                    <Col md={2}  >{plan.startTime}-{plan.endTime}</Col>
-                                    <Col md={2}  >{plan.roomNames}</Col>
-
-
+                                    <Col md={2}>{plan.lectureCode}</Col>
+                                    <Col md={4}>{plan.lectureName}</Col>
+                                    <Col md={2}>{plan.date}</Col>
+                                    <Col md={2}>{plan.startTime}-{plan.endTime}</Col>
+                                    <Col md={2}>{plan.roomNames}</Col>
                                   </Row>
                                 </Card.Body>
                               </Card>

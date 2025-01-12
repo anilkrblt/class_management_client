@@ -6,24 +6,24 @@ import { UserContext } from "../components/UserContext";
 import { getInstructorById, getStudentById } from "../utils/ProfileApiService";
 
 const ProfilePage = () => {
-    const { userType } = useContext(UserContext);  // Kullanıcı türü Context'ten alınır
-    const [userInfo, setUserInfo] = useState(null); // Başlangıçta userInfo null
+    const { userType , userId} = useContext(UserContext); 
+    const [userInfo, setUserInfo] = useState(null); 
     const [user, setUser] = useState([]);
-    const userid = 1015;
+
 
     useEffect(() => {
         const fetchUserData = async () => {
             let user;
             if (userType === "instructor") {
-                user = await getInstructorById(userid);
+                user = await getInstructorById(userId);
             } else if (userType === "student") {
-                user = await getStudentById(3);
+                user = await getStudentById(userId);
             }
-            setUserInfo(user); // Kullanıcı bilgilerini güncelle
+            setUserInfo(user); 
         };
 
         fetchUserData();
-    }, [userType]); // userType değiştiğinde fetchUserData yeniden çağrılır
+    }, [userType]); 
 
     useEffect(() => {
         if (userInfo) {
@@ -50,9 +50,9 @@ const ProfilePage = () => {
                 ];
             }
 
-            setUser(userDetails); // user bilgilerini güncelle
+            setUser(userDetails); 
         }
-    }, [userInfo, userType]); // userInfo veya userType değiştiğinde user bilgilerini güncelle
+    }, [userInfo, userType]); 
 
     return (
         <Container>

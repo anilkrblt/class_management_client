@@ -31,12 +31,13 @@ let menusAdmin = [
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
   { name: "Dersler", href: "/dersler", icon: <Icon.LayersFill size={20} />, disableIcon: <Icon.Layers /> },
   { name: "Sınıf yönetimi", href: "/sınıfyonetimi", icon: <Icon.ClipboardCheckFill size={20} />, disableIcon: <Icon.ClipboardCheck />},
+  { name: "Sınavlar", href: "/sınavolustur", icon: <Icon.ClipboardCheckFill size={20} />, disableIcon: <Icon.ClipboardCheck />},
   { name: "Kulüpler", href: "/kulüpler", icon: <Icon.LightningChargeFill size={20} />, disableIcon: <Icon.LightningCharge /> },
   { name: "Şikayetler", href: "/şikayetler", icon: <Icon.PencilFill size={20} />, disableIcon: <Icon.Pencil />  },
 ];
 
 const Navbarx = () => {
-  const { userType, setUserType } = useContext(UserContext);
+  const { userType, setUserType,notifications, userName } = useContext(UserContext);
   const menus =
     userType === "admin"
       ? menusAdmin
@@ -46,9 +47,9 @@ const Navbarx = () => {
 
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-
-  const notifications = [];
-
+console.log(notifications)
+  const notificationsa = [];
+console.log(JSON.stringify(notifications, null, 2))
   // Referans tanımlıyoruz
   const notificationRef = useRef(null);
 
@@ -76,17 +77,17 @@ const Navbarx = () => {
   // İkonlar Dizisi
   const iconMenus = [
     {
-      icon: <Icon.Bell />,
+      icon: <Icon.Bell size={20}/>,
       disableIcon: <Icon.BellFill/>,
       action: () => setShowNotifications(!showNotifications) // Bildirimleri göster
     },
     {
-      icon: <Icon.Person />,
-      disableIcon: <Icon.PersonFill/>,
+      icon: <><Icon.Person size={23}/> <span className='align-items-center'>      {userName}</span></>,
+      disableIcon: <Icon.PersonFill size={30}/>,
       action: () => navigate("/profil") // Profil
     },
     {
-      icon: <Icon.BoxArrowRight className='logout'/>,
+      icon: <Icon.BoxArrowRight size={23} className='logout'/>,
       action: () => handleLogout() // Çıkış yap
     }
   ];
@@ -94,6 +95,7 @@ const Navbarx = () => {
   return (
     <Navbar bg="light" data-bs-theme="light" fixed="top" expand="lg" className='shadow-sm'>
       <Container>
+  
         <Navbar.Brand href="/anasayfa">
           <Image
             src="/tu_logo.jpg"

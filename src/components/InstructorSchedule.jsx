@@ -1,43 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import { RRule } from "rrule";
-import { Modal, Button, Form, Card, DropdownButton, Dropdown, Col, Row, Container } from "react-bootstrap";
+import { Modal, Button, Form, Col, Row, Container } from "react-bootstrap";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import ClassCalendar from "./ClassCalendar";
 import ClassChangeCalendar from "./ClassChangeCalendar";
 import ClassesList from "./ClassesList";
-import { getLecturesByInstructorId, getLecturesByRoomId, getLecturesByStudentId, getScheduleByInstructorId } from "../utils/LectureApiService";
+import { getLecturesByInstructorId, getScheduleByInstructorId } from "../utils/LectureApiService";
 import { addExtraLecture, changeLectureRoomTime, deleteLectureSession } from "../utils/InstructorsApiService";
 import { getAllRooms } from "../utils/RoomApiService";
 import * as Icon from 'react-bootstrap-icons';
+import { UserContext } from "./UserContext";
 
-// Localizer ayarı
 const localizer = momentLocalizer(moment);
-let instructorid = 1015
 
-const InstructorSchedule = ({ lesson }) => {
 
+const InstructorSchedule = () => {
+
+
+  const {userId } = useContext(UserContext);
   const [schedule, setSchedule] = useState([])
-
+console.log(userId)
   const [view, setView] = useState('day');
   useEffect(() => {
     const fetchEvents = async () => {
-      // const events = await getLecturesByStudentId(instructorid);
-      const events = await getScheduleByInstructorId(instructorid);
-      setSchedule(events.schedule) // Veriyi burada işleyebilirsiniz.
+      const events = await getScheduleByInstructorId(userId);
+      setSchedule(events.schedule)
     };
-
     fetchEvents();
   }, []);
 
 
   const fetchSchedule = async () => {
-    const events = await getScheduleByInstructorId(instructorid);
+    const events = await getScheduleByInstructorId(userId);
     setSchedule(events.schedule)
   }
 
-console.log(schedule)
+
   const scheduleEvent = Array.isArray(schedule)
     ? schedule.map((item) => ({
       title: item.lectureName,
@@ -68,6 +66,7 @@ console.log(schedule)
     endTime: '',
 
   });
+
   const handleSelectTime = (e) => {
     const { name, value } = e.target;
     setSelectTime((prev) => ({
@@ -75,15 +74,15 @@ console.log(schedule)
       [name]: value,
     }));
   };
-  console.log(selectTime)
+
 
 
   const [lectures, setLectures] = useState([])
   useEffect(() => {
 
     const fetchEvents = async () => {
-      const lecture = await getLecturesByInstructorId(1015);
-      setLectures(lecture); // Veriyi burada işleyebilirsiniz.
+      const lecture = await getLecturesByInstructorId(Number(userId));
+      setLectures(lecture);
     };
 
     fetchEvents();
@@ -93,17 +92,13 @@ console.log(schedule)
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showChangeClassModal, setShowChangeClassModal] = useState(false);
-
   const [showExtraLessonModal, setShowExtraLessonModal] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [showMessage, setShowMessage] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
 
-
-
   const handleDataFromChild = (value) => {
-    // Update the lessonDetails with the received data
     setLessonDetails({
       title: value.title,
       date: value.date,
@@ -148,9 +143,7 @@ console.log(schedule)
 
   const handleSave = async () => {
 
-
     if (!selectedEvent || !selectedCard) {
-
       setMessage3(true)
       return
     }
@@ -181,10 +174,7 @@ console.log(schedule)
     );
     console.log(updatedEvents);
 
-    setShowChangeClassModal(false); // Modal'ı kapat
-
-
-
+    setShowChangeClassModal(false); 
     setSelectedCard(null)
     setLessonDetails({
       title: '',
@@ -196,9 +186,6 @@ console.log(schedule)
 
     })
   };
-
-
-
 
 
   const handleOpenExtraLessonModal = () => {
@@ -217,15 +204,13 @@ console.log(schedule)
     }
     setMessage3(false)
     const extraLesson = {
-      instructorId: instructorid,
+      instructorId: Number(userId),
       lectureCode: selectedEvent.lectureCode,
       startTime: lessonDetails.startTime,
       endTime: lessonDetails.endTime,
       eventDate: lessonDetails.date,
       roomName: selectedCard.name
     }
-
-
 
     try {
       await addExtraLecture(extraLesson)
@@ -235,15 +220,10 @@ console.log(schedule)
       alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.")
     }
 
-
-
-    handleCloseExtraLessonModal(
-
-
-    )
+    handleCloseExtraLessonModal()
 
   }
-  console.log(schedule)
+
   const handleDelete = async () => {
     try {
       await deleteLectureSession(selectedEvent.lectureSessionId)
@@ -256,46 +236,31 @@ console.log(schedule)
     }
   }
 
-
-  const [showComponent, setShowComponent] = useState(false);
-
-  const handleToggleComponent = () => {
-    setShowComponent(!showComponent);
-  };
-
-
-  const handleSelectClass = () => {
-    handleToggleComponent()
-
-  }
-
   const [rooms, setRooms] = useState()
   useEffect(() => {
 
     const fetchRooms = async () => {
       const events = await getAllRooms();
-      setRooms(events); // Veriyi burada işleyebilirsiniz.
+      setRooms(events);
     };
-
     fetchRooms();
-
   }, []);
 
   const [emptyRooms, setEmptyRooms] = useState([])
   const fetchEmptyRooms = (start, end) => {
     const availableRooms = rooms.filter(room => {
-      // O günün derslerini al
+   
       const lecturesOnDate = room.lectures.filter(lecture =>
         lecture.date.split("T")[0] === start.toISOString().split("T")[0]
       );
 
-      // Derslerin verilen zaman aralığını kesip kesmediğini kontrol et
+      
       const isRoomFree = lecturesOnDate.every(lecture =>
         !(lecture.startTime < end.toTimeString().split(" ")[0] && lecture.endTime > start.toTimeString().split(" ")[0])
 
       );
 
-      return isRoomFree; // Ders çakışmıyorsa sınıf uygundur
+      return isRoomFree; 
     });
 
     setEmptyRooms(availableRooms)
@@ -310,20 +275,19 @@ console.log(schedule)
 
     const now = new Date();
 
-    // Geçmiş bir zamana etkinlik eklenemez
+
     if (start < now) {
-      //alert('Geçmiş bir zamana etkinlik ekleyemezsiniz.');
+      
       setMessage(true)
       return;
     }
     setMessage(false)
 
-    // Çakışma kontrolü
     const hasConflict = scheduleEvent.some(event => {
       return (
-        (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
-        (end > event.start && end <= event.end) || // Bitiş zamanı başka bir etkinlik arasında mı?
-        (start <= event.start && end >= event.end) // Seçim tamamen başka bir etkinliği kapsıyor mu?
+        (start >= event.start && start < event.end) || 
+        (end > event.start && end <= event.end) || 
+        (start <= event.start && end >= event.end) 
       );
     });
 
@@ -343,8 +307,6 @@ console.log(schedule)
 
     }
     )
-
-
     fetchEmptyRooms(start, end)
 
   }
@@ -356,7 +318,7 @@ console.log(schedule)
     }
     setMessage3(false)
     const extraLesson = {
-      instructorId: 1015,
+      instructorId: Number(userId),
       lectureCode: selectTime?.lecture,
       startTime: selectTime?.startTime,
       endTime: selectTime?.endTime,
@@ -375,7 +337,7 @@ console.log(schedule)
   }
 
   const EventComponent = ({ event }) => {
-    // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
+   
     if (view === 'day') {
       return (
         <Container className="d-flex flex-column align-items-center">
@@ -387,10 +349,6 @@ console.log(schedule)
             <Icon.BuildingFill size="1.3vw"/>
           <span className='fw-semibold' style={{ fontSize: "1.3vw" }}>{event.roomName}</span>
         </div>
-
-       
-        
-          
         </Container>
       );
     }
@@ -402,48 +360,41 @@ console.log(schedule)
         <div className=" d-flex align-items-center">
           <span className='fw-semibold' style={{ fontSize: "1.1vw" }}>{event.roomName}</span>
         </div>
-
-
-
       </Container>
     );
-
-
   };
 
   const eventPropGetter = (event) => {
     let className = '';
   
-    // Her bölüm için farklı sınıf
+  
     switch (event.departmentName) {
       case 'Bilgisayar Mühendisliği':
-        className = 'event-cs'; // Bilgisayar Mühendisliği için sınıf
+        className = 'event-cs'; 
         break;
       case 'Makine Mühendisliği':
-        className = 'event-me'; // Makine Mühendisliği için sınıf
+        className = 'event-me'; 
         break;
       case 'Genetik ve Biyomühendislik':
-        className = 'event-bio'; // Genetik ve Biyomühendislik için sınıf
+        className = 'event-bio'; 
         break;
       case 'Gıda Mühendisliği':
-        className = 'event-food'; // Gıda Mühendisliği için sınıf
+        className = 'event-food';
         break;
       case 'Elektrik - Elektronik Mühendisliği':
-        className = 'event-ee'; // Elektrik-Elektronik Mühendisliği için sınıf
+        className = 'event-ee'; 
         break;
       default:
-        className = 'event-default'; // Varsayılan sınıf
+        className = 'event-default'; 
     }
   
-    // Kulüp etkinlikleri için farklı sınıf
+   
     if (event.eventType === 'Kulüp etkinliği') {
       className = 'event-club';
     }
   
-    return { className }; // Dinamik sınıf adı döndür
+    return { className };
   };
-
-
 
   return (
     <>
@@ -452,7 +403,7 @@ console.log(schedule)
       <Calendar
         localizer={localizer}
         events={[...scheduleEvent]}
-        selectable={true} // Takvimde aralık seçimi yapılabilsin
+        selectable={true} 
         onSelectSlot={handleSelectSlot}
         startAccessor="start"
         endAccessor="end"
@@ -463,7 +414,7 @@ console.log(schedule)
         min={new Date().setHours(8, 0, 0)}
         max={new Date().setHours(22, 0, 0)}
         components={{
-          event: EventComponent, // Özel etkinlik bileşeni
+          event: EventComponent, 
         }}
         eventPropGetter={eventPropGetter}
         formats={{
@@ -490,7 +441,7 @@ console.log(schedule)
         onSelectEvent={handleSelectEvent}
       />
 
-      {/* Ana Modal */}
+    
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
           <Modal.Title>{selectedEvent?.title}</Modal.Title>
@@ -506,8 +457,6 @@ console.log(schedule)
           </Row>
 
 
-
-
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
@@ -516,7 +465,7 @@ console.log(schedule)
         </Modal.Footer>
       </Modal>
 
-      {/* Sınıf Değiştirme Modalı */}
+ 
       <Modal size="xl" show={showChangeClassModal} onHide={handleCloseChangeClassModal}>
         <Modal.Header closeButton>
           <Modal.Title>Tarih ve Sınıfı Değiştir</Modal.Title>

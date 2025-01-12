@@ -1,19 +1,11 @@
 import React from "react";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
+import { Calendar, momentLocalizer } from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import enUS from "date-fns/locale/en-US";
-
-const locales = { "en-US": enUS };
-
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 1 }),
-  getDay,
-  locales,
-});
-
+import moment from 'moment';
+moment.locale('tr');
+const localizer = momentLocalizer(moment);
 const CreateExamCalendar = ({ selectedDates, setSelectedDates }) => {
   const formatDate = (date) =>
     date.toLocaleDateString("tr-TR", {
@@ -43,7 +35,7 @@ const CreateExamCalendar = ({ selectedDates, setSelectedDates }) => {
   return (
     <div style={{ height: "500px" }}>
       <Calendar
-        localizer={localizer}
+localizer={localizer}
         events={selectedDates.map((date) => ({
           start: new Date(date.split(".").reverse().join("-")), // Tarihi uygun formata çevir
           end: new Date(date.split(".").reverse().join("-")),   // Tarihi uygun formata çevir
@@ -57,6 +49,19 @@ const CreateExamCalendar = ({ selectedDates, setSelectedDates }) => {
         views={["month"]}
         defaultView="month"
         style={{ height: 500 }}
+        messages={{
+          today: 'Bugün',
+          previous: 'Önceki',
+          next: 'Sonraki',
+          day: 'Günlük',
+          week: 'Hafta',
+          month: 'Ay',
+          agenda: 'Ajanda',
+          date: 'Tarih',
+          time: 'Saat',
+          event: 'Etkinlik',
+          work_week: "Haftalık",
+        }}
       />
     </div>
   );

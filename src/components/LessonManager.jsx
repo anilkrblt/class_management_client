@@ -30,7 +30,7 @@ const LessonManager = () => {
 
         fetchInstructors();
     }, []);
-    console.log(instructors)
+
     const [departments, setDepartments] = useState([])
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -145,7 +145,6 @@ const LessonManager = () => {
         }
     };
 
-    console.log(selectedInstructor)
     const handleAdd = async () => {
 
         if (!formData.name || !formData.code || formData.instructors.length === 0) {
@@ -200,21 +199,18 @@ const LessonManager = () => {
         setShowInstructorModal(true);
     };
     const [selectedLectureInstructors, setSelectedLectureInstructors] = useState([])
+    
     const handleRemoveInstructor = (lessonIndex) => {
         setSelectedLesson(lessons[lessonIndex]);
 
         setShowRemoveModal(true);
     };
-console.log(selectedLesson)
+
 
     const handleConfirmRemove = async (instructorIndex) => {
-
-
-
-        const instructor= selectedLesson.instructors[instructorIndex]
-console.log(selectedLesson)
+        const instructor = selectedLesson.instructors[instructorIndex]
         try {
-            await unassignCourse(Number(instructor.instructorId), selectedLesson.code)
+            await deleteInstructor(Number(instructor.instructorId), selectedLesson.code)
             fetchLectures()
         } catch (error) {
             alert("Öğretim üyesi kaldırılırken hata oluştu.")
@@ -229,13 +225,8 @@ console.log(selectedLesson)
         if (lessonIndex !== -1) {
             updatedLessons[lessonIndex].instructors.splice(instructorIndex, 1);
         }
-        console.log(selectedLesson.instructors)
-        //deleteInstructor( ,selectedLesson.code)
-
         setLessons(updatedLessons);
     };
-
-
     const handleConfirmInstructor = async () => {
         const updatedLessons = [...lessons];
         if (!updatedLessons[currentLessonIndex].instructors.some(
@@ -251,10 +242,7 @@ console.log(selectedLesson)
             }
         } else {
             setShowMessage(true)
-
         }
-
-
     };
 
     const handleEdit = (index) => {
@@ -293,21 +281,17 @@ console.log(selectedLesson)
     const handleDelete = async () => {
 
         try {
-
             await deleteLecture(deleteLectureCode);
-
             fetchLectures()
-
             setShowDeleteModal(false);
-            console.log("Ders listesi güncellendi.");
         } catch (error) {
             alert("Ders silinirken bir hata oluştu. Lütfen tekrar deneyin.");
         };
     }
 
     const filteredLessons = lessons.filter((lesson) => {
-        const lessonName = lesson.name?.toLowerCase() || ""; // Varsayılan olarak boş string
-        const lessonId = lesson.lessonId?.toLowerCase() || ""; // Varsayılan olarak boş string
+        const lessonName = lesson.name?.toLowerCase() || ""; 
+        const lessonId = lesson.lessonId?.toLowerCase() || ""; 
 
         const matchesSearchTerm = lessonName.includes(searchTerm.toLowerCase()) ||
             lessonId.includes(searchTerm.toLowerCase());
@@ -324,13 +308,13 @@ console.log(selectedLesson)
     });
 
 
-    const [showInstructorModal, setShowInstructorModal] = useState(false); // Modal kontrolü
-    const [currentLessonIndex, setCurrentLessonIndex] = useState(null); // Hangi dersin seçildiği
-    // Modal'da seçilen öğretim üyesi
+    const [showInstructorModal, setShowInstructorModal] = useState(false);
+    const [currentLessonIndex, setCurrentLessonIndex] = useState(null); 
+
     const [addLessonSectionShow, setAddLessonSectionShow] = useState(false)
 
 
-    console.log(selectedInstructor)
+
 
 
     return (
@@ -439,46 +423,44 @@ console.log(selectedLesson)
             </Row>}
 
             <h4 className="mt-4">Ders Listesi</h4>
-
-
             <Row>
-            <Row className='justify-content-center d-flex'>
-<Col md="auto">
-<Form.Control
-                    type="text"
-                    placeholder="Ders ara..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                /></Col>
-<Col md="auto">
-    <Pagination className="mb-3 custom-pagination">
-        <Pagination.Item
-            onClick={() => {
-                setShowAll2(true);
-                setSelectedDepartments([]);
-            }}
-            active={showAll2}
-        >
-            Tümü
-        </Pagination.Item>
-        {grades}
-    </Pagination>
-</Col>
-<Col md="auto">
-    <Pagination className="mb-3 custom-pagination">
-        <Pagination.Item
-            onClick={() => {
-                setShowAll3(true);
-                setSelectedDepartments([]);
-            }}
-            active={showAll3}
-        >
-            Tümü
-        </Pagination.Item>
-        {terms}
-    </Pagination>
-</Col>
-</Row>
+                <Row className='justify-content-center d-flex'>
+                    <Col md="auto">
+                        <Form.Control
+                            type="text"
+                            placeholder="Ders ara..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        /></Col>
+                    <Col md="auto">
+                        <Pagination className="mb-3 custom-pagination">
+                            <Pagination.Item
+                                onClick={() => {
+                                    setShowAll2(true);
+                                    setSelectedDepartments([]);
+                                }}
+                                active={showAll2}
+                            >
+                                Tümü
+                            </Pagination.Item>
+                            {grades}
+                        </Pagination>
+                    </Col>
+                    <Col md="auto">
+                        <Pagination className="mb-3 custom-pagination">
+                            <Pagination.Item
+                                onClick={() => {
+                                    setShowAll3(true);
+                                    setSelectedDepartments([]);
+                                }}
+                                active={showAll3}
+                            >
+                                Tümü
+                            </Pagination.Item>
+                            {terms}
+                        </Pagination>
+                    </Col>
+                </Row>
                 <Col md={12}>
                     <div className="overflow-auto my-2">
                         <Pagination className="mb-3 custom-pagination">
@@ -524,7 +506,7 @@ console.log(selectedLesson)
                                 <td>
                                     {lesson.instructors.length > 0
                                         ? lesson.instructors
-                                            .map(ins => ins.instructorName) // Sadece instructorName değerlerini al
+                                            .map(ins => ins.instructorName) 
                                             .join(", ")
                                         : 'Atanmadı'}
                                     <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
@@ -550,8 +532,6 @@ console.log(selectedLesson)
                 </Table>
             }
 
-
-            {/* Düzenleme Modalı */}
             <Modal show={showEditModal} onHide={() => setShowEditModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Ders Düzenle</Modal.Title>
@@ -602,7 +582,7 @@ console.log(selectedLesson)
                                 </Form.Select>
                             </Form.Group>
                         </Form.Group>
-                        {/* Diğer alanlar */}
+                      
                     </Form>
                 </Modal.Body>
                 <Modal.Footer>
@@ -611,7 +591,7 @@ console.log(selectedLesson)
                 </Modal.Footer>
             </Modal>
 
-            {/* Silme Modalı */}
+   
             <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Ders Sil</Modal.Title>

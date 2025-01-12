@@ -4,14 +4,14 @@ import * as Icon from 'react-bootstrap-icons';
 import getAllRooms from "../utils/ApiService";
 
 
-const ClassesList = ({ setSelectedCard , emptyRooms }) => {
+const ClassesList = ({ setSelectedCard, emptyRooms }) => {
 
     const [rooms, setRooms] = useState([])
 
     useEffect(() => {
         const fetchEvents = async () => {
             const events = await getAllRooms();
-           emptyRooms=== undefined ? setRooms(events) : setRooms(emptyRooms) // Veriyi burada işleyebilirsiniz.
+            emptyRooms === undefined ? setRooms(events) : setRooms(emptyRooms) // Veriyi burada işleyebilirsiniz.
         };
 
         fetchEvents();
@@ -26,32 +26,32 @@ const ClassesList = ({ setSelectedCard , emptyRooms }) => {
         classType: ''
     });
 
-    const typeCode2Name = (typeName) =>{
-      
+    const typeCode2Name = (typeName) => {
+
         switch (typeName) {
             case 0:
-              return "Derslik"
+                return "Derslik"
             case 5:
-              return "Amfi"
+                return "Amfi"
             case 2:
-              return "Bilgisayar Lab."
+                return "Bilgisayar Lab."
             case 1:
-              return "Elektrik Lab."
+                return "Elektrik Lab."
             case 3:
-              return "Genetik Lab."
+                return "Genetik Lab."
             case 4:
-              return "Gıda Lab."
+                return "Gıda Lab."
             case 6:
-              return "Makine Lab."
-          }
+                return "Makine Lab."
+        }
 
-}
+    }
 
     const filteredCards = rooms.filter(card =>
         card.name.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
         (filterOptions.projection ? card.projection === (filterOptions.projection === "true") : true) &&
-        (filterOptions.classType ? card.classType === filterOptions.classType : true) 
+        (filterOptions.classType ? card.classType === filterOptions.classType : true)
     );
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -118,29 +118,81 @@ const ClassesList = ({ setSelectedCard , emptyRooms }) => {
                                         <Col md={3}> <Card.Title className="fw-bold ">{card.name}</Card.Title></Col>
                                         <Col md={3}>Kapasite: <b>{card.capacity}</b></Col>
                                         <Col md={3}>{typeCode2Name(card.roomType)}</Col>
-                                        {card.isProjectorWorking && <Col md={1} className="d-flex justify-content-end">
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip id="tooltip-top">Projeksiyon Cihazı</Tooltip>}
-                                            >
-                                                <div className='cursor-pointer'>
-                                                    <Icon.Projector size={30} />
-                                                </div>
-                                            </OverlayTrigger>
-                                        </Col>}
+                                        <Col md={3}>
+                                        <Row className="justify-content-evenly">
+                                            {card.isProjectorWorking && <Col md={2} >
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Projeksiyon Cihazı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.Projector size={30} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
 
 
-                                        <Col md={2}>
-                                            <OverlayTrigger
-                                                placement="top"
-                                                overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
-                                            >
-                                                <div className='cursor-pointer'>
-                                                    <Icon.PcDisplay size={20} />
-                                                </div>
-                                            </OverlayTrigger>
-                                        </Col>
+
+                                            {card.roomType === 1 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Elektrik Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.LightningFill size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+                                            {card.roomType === 2 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.PcDisplay size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
+
+
+                                            {card.roomType === 3 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Genetik Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <span class="material-symbols-outlined">genetics</span>
+
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
+                                            {card.roomType === 4 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Gıda Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <span class="material-symbols-outlined">fastfood</span>
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
+                                            {card.roomType === 6 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Makine Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.GearFill size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+                                  </Row>      </Col>
                                     </Row>
+
+
                                 </Card.Body>
                             </Card>
                         </Row>

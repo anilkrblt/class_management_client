@@ -103,22 +103,8 @@ export const addInstructor = async (instructorId,lectureCode) => {
     }
 }
 
-export const deleteInstructor = async (instructorId,lectureCode) => {
-    try {
-        console.log(instructorId);
-        
-        const response = await axios.delete(`${baseUrl2}unassign/${instructorId}` ,lectureCode,
-            { headers: {
-                'Content-Type': 'application/json',
-              },}
-        );
-        console.log('Lecture added successfully:', response.data);
-    } catch (error) {
-        alert("Hata!" ,error)
-    }
-}
 
-export const unassignCourse = async (id, courseCode) => {
+export const deleteInstructor = async (id, courseCode) => {
     try {
       const response = await axios.delete(`http://localhost:5132/unassign/${id}`, {
         headers: {

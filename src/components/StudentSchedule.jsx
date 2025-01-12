@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
-import { RRule } from "rrule";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { Container } from "react-bootstrap";
 import * as Icon from 'react-bootstrap-icons';
@@ -9,9 +8,15 @@ import { getLecturesByStudentId } from "../utils/LectureApiService";
 
 // Localizer ayarı
 const localizer = momentLocalizer(moment);
-let studentId = 1
+let studentId = 3
+
 const StudentSchedule = () => {
+
   const [schedule, setSchedule] = useState([])
+
+    const [view, setView] = useState('day');
+
+
   useEffect(() => {
     const fetchEvents = async () => {
       const events = await getLecturesByStudentId(studentId);
@@ -20,49 +25,21 @@ const StudentSchedule = () => {
 
     fetchEvents();
   }, []);
-console.log(schedule)
-  const getDayOfWeek = (day) => {
-    const days = {
-      Monday: RRule.MO,
-      Tuesday: RRule.TU,
-      Wednesday: RRule.WE,
-      Thursday: RRule.TH,
-      Friday: RRule.FR,
-      Saturday: RRule.SA,
-      Sunday: RRule.SU,
-    };
-    return days[day];
-  };
 
-  // JSON etkinliklerini RRule formatına dönüştür
-  const transformEvents = (events) => {
-    return events.map((event) => {
-      const startTimeParts = event.startTime.split(":");
-      const endTimeParts = event.endTime.split(":");
-
-      // Başlangıç ve bitiş tarihleri
-      const dtstart = new Date(2024, 8, 16, parseInt(startTimeParts[0]), parseInt(startTimeParts[1])); // 16 Eylül 2024
-      const until = new Date(2024, 11, 27, parseInt(endTimeParts[0]), parseInt(endTimeParts[1])); // 27 Aralık 2024
-
-      const rule = new RRule({
-        freq: RRule.WEEKLY, // Haftalık tekrarlama
-        dtstart: dtstart, // Başlangıç tarihi
-        until: until, // Bitiş tarihi
-        byweekday: [getDayOfWeek(event.dayOfWeek)], // Belirtilen gün
-      });
+  const scheduleEvent = Array.isArray(schedule)
+    ? schedule.map((item) => ({
+      title: item.lectureName,
+      start: new Date(`${item.date.split("T")[0]}T${item.startTime}`),
+      end: new Date(`${item.date.split("T")[0]}T${item.endTime}`),
+      departmentName: item.departmentName,
+      roomName: item.roomName,
+      eventType: item.teacherName,
+      lectureCode: item.lectureCode,
+      lectureSessionId: item.lectureSessionId
+    }))
+    : []
 
 
-      // Etkinlikleri oluştur
-      return rule.all().map((date) => ({
-        title: event.lectureName,
-        start: date,
-        end: new Date(moment(date).set({ hour: parseInt(endTimeParts[0]), minute: parseInt(endTimeParts[1]) }).toDate()),
-        type: event.departmentName,
-        message: event.roomName
-      }));
-    }).flat(); // Etkinlikleri düzleştir
-  };
-  const events = transformEvents(schedule);
 
 
 
@@ -71,31 +48,81 @@ console.log(schedule)
   minTime.setHours(8, 0, 0); // Minimum saati 08:00 olarak ayarla
   maxTime.setHours(22, 0, 0); // Maksimum saati 22:00 olarak ayarla
 
-  const EventComponent = ({ event }) => {
-    // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
-
-    return (
-      <Container className="d-flex flex-column align-items-center ">
-        <div className="d-flex align-items-center ">
-          <span className="fw-bolder lh-sm" style={{ fontSize: "1.1vw" }}>{event.title}</span>
-        </div>
-        <div className=" d-flex align-items-center">
-          <span className='fw-semibold' style={{ fontSize: "1.1vw" }}>{event.message}</span>
-        </div>
-
-
-      </Container>
-    );
-
-
-
-  };
+    const EventComponent = ({ event }) => {
+      // Sadece "week" görünümünde özelleştirilmiş tasarımı göster
+      if (view === 'day') {
+        return (
+          <Container className="d-flex flex-column align-items-center">
+            <div className="d-flex align-items-center mb-2">
+           <Icon.Stack size="1vw" />  
+              <strong className="ms-1" style={{ fontSize: "0.9vw" }}>{event.title}</strong>
+            </div>
+            <div className=" d-flex align-items-center">
+              <Icon.BuildingFill size="1.3vw"/>
+            <span className='fw-semibold' style={{ fontSize: "1.3vw" }}>{event.roomName}</span>
+          </div>
+  
+         
+          
+            
+          </Container>
+        );
+      }
+     else return (
+        <Container className="d-flex flex-column align-items-center ">
+          <div className="d-flex align-items-center ">
+            <span className="fw-bolder lh-sm" style={{ fontSize: "1.1vw" }}>{event.title}</span>
+          </div>
+          <div className=" d-flex align-items-center">
+            <span className='fw-semibold' style={{ fontSize: "1.1vw" }}>{event.roomName}</span>
+          </div>
+  
+  
+  
+        </Container>
+      );
+  
+  
+    };
+  
+    const eventPropGetter = (event) => {
+      let className = '';
+    
+      // Her bölüm için farklı sınıf
+      switch (event.departmentName) {
+        case 'Bilgisayar Mühendisliği':
+          className = 'event-cs'; // Bilgisayar Mühendisliği için sınıf
+          break;
+        case 'Makine Mühendisliği':
+          className = 'event-me'; // Makine Mühendisliği için sınıf
+          break;
+        case 'Genetik ve Biyomühendislik':
+          className = 'event-bio'; // Genetik ve Biyomühendislik için sınıf
+          break;
+        case 'Gıda Mühendisliği':
+          className = 'event-food'; // Gıda Mühendisliği için sınıf
+          break;
+        case 'Elektrik - Elektronik Mühendisliği':
+          className = 'event-ee'; // Elektrik-Elektronik Mühendisliği için sınıf
+          break;
+        default:
+          className = 'event-default'; // Varsayılan sınıf
+      }
+    
+      // Kulüp etkinlikleri için farklı sınıf
+      if (event.eventType === 'Kulüp etkinliği') {
+        className = 'event-club';
+      }
+    
+      return { className }; // Dinamik sınıf adı döndür
+    };
+  
 
 
   return (
     <Calendar
       localizer={localizer}
-      events={events}
+      events={scheduleEvent}
       startAccessor="start"
       endAccessor="end"
       defaultView="work_week" // Çalışma haftası görünümü
@@ -106,6 +133,7 @@ console.log(schedule)
       components={{
         event: EventComponent, // Özel etkinlik bileşeni
       }}
+      eventPropGetter={eventPropGetter}
       formats={{
         timeGutterFormat: 'HH:mm',
         dayHeaderFormat: 'DD MMMM dddd', // Tarih formatını "14 Kasım Perşembe" olarak ayarla

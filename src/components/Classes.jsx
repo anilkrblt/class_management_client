@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Dropdown, DropdownButton, Modal, Button, ProgressBar } from 'react-bootstrap';
+import { Container, Row, Col, Card, Modal, Button, ProgressBar } from 'react-bootstrap';
 import Form from 'react-bootstrap/Form';
 import * as Icon from 'react-bootstrap-icons';
 import ClassCalendar from './ClassCalendar';
@@ -11,27 +11,14 @@ import { getLecturesByInstructorId } from '../utils/LectureApiService';
 import { addExtraLecture } from '../utils/InstructorsApiService';
 
 
-let instructorId = 1015
+
 const Classes = ({ col }) => {
 
 
     const now = new Date();
-    const formatter = new Intl.DateTimeFormat('tr-TR', {
-        hour: '2-digit',
-        minute: '2-digit',
-
-    });
-
-    //   const formattedDate = formatter.format(date);
-
-
-    console.log(now)
     const { userType, userId } = useContext(UserContext);
 
-    console.log(userId)
-
     const [events, setEvents] = useState([]);
-
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
@@ -44,7 +31,7 @@ const Classes = ({ col }) => {
         classType: ''
     });
 
-    const [showAddLesson, setShowAddLesson] = useState(false); // Ek ders formunun görünürlüğü
+    const [showAddLesson, setShowAddLesson] = useState(false);
     const [lessonDetails, setLessonDetails] = useState({
         title: '',
         date: '',
@@ -59,7 +46,7 @@ const Classes = ({ col }) => {
     useEffect(() => {
         const fetchEvents = async () => {
             const events = await getAllRooms();
-            setRooms(events) // Veriyi burada işleyebilirsiniz.
+            setRooms(events) 
         };
 
         fetchEvents();
@@ -69,8 +56,8 @@ const Classes = ({ col }) => {
     useEffect(() => {
         if (userType === "instructor") {
             const fetchEvents = async () => {
-                const events = await getLecturesByInstructorId(1015);
-                setLectures(events); // Veriyi burada işleyebilirsiniz.
+                const events = await getLecturesByInstructorId(Number(userId));
+                setLectures(events); 
             };
 
             fetchEvents();
@@ -100,26 +87,6 @@ const Classes = ({ col }) => {
 
     }
 
-    const typeName2Code = (typeCode) => {
-
-        switch (typeCode) {
-            case "Derslik":
-                return 0
-            case "Amfi":
-                return 5
-            case "Bilgisayar Laboratuvarı":
-                return 2
-            case "Elektrik Laboratuvarı":
-                return 1
-            case "Genetik Laboratuvarı":
-                return 3
-            case "Gıda Laboratuvarı":
-                return 4
-            case "Makine Laboratuvarı":
-                return 6
-        }
-
-    }
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -154,7 +121,6 @@ const Classes = ({ col }) => {
         }));
     };
 
-    // Filtreli sınıflar
     const filteredRooms = rooms.filter(card =>
         card.name.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
@@ -171,9 +137,6 @@ const Classes = ({ col }) => {
             : true
 
         ))
-
-
-
 
     const filterText = `
     ${filterOptions.capacity !== ''
@@ -195,7 +158,6 @@ const Classes = ({ col }) => {
         }
     `
 
-
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilterOptions(prevState => ({
@@ -209,8 +171,6 @@ const Classes = ({ col }) => {
 
 
     const handleDataFromChild = (value) => {
-        // Update the lessonDetails with the received data
-
 
         setLessonDetails((prev) => ({
             ...prev,
@@ -225,24 +185,24 @@ const Classes = ({ col }) => {
     };
 
     const [selectedEvent, setSelectedEvent] = useState({ start: "", end: "", title: "seçilen" })
-    console.log(lessonDetails)
+ 
     const handleSaveLesson = async () => {
-        // Alanların boş olup olmadığını kontrol et
+        
         if (!lessonDetails.title || !lessonDetails.date || !lessonDetails.startTime || !lessonDetails.endTime) {
             alert('Lütfen tüm alanları doldurunuz.');
             return;
         }
 
-        // Başlangıç ve bitiş zamanlarını birleştir
+     
         const start = new Date(`${lessonDetails.date}T${lessonDetails.startTime}`);
         const end = new Date(`${lessonDetails.date}T${lessonDetails.endTime}`);
 
-        // Çakışma kontrolü
+  
         const hasConflict = events.some(event => {
             return (
-                (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
-                (end > event.start && end <= event.end) ||     // Bitiş zamanı başka bir etkinlik arasında mı?
-                (start <= event.start && end >= event.end)     // Seçim tamamen başka bir etkinliği kapsıyor mu?
+                (start >= event.start && start < event.end) || 
+                (end > event.start && end <= event.end) ||    
+                (start <= event.start && end >= event.end)  
             );
         });
 
@@ -251,20 +211,9 @@ const Classes = ({ col }) => {
             return;
         }
 
-        // Yeni etkinlik oluştur
-        const newEvent = {
-            title: lessonDetails.title,
-            start,
-            end,
-            type: 'Ek ders',
-        };
-
-        // Yeni etkinliği events array'ine ekle
-        // setEvents(prevEvents => [...prevEvents, newEvent]);
-
         const selectedLectureCode = lectures.find(lecture => lecture.name === lessonDetails.title).code
         const extraLesson = {
-            instructorId: instructorId,
+            instructorId: Number(userId),
             lectureCode: selectedLectureCode,
             startTime: lessonDetails.startTime,
             endTime: lessonDetails.endTime,
@@ -272,8 +221,6 @@ const Classes = ({ col }) => {
             roomName: selectedCard.name
         }
 
-
-        console.log(extraLesson,)
         try {
             await addExtraLecture(extraLesson)
 
@@ -284,7 +231,6 @@ const Classes = ({ col }) => {
 
         setSelectedEvent({ start: "", end: "", title: "seçilen" })
 
-        // Ders detaylarını sıfırla
         setLessonDetails({
             title: "",
             date: "",
@@ -294,11 +240,7 @@ const Classes = ({ col }) => {
         });
 
         setShowAddLesson(false);
-
-        console.log('Ek ders bilgileri:', lessonDetails);
     };
-
-    console.log(filteredRooms)
 
     return (
         <Container className='w-100  '>
@@ -307,9 +249,6 @@ const Classes = ({ col }) => {
 
                 <Col>
                     <h2 className='ps-2'>Sınıflar</h2>
-
-
-
                 </Col>
                 <Col>
                     <Row>
@@ -427,8 +366,6 @@ const Classes = ({ col }) => {
 
                                         </Row>
 
-
-
                                         <Card.Text className={`fw-light fw-bold ${!card.isActive ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
                                             {!card.isActive && <span className='fw-light fw-bold text-danger'>Sınıf kapalı</span>}
                                         </Card.Text>
@@ -470,7 +407,7 @@ const Classes = ({ col }) => {
                                                 return <Card.Text className='text-success fw-light fw-bold'>Boş</Card.Text>;
                                             }
 
-                                            return null; // Aktif değilse hiçbir şey döndürme
+                                            return null;
                                         })()}
 
                                     </Card.Body>
@@ -480,7 +417,6 @@ const Classes = ({ col }) => {
                         )}
             </Row>
 
-            {/* Filtre Modal */}
             <Modal show={showFilterModal} onHide={handleCloseFilterModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Filtrele</Modal.Title>
@@ -491,8 +427,8 @@ const Classes = ({ col }) => {
                             <Form.Label>Kapasite</Form.Label>
                             <ProgressBar
                                 now={filterOptions.capacity}
-                                max={200}  // max kapasite değeri
-                                label={`${filterOptions.capacity}`}  // Kapasiteyi tam sayı olarak göster
+                                max={200} 
+                                label={`${filterOptions.capacity}`}  
                             />
                             <Form.Control
                                 type="range"
@@ -576,7 +512,6 @@ const Classes = ({ col }) => {
                 </Modal.Footer>
             </Modal>
 
-            {/* Card Detayları Modal */}
             {selectedCard && (
                 <Modal show={showModal} size="lg" onHide={handleCloseModal}>
                     <Modal.Header closeButton>
@@ -658,10 +593,6 @@ const Classes = ({ col }) => {
                                         </Button>
                                     </Col>
                                 </Row>
-
-
-
-
                             </Form>
                         )}
                         {userType === "student"
