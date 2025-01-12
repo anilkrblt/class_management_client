@@ -1,93 +1,91 @@
-import React, { useContext, useEffect } from 'react';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import StudentHomePage from './pages/StudentHomepage';
-import ClassesPage from './pages/ClassesPage';
-import LessonManagerPage from './pages/LessonManegerPage';
-import ClassroomManagerPage from './pages/ClassroomManagerPage';
-import ComplaintsPage from './pages/ComplaintsPage';
-import InstructorSchedulePage from './pages/InstructorSchedulePage';
-import AdminHomePage from './pages/AdminHomePage';
-import InstructorHomePage from './pages/InstructorHomePage';
-import LessonPlaningPage from './pages/LessonPlaningPage';
-import { UserContext, UserProvider } from './components/UserContext';
-import PrivateRoute from './pages/PrivateRoute';
-import HomePage from './pages/HomePage';
-import ErrorPage from './pages/404Page';
-import CreateComplaintPage from './pages/CreateComplaintPage';
-import StudentSchedulePage from './pages/StudentSchedulePage';
-import ProfilePage from './pages/ProfilePage';
-import ClubEvents from './components/ClubEvents';
-import ClubEventsOld from './components/ClubEventsOld';
-import ClubEventsPage from './pages/ClubEventsPage';
-import ClassReservationRequests from './components/ClassReservationRequests';
-import ClassReservationRequestsPage from './pages/ClassReservationRequestsPage';
-import LessonPlaning from './components/LessonPlaning';
-import StudentExams from './components/StudentExams';
-import LoginScreen from './pages/LoginPage2';
+import React, { useContext, useEffect } from "react";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import StudentHomePage from "./pages/StudentHomepage";
+import ClassesPage from "./pages/ClassesPage";
+import LessonManagerPage from "./pages/LessonManegerPage";
+import ClassroomManagerPage from "./pages/ClassroomManagerPage";
+import ComplaintsPage from "./pages/ComplaintsPage";
+import InstructorSchedulePage from "./pages/InstructorSchedulePage";
+import AdminHomePage from "./pages/AdminHomePage";
+import InstructorHomePage from "./pages/InstructorHomePage";
+import LessonPlaningPage from "./pages/LessonPlaningPage";
+import { UserContext, UserProvider } from "./components/UserContext";
+import PrivateRoute from "./pages/PrivateRoute";
+import HomePage from "./pages/HomePage";
+import ErrorPage from "./pages/404Page";
+import CreateComplaintPage from "./pages/CreateComplaintPage";
+import StudentSchedulePage from "./pages/StudentSchedulePage";
+import ProfilePage from "./pages/ProfilePage";
+import ClubEvents from "./components/ClubEvents";
+import ClubEventsOld from "./components/ClubEventsOld";
+import ClubEventsPage from "./pages/ClubEventsPage";
+import ClassReservationRequests from "./components/ClassReservationRequests";
+import ClassReservationRequestsPage from "./pages/ClassReservationRequestsPage";
+import LessonPlaning from "./components/LessonPlaning";
+import StudentExams from "./components/StudentExams";
+import LoginScreen from "./pages/LoginPage2";
 
-import InstructorLessons from './components/InstructorLessons';
+import InstructorLessons from "./components/InstructorLessons";
 
-import getAllRooms from './utils/deneme';
-import { getAllLectures, updateLecture } from './utils/LectureApiService';
-import { getAllComplaints } from './utils/ComplaintApiService';
-import InstructorLessonsPage from './pages/InstructorLessonsPage';
-import ComplaintsStudentPage from './pages/ComplaintsStudentPage';
-import CreateExam from './components/CreateExam';
-import CreateExamPage from './pages/CreateExamPage';
-
+import { getAllLectures, updateLecture } from "./utils/LectureApiService";
+import { getAllComplaints } from "./utils/ComplaintApiService";
+import InstructorLessonsPage from "./pages/InstructorLessonsPage";
+import ComplaintsStudentPage from "./pages/ComplaintsStudentPage";
+import CreateExam from "./components/CreateExam";
+import CreateExamPage from "./pages/CreateExamPage";
 
 const App = () => {
-
   const { userType, setUserType } = useContext(UserContext);
 
-  //room sayfası
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const events = await getAllRooms();
-      console.log(events); // Veriyi burada işleyebilirsiniz.
-    };
-
-    fetchEvents();
-  }, []);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const events = await getAllComplaints();
-      console.log(events); // Veriyi burada işleyebilirsiniz.
-    };
-
-    fetchEvents();
-  }, []);
+  
 
   
   return (
-
     <BrowserRouter>
       <Routes>
         <Route
           path="/"
-          element={userType === null ? <Navigate to="/giris" replace /> : <HomePage />}
+          element={
+            userType === null ? <Navigate to="/giris" replace /> : <HomePage />
+          }
         />
         <Route
           path="/giris"
-          element={userType !== null ? <Navigate to="/anasayfa" /> : <LoginPage />}
+          element={
+            userType !== null ? <Navigate to="/anasayfa" /> : <LoginPage />
+          }
         />
         <Route path="/anasayfa" element={<HomePage />} />
-        <Route path="/anasayfa/student" element={<PrivateRoute allowedRoles={["student"]}>
-          <StudentHomePage />
-        </PrivateRoute>} />
-        <Route path="/anasayfa/admin" element={<PrivateRoute allowedRoles={['admin']}>
-          <AdminHomePage />
-        </PrivateRoute>} />
-        <Route path="/anasayfa/instructor" element={<PrivateRoute allowedRoles={["instructor"]}>
-          <InstructorHomePage />
-        </PrivateRoute>} />
+        <Route
+          path="/anasayfa/student"
+          element={
+            <PrivateRoute allowedRoles={["student"]}>
+              <StudentHomePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/anasayfa/admin"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminHomePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/anasayfa/instructor"
+          element={
+            <PrivateRoute allowedRoles={["instructor"]}>
+              <InstructorHomePage />
+            </PrivateRoute>
+          }
+        />
 
         <Route
           path="/sınıflar"
           element={
-            <PrivateRoute allowedRoles={['admin', "student", "instructor"]}>
+            <PrivateRoute allowedRoles={["admin", "student", "instructor"]}>
               <ClassesPage />
             </PrivateRoute>
           }
@@ -95,7 +93,7 @@ const App = () => {
         <Route
           path="/dersler"
           element={
-            <PrivateRoute allowedRoles={['admin']}>
+            <PrivateRoute allowedRoles={["admin"]}>
               <LessonManagerPage />
             </PrivateRoute>
           }
@@ -103,7 +101,7 @@ const App = () => {
         <Route
           path="/sınıfyonetimi"
           element={
-            <PrivateRoute allowedRoles={['admin']}>
+            <PrivateRoute allowedRoles={["admin"]}>
               <ClassroomManagerPage />
             </PrivateRoute>
           }
@@ -111,7 +109,7 @@ const App = () => {
         <Route
           path="/şikayetler"
           element={
-            <PrivateRoute allowedRoles={['admin']}>
+            <PrivateRoute allowedRoles={["admin"]}>
               <ComplaintsPage />
             </PrivateRoute>
           }
@@ -119,7 +117,7 @@ const App = () => {
         <Route
           path="/şikayetoluştur"
           element={
-            <PrivateRoute allowedRoles={['student', 'instructor']}>
+            <PrivateRoute allowedRoles={["student", "instructor"]}>
               <CreateComplaintPage />
             </PrivateRoute>
           }
@@ -127,7 +125,7 @@ const App = () => {
         <Route
           path="/şikayetleriniz"
           element={
-            <PrivateRoute allowedRoles={['student', 'instructor']}>
+            <PrivateRoute allowedRoles={["student", "instructor"]}>
               <ComplaintsStudentPage />
             </PrivateRoute>
           }
@@ -135,7 +133,7 @@ const App = () => {
         <Route
           path="/dersprogrami"
           element={
-            <PrivateRoute allowedRoles={['instructor', 'admin']}>
+            <PrivateRoute allowedRoles={["instructor", "admin"]}>
               <InstructorSchedulePage />
             </PrivateRoute>
           }
@@ -178,15 +176,13 @@ const App = () => {
         <Route
           path="/sınavolustur"
           element={
-            <PrivateRoute allowedRoles={[ "admin"]}>
+            <PrivateRoute allowedRoles={["admin"]}>
               <CreateExamPage />
             </PrivateRoute>
           }
         />
       </Routes>
-
     </BrowserRouter>
-
   );
 };
 
