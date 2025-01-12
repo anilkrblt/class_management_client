@@ -25,7 +25,7 @@ import ClassReservationRequestsPage from "./pages/ClassReservationRequestsPage";
 import LessonPlaning from "./components/LessonPlaning";
 import StudentExams from "./components/StudentExams";
 import LoginScreen from "./pages/LoginPage2";
-
+import { getAllRooms } from "./utils/RoomApiService";
 import InstructorLessons from "./components/InstructorLessons";
 
 import { getAllLectures, updateLecture } from "./utils/LectureApiService";

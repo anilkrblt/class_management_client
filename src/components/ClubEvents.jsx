@@ -77,7 +77,7 @@ const ClubEvents = ({ events }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedImage(file); // Önizleme için URL oluşturuluyor
+            setSelectedImage(file); 
             setPreviewImage(URL.createObjectURL(file));
         }
     };
@@ -384,7 +384,7 @@ const ClubEvents = ({ events }) => {
                             {selectedImage && (
                                 <div className="mt-3">
                                     <img
-                                        src={selectedImage}
+                                        src={previewImage}
                                         alt="Afiş Önizleme"
                                         style={{ width: "150px", height: "auto", borderRadius: "8px" }}
                                     />
