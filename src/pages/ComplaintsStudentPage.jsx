@@ -31,9 +31,9 @@ console.log(solvedComplaints)
         </Helmet>
         <Navbarx/>
        <Row style={{ marginTop: "120px" }} className="justify-content-evenly px-4">
-            <Col md={6} className="scrollable bg-light rounded-4 shadow">
+            <Col md={5}  className="scrollable bg-light rounded-4 shadow">
             <ComplaintsUnresolvedStudent complaints={unResolvedComplaints}/></Col>
-            <Col  md={6} className="scrollable bg-light rounded-4  shadow"
+            <Col  md={5} className="scrollable bg-light rounded-4  shadow"
             ><ComplaintsStudentSolved complaints={solvedComplaints}/></Col>
 
         </Row>     

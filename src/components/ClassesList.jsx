@@ -4,14 +4,14 @@ import * as Icon from 'react-bootstrap-icons';
 import getAllRooms from "../utils/ApiService";
 
 
-const ClassesList = ({ setSelectedCard }) => {
+const ClassesList = ({ setSelectedCard , emptyRooms }) => {
 
     const [rooms, setRooms] = useState([])
 
     useEffect(() => {
         const fetchEvents = async () => {
             const events = await getAllRooms();
-            setRooms(events) // Veriyi burada işleyebilirsiniz.
+           emptyRooms=== undefined ? setRooms(events) : setRooms(emptyRooms) // Veriyi burada işleyebilirsiniz.
         };
 
         fetchEvents();
@@ -51,7 +51,7 @@ const ClassesList = ({ setSelectedCard }) => {
         card.name.toLowerCase().includes(searchTerm) &&
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
         (filterOptions.projection ? card.projection === (filterOptions.projection === "true") : true) &&
-        (filterOptions.classType ? card.classType === filterOptions.classType : true)
+        (filterOptions.classType ? card.classType === filterOptions.classType : true) 
     );
     const handleFilterChange = (e) => {
         const { name, value } = e.target;

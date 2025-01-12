@@ -5,7 +5,8 @@ import CreateExam from "../components/CreateExam"
 const CreateExamPage = () => {
     return <Container>
         <Navbarx/>
-        <div style={{marginTop: 150}}>
+        
+        <div className="bg-light rounded-4 shadow ps-2 py-2" style={{marginTop: 120}}>
         <CreateExam/>
         </div>
         

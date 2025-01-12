@@ -82,4 +82,12 @@ export const addRoom = async (room) => {
 }
 };
 
-
+export const closeRoom = async (roomName) => {
+  try {
+    const response = await axios.put(`${baseUrl}/rooms/close?roomName=${roomName}`);
+      console.log(response)
+      
+  } catch (error) {
+      
+  }
+};

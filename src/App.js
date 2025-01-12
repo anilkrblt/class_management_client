@@ -38,7 +38,7 @@ import CreateExamPage from "./pages/CreateExamPage";
 const App = () => {
   const { userType, setUserType } = useContext(UserContext);
 
-  
+
 
   
   return (
@@ -146,7 +146,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<CreateExam />} />
+        <Route path="*" element={<ErrorPage />} />
 
         <Route
           path="/profil"

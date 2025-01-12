@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Form, Button, Table, Modal, Alert, Pagination } from 'react-bootstrap';
-import { addInstructor, addLecture, deleteLecture, getAllLectures, updateLecture } from '../utils/LectureApiService';
+import { addInstructor, addLecture, deleteInstructor, deleteLecture, getAllLectures, unassignCourse, updateLecture } from '../utils/LectureApiService';
 import { getAllInstructors } from '../utils/InstructorsApiService';
 import { getAllDepartments } from '../utils/DepartmentApiService';
 
@@ -16,6 +16,11 @@ const LessonManager = () => {
         fetchLectures();
     }, []);
 
+    const fetchLectures = async () => {
+        const lecture = await getAllLectures();
+        setLessons(lecture)
+    }
+
     const [instructors, setInstructors] = useState([])
     useEffect(() => {
         const fetchInstructors = async () => {
@@ -25,7 +30,7 @@ const LessonManager = () => {
 
         fetchInstructors();
     }, []);
-
+    console.log(instructors)
     const [departments, setDepartments] = useState([])
     useEffect(() => {
         const fetchDepartments = async () => {
@@ -52,7 +57,13 @@ const LessonManager = () => {
     const [deleteLectureCode, setDeleteLectureCode] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
     const [selectedDepartments, setSelectedDepartments] = useState([]);
+    const [selectedGrades, setSelectedGrades] = useState([]);
+    const [selectedTerms, setSelectedTerms] = useState([]);
+
     const [showAll, setShowAll] = useState(true);
+    const [showAll2, setShowAll2] = useState(true);
+    const [showAll3, setShowAll3] = useState(true);
+
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedInstructor, setSelectedInstructor] = useState('');
     const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -68,6 +79,24 @@ const LessonManager = () => {
         setShowAll(updatedDepartments.length === 0);
     };
 
+    const toggleGradeSelection = (department) => {
+        const updatedDepartments = selectedGrades.includes(department)
+            ? selectedDepartments.filter((d) => d !== department)
+            : [...selectedGrades, department];
+
+        setSelectedGrades(updatedDepartments);
+        setShowAll2(updatedDepartments.length === 0);
+    };
+
+    const toggleTermSelection = (department) => {
+        const updatedDepartments = selectedTerms.includes(department)
+            ? selectedDepartments.filter((d) => d !== department)
+            : [...selectedTerms, department];
+
+        setSelectedTerms(updatedDepartments);
+        setShowAll3(updatedDepartments.length === 0);
+    };
+
 
     const items = departments.map((department) => (
         <Pagination.Item
@@ -76,6 +105,26 @@ const LessonManager = () => {
             onClick={() => toggleDepartmentSelection(department.name)}
         >
             {department.name}
+        </Pagination.Item>
+    ));
+
+    const grades = [1, 2, 3, 4].map((grade) => (
+        <Pagination.Item
+            key={grade}
+            active={selectedGrades.includes(grade)}
+            onClick={() => toggleGradeSelection(grade)}
+        >
+            {grade}. sınıf
+        </Pagination.Item>
+    ));
+
+    const terms = ["güz", "bahar"].map((term) => (
+        <Pagination.Item
+            key={term}
+            active={selectedTerms.includes(term)}
+            onClick={() => toggleTermSelection(term)}
+        >
+            {term}
         </Pagination.Item>
     ));
 
@@ -96,9 +145,9 @@ const LessonManager = () => {
         }
     };
 
-console.log(selectedInstructor)
+    console.log(selectedInstructor)
     const handleAdd = async () => {
-    
+
         if (!formData.name || !formData.code || formData.instructors.length === 0) {
             setShowAlert(true);
             setTimeout(() => setShowAlert(false), 3000);
@@ -116,95 +165,93 @@ console.log(selectedInstructor)
         // Güncellenmiş formData ile işlemleri sürdür
         const updatedFormData = {
             ...formData,
-          
+
             instructors: instructorsWithIds
         };
 
 
 
-       try {
-        // Ders ekleme fonksiyonunu çağır
-        await addLecture(updatedFormData);
+        try {
+            // Ders ekleme fonksiyonunu çağır
+            await addLecture(updatedFormData);
 
-        // Ders başarılı bir şekilde eklendiyse listeye ekle
-        setLessons([...lessons, updatedFormData]);
+            // Ders başarılı bir şekilde eklendiyse listeye ekle
+            fetchLectures()
 
-        // Formu sıfırla
-        setFormData({
-            name: '',
-            code: '',
-            department: 'Bilgisayar Mühendisliği',
-            grade: '1',
-            term: 'Güz',
-            instructors: []
-        });
-    } catch (error) {
-        alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.");
-    }
+            // Formu sıfırla
+            setFormData({
+                name: '',
+                code: '',
+                department: 'Bilgisayar Mühendisliği',
+                grade: '1',
+                term: 'Güz',
+                instructors: []
+            });
+        } catch (error) {
+            alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.");
+        }
     };
 
 
     const handleAddInstructor = (index) => {
         setCurrentLessonIndex(index);
-        setSelectedInstructor(instructors[0].instructorId); // Varsayılan olarak ilk öğretim üyesi
+        setSelectedInstructor(instructors[index]);
+        setSelectedLesson(lessons[index])
         setShowInstructorModal(true);
     };
-
+    const [selectedLectureInstructors, setSelectedLectureInstructors] = useState([])
     const handleRemoveInstructor = (lessonIndex) => {
         setSelectedLesson(lessons[lessonIndex]);
+
         setShowRemoveModal(true);
     };
-    const handleConfirmRemove = (instructorIndex) => {
+console.log(selectedLesson)
+
+    const handleConfirmRemove = async (instructorIndex) => {
+
+
+
+        const instructor= selectedLesson.instructors[instructorIndex]
+console.log(selectedLesson)
+        try {
+            await unassignCourse(Number(instructor.instructorId), selectedLesson.code)
+            fetchLectures()
+        } catch (error) {
+            alert("Öğretim üyesi kaldırılırken hata oluştu.")
+        }
+
         const updatedLessons = [...lessons];
 
         const lessonIndex = updatedLessons.findIndex(
             lesson => lesson.code === selectedLesson.code);
-
+        setSelectedLectureInstructors(lessons[lessonIndex]?.instructors)
 
         if (lessonIndex !== -1) {
             updatedLessons[lessonIndex].instructors.splice(instructorIndex, 1);
         }
+        console.log(selectedLesson.instructors)
+        //deleteInstructor( ,selectedLesson.code)
+
         setLessons(updatedLessons);
     };
 
+
     const handleConfirmInstructor = async () => {
-        setShowMessage(false)
         const updatedLessons = [...lessons];
-
-        // `selectedInstructor`'dan sadece name ve instructorId alınarak ekleniyor
-        const instructorToAdd = {
-            instructorId: selectedInstructor.instructorId,
-            instructorName: selectedInstructor.instructorName
-        };
-
-        const lectureCode = lessons[currentLessonIndex].code 
-        console.log(selectedInstructor)
-        const updateInstructor = {
-            instructorId: selectedInstructor,
-            lectureCode : lectureCode 
-        }
-        console.log(lectureCode)
-       console.log(selectedInstructor)
-       console.log(updateInstructor)
-
-        // Eğer bu eğitmen zaten ekli değilse, yeni eğitmeni ekleyin
-        if (!updatedLessons[currentLessonIndex].instructors.some(instructor => instructor.instructorId === selectedInstructor.instructorId)) {
+        if (!updatedLessons[currentLessonIndex].instructors.some(
+            (instructor) => Number(instructor.instructorId) === Number(selectedInstructor.instructorId)
+        )) {
 
             try {
-                // Ders ekleme fonksiyonunu çağır
-                await addInstructor(updateInstructor.instructorId, updateInstructor.lectureCode);
-                updatedLessons[currentLessonIndex].instructors.push(instructorToAdd);
-                setLessons(updatedLessons);
+                await addInstructor(Number(selectedInstructor.instructorId), selectedLesson.code)
+                fetchLectures()
                 setShowInstructorModal(false);
-            
             } catch (error) {
-                alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.");
+                alert("Öğretim üyesi eklenirken bir hata oluştu.")
             }
-
-
-   
         } else {
             setShowMessage(true)
+
         }
 
 
@@ -224,21 +271,21 @@ console.log(selectedInstructor)
         const id = lessons[editIndex].code
         const updateLecturew = {
             name: formData.name,
-            departmentId: departments.find((item)=> item.name ===  formData.department).departmentId,
+            departmentId: departments.find((item) => item.name === formData.department).departmentId,
             grade: Number(formData.grade),
             term: formData.term
         }
-    
 
-         try {
-              await updateLecture(id, updateLecturew)
-              setLessons(updatedLessons);
-              setShowEditModal(false);
-              setEditIndex(null);
-            } catch (error) {
-              alert("Ders güncellenirken bir hata oluştu. Lütfen tekrar deneyin.")
-            }
-        
+
+        try {
+            await updateLecture(id, updateLecturew)
+            fetchLectures()
+            setShowEditModal(false);
+            setEditIndex(null);
+        } catch (error) {
+            alert("Ders güncellenirken bir hata oluştu. Lütfen tekrar deneyin.")
+        }
+
 
         setFormData({ name: '', code: '', department: 'Bilgisayar Mühendisliği', grade: '1', term: 'Güz', instructors: [] });
     };
@@ -246,16 +293,17 @@ console.log(selectedInstructor)
     const handleDelete = async () => {
 
         try {
-            
+
             await deleteLecture(deleteLectureCode);
-    
-            setLessons(lessons.filter((_, i) => i !== deleteIndex));
-           
+
+            fetchLectures()
+
             setShowDeleteModal(false);
             console.log("Ders listesi güncellendi.");
         } catch (error) {
             alert("Ders silinirken bir hata oluştu. Lütfen tekrar deneyin.");
-    }; }
+        };
+    }
 
     const filteredLessons = lessons.filter((lesson) => {
         const lessonName = lesson.name?.toLowerCase() || ""; // Varsayılan olarak boş string
@@ -264,17 +312,25 @@ console.log(selectedInstructor)
         const matchesSearchTerm = lessonName.includes(searchTerm.toLowerCase()) ||
             lessonId.includes(searchTerm.toLowerCase());
 
-        return (showAll || selectedDepartments.includes(lesson.department)) && matchesSearchTerm;
+        return (
+            (
+                showAll || (selectedDepartments.includes(lesson.department)))
+            &&
+            (showAll2 || selectedGrades.includes(lesson.grade)) &&
+            (showAll3 || selectedTerms.includes(lesson.term))
+
+
+        ) && matchesSearchTerm;
     });
 
 
     const [showInstructorModal, setShowInstructorModal] = useState(false); // Modal kontrolü
     const [currentLessonIndex, setCurrentLessonIndex] = useState(null); // Hangi dersin seçildiği
- // Modal'da seçilen öğretim üyesi
+    // Modal'da seçilen öğretim üyesi
     const [addLessonSectionShow, setAddLessonSectionShow] = useState(false)
 
 
-console.log(selectedInstructor)
+    console.log(selectedInstructor)
 
 
     return (
@@ -282,17 +338,17 @@ console.log(selectedInstructor)
             <Row >
                 <Col md="auto"><h4>Ders Ekle/Düzenle</h4></Col>
                 <Col md="auto">
-                <Button 
-                variant={`${addLessonSectionShow ? "success" : "outline-success"}`}
-                onClick={()=> setAddLessonSectionShow(!addLessonSectionShow)}>Yeni ders ekle</Button></Col>
+                    <Button
+                        variant={`${addLessonSectionShow ? "success" : "outline-success"}`}
+                        onClick={() => setAddLessonSectionShow(!addLessonSectionShow)}>Yeni ders ekle</Button></Col>
             </Row>
-             
+
             {showAlert && (
                 <Alert variant="danger" className='mt-2' onClose={() => setShowAlert(false)} dismissible>
                     Lütfen tüm alanları doldurun!
                 </Alert>
             )}
-        {   addLessonSectionShow && <Row className='mt-2'>
+            {addLessonSectionShow && <Row className='mt-2'>
                 <Col md={12}>
                     <Form>
                         <Row className="mb-3 justify-content-center">
@@ -332,8 +388,8 @@ console.log(selectedInstructor)
                                     </Form.Select>
                                 </Form.Group>
                             </Col>
-                            </Row>
-                            <Row className="mb-3 justify-content-center"> 
+                        </Row>
+                        <Row className="mb-3 justify-content-center">
                             <Col md={1}>
                                 <Form.Group controlId="grade">
                                     <Form.Label className='ms-1'>Sınıf</Form.Label>
@@ -384,10 +440,48 @@ console.log(selectedInstructor)
 
             <h4 className="mt-4">Ders Listesi</h4>
 
+
             <Row>
-                <Col md={10}>
-                    <div className="overflow-auto">
-                        <Pagination className="mb-3">
+            <Row className='justify-content-center d-flex'>
+<Col md="auto">
+<Form.Control
+                    type="text"
+                    placeholder="Ders ara..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                /></Col>
+<Col md="auto">
+    <Pagination className="mb-3 custom-pagination">
+        <Pagination.Item
+            onClick={() => {
+                setShowAll2(true);
+                setSelectedDepartments([]);
+            }}
+            active={showAll2}
+        >
+            Tümü
+        </Pagination.Item>
+        {grades}
+    </Pagination>
+</Col>
+<Col md="auto">
+    <Pagination className="mb-3 custom-pagination">
+        <Pagination.Item
+            onClick={() => {
+                setShowAll3(true);
+                setSelectedDepartments([]);
+            }}
+            active={showAll3}
+        >
+            Tümü
+        </Pagination.Item>
+        {terms}
+    </Pagination>
+</Col>
+</Row>
+                <Col md={12}>
+                    <div className="overflow-auto my-2">
+                        <Pagination className="mb-3 custom-pagination">
                             <Pagination.Item
                                 onClick={() => {
                                     setShowAll(true);
@@ -401,14 +495,7 @@ console.log(selectedInstructor)
                         </Pagination>
                     </div>
                 </Col>
-                <Col md={2}>
-                    <Form.Control
-                        type="text"
-                        placeholder="Ders ara..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </Col>
+
             </Row>
             {filteredLessons.length === 0
                 ? <p className='text-center fs-5 fw-semibold'>Ders bulunamadı.</p>
@@ -437,14 +524,14 @@ console.log(selectedInstructor)
                                 <td>
                                     {lesson.instructors.length > 0
                                         ? lesson.instructors
-                                        .map(ins => ins.instructorName) // Sadece instructorName değerlerini al
-                                        .join(", ")
+                                            .map(ins => ins.instructorName) // Sadece instructorName değerlerini al
+                                            .join(", ")
                                         : 'Atanmadı'}
                                     <Button size="sm" className="ms-2" onClick={() => handleAddInstructor(index)}>
-                                        Öğretim Üyesi Ekle
+                                        Ekle
                                     </Button>
-                                    <Button size='sm' variant='danger' onClick={() => handleRemoveInstructor(index)}>
-                                        Öğretim Üyesi Kaldır
+                                    <Button size='sm' className='ms-2' variant='danger' onClick={() => { handleRemoveInstructor(index); }}>
+                                        Kaldır
                                     </Button>
                                 </td>
 
@@ -547,19 +634,30 @@ console.log(selectedInstructor)
                     <Form.Group controlId="selectInstructor">
                         <Form.Label>Öğretim Üyesi Seçin</Form.Label>
                         <Form.Select
-                            value={selectedInstructor}
-                            onChange={(e) => setSelectedInstructor(e.target.value)}
+                            value={selectedInstructor?.instructorId || ''}
+                            onChange={(e) => {
+                                const selectedOption = e.target.options[e.target.selectedIndex];
+                                setSelectedInstructor({
+                                    instructorId: e.target.value,
+                                    instructorName: selectedOption.getAttribute('data-instructor-name'),
+                                });
+                            }}
                         >
                             {instructors.map((instructor) => (
-                                <option key={instructor.instructorId} value={instructor.instructorId}>
+                                <option
+                                    key={instructor.instructorId}
+                                    value={instructor.instructorId}
+                                    data-instructor-name={instructor.instructorName}
+                                >
                                     {instructor.instructorName}
                                 </option>
                             ))}
                         </Form.Select>
+
                     </Form.Group>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => {setShowInstructorModal(false);  setShowMessage(false)}}>
+                    <Button variant="secondary" onClick={() => { setShowInstructorModal(false); setShowMessage(false) }}>
                         Kapat
                     </Button>
                     <Button variant="primary" onClick={handleConfirmInstructor}>

@@ -12,7 +12,7 @@ const ClassroomManagerPage = () => {
 
         <Navbarx />
         <div
-            className="bg-light rounded-4 py-2 shadow"
+            className="bg-light rounded-4 py-2 mb-4 shadow"
             style={{ marginTop: "120px" }}
         ><ClassroomManager /></div>
     </Container>

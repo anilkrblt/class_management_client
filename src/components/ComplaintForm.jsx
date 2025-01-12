@@ -121,7 +121,7 @@ const ComplaintForm = () => {
   };
 
   return (
-    <div className="container my-5">
+    <div className="container my-5 p-3">
       <Row className='align-items-center'>
         <Col md="auto"><h2>Şikayet Oluştur</h2></Col>
         <Col md="auto">

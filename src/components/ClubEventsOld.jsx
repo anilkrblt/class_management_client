@@ -15,8 +15,8 @@ const ClubEventsOld = ({ events }) => {
         return moment(startTime, "HH:mm:ss").format("HH:mm"); // Formatla ve döndür
     }
     return (
-        <Container className="bg-light rounded-4">
-            <h3 className="sticky-top bg-light">Gerçekleşen kulüp etkinlikleri</h3>
+        <Container className="bg-light rounded-4 p-1 ps-3">
+            <h3 className="sticky-top bg-light">Gerçekleşen Kulüp Etkinlikleri</h3>
             <Row>
                 {events.map((event, index) => (
                     <Col md={4} key={index}>

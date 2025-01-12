@@ -13,7 +13,7 @@ moment.locale('tr');
 // Moment.js'yi takvime bağlamak için
 const localizer = momentLocalizer(moment);
 
-const ClassCalendar = ({ roomId, onDataSubmit, lessonName, selectedEvent, setSelectedEvent , events1 } ) => {
+const ClassCalendar = ({ roomId, onDataSubmit, lessonName, selectedEvent, setSelectedEvent , setEvents } ) => {
 
   const [view, setView] = useState('day');
  const [message, setMessage] = useState (false)
@@ -55,7 +55,7 @@ const lectureEvent = Array.isArray(lectures)
     setMessage(false)
   
     // Çakışma kontrolü
-    const hasConflict = lectureEvent.some(event => {
+    const hasConflict = [...lectureEvent, ...clubEvent].some(event => {
       return (
         (start >= event.start && start < event.end) || // Başlangıç zamanı başka bir etkinlik arasında mı?
         (end > event.start && end <= event.end) || // Bitiş zamanı başka bir etkinlik arasında mı?
@@ -121,16 +121,26 @@ const lectureEvent = Array.isArray(lectures)
       return (
         <Container className="d-flex flex-column align-items-center">
           <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size="1.7vw" />
-            <strong className="ms-2" style={{ fontSize: "1.7vw" }}>{event.title}</strong>
+           {!event.clubTitle ? <Icon.Stack size="1.7vw" /> : <Icon.LightningChargeFill size="1.7vw"/> } 
+            <strong className="ms-2" style={{ fontSize: "1.5vw" }}>{event.title} {event.clubTitle && `Kulüp Etkinliği - ${event.clubTitle} `}</strong>
           </div>
           {event.clubTitle && <div className="d-flex align-items-center">
             <Icon.LightningChargeFill className="me-1" size="1.2vw" />
             <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.clubTitle}</span>
           </div>}
           {event.eventType && <div className="d-flex align-items-center mt-2">
-            <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.eventType}</span>
-          </div>}
+           <Icon.PersonFill size="1.5vw"/>
+           <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{`${event.eventType} `}  
+            {event.departmentName === "Bilgisayar Mühendisliği" &&   <Icon.PcDisplay size="1.3vw"/>}
+            {event.departmentName === "Makine Mühendisliği" && <Icon.GearFill size="1.3vw"/>}
+            {event.departmentName === "Genetik ve Biyomühendislik" && <span class="material-symbols-outlined" style={{fontSize:"1.3vw"}}>genetics</span>}
+            {event.departmentName === "Gıda Mühendisliği" && <span class="material-symbols-outlined" style={{fontSize:"1.4vw"}}>fastfood</span>}
+            {event.departmentName === "Elektrik - Elektronik Mühendisliği" && <Icon.LightningFill size="1.3vw"/>}{event.departmentName}
+            </span>
+          </div>
+          }
+        
+          
         </Container>
       );
     }
@@ -138,24 +148,67 @@ const lectureEvent = Array.isArray(lectures)
     // Diğer görünümler için sadece başlık göster
     return <Container className="d-flex flex-column">
       <div className="d-flex align-items-center mb-2">
-        <strong className="ms-2" style={{fontSize:"1vw"}}>{event.title}</strong>
+        <strong  style={{fontSize:"1vw"}}>{event.title}</strong>
       </div>
-      <div className="mb-2 d-flex align-items-center" style={{fontSize:"1vw"}}>
-        {event.type}
-      </div>
-      {event.message}
+
+      { event.clubTitle &&  <div className="d-flex align-items-center mb-2">
+        
+      <strong style={{fontSize:"1vw"}}>{event.clubTitle}</strong>
+       <strong style={{fontSize:"1vw"}}>{event.clubTitle && `Kulüp Etkinliği - ${event.clubTitle} `}</strong> 
+      </div>}
+      
+     {event.departmentName && <div className="d-flex align-items-center mb-2">
+      
+        <strong style={{fontSize:"1vw"}}>{event.departmentName}</strong>
+      </div>}
+      {event.eventType && <div className="d-flex align-items-center mb-2">
+        <strong style={{fontSize:"1vw"}}>{event.eventType}</strong>
+      </div>}
     </Container>
+  };
+
+  const eventPropGetter = (event) => {
+    let className = '';
+  
+    // Her bölüm için farklı sınıf
+    switch (event.departmentName) {
+      case 'Bilgisayar Mühendisliği':
+        className = 'event-cs'; // Bilgisayar Mühendisliği için sınıf
+        break;
+      case 'Makine Mühendisliği':
+        className = 'event-me'; // Makine Mühendisliği için sınıf
+        break;
+      case 'Genetik ve Biyomühendislik':
+        className = 'event-bio'; // Genetik ve Biyomühendislik için sınıf
+        break;
+      case 'Gıda Mühendisliği':
+        className = 'event-food'; // Gıda Mühendisliği için sınıf
+        break;
+      case 'Elektrik - Elektronik Mühendisliği':
+        className = 'event-ee'; // Elektrik-Elektronik Mühendisliği için sınıf
+        break;
+      default:
+        className = 'event-default'; // Varsayılan sınıf
+    }
+  
+    // Kulüp etkinlikleri için farklı sınıf
+    if (event.eventType === 'Kulüp etkinliği') {
+      className = 'event-club';
+    }
+  
+    return { className }; // Dinamik sınıf adı döndür
   };
   
   return (
     <div style={{ height: '100vh' }}>
-      {message && <p className='text-danger'>Geçmiş bir zamana ders ekleyemezsiniz.</p>}
-      {message2 && <p className='text-danger'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor</p>}
+      {message && <p className='text-danger fw-semibold'>Geçmiş bir zamana ders ekleyemezsiniz.</p>}
+      {message2 && <p className='text-danger fw-semibold'>Seçtiğiniz zaman aralığında başka bir etkinlik bulunuyor</p>}
 
       <Calendar
         localizer={localizer}
         events={[...clubEvent, ...lectureEvent, selectedEvent]} // Tüm etkinlikleri göster
         step={30}
+        eventPropGetter={eventPropGetter}
         views={{ work_week: true, day: true }}
         onView={(view) => setView(view)}
         defaultView="day"
