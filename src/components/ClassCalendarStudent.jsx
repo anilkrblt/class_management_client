@@ -20,6 +20,7 @@ const ClassCalendarStudent = ({ roomId }) => {
   useEffect(() => {
     const fetchEvents = async () => {
       const events = await getLecturesByRoomId(roomId);
+      console.log(events  )
       setLectures(events.lectures)
       setClubs(events.clubEvents)
     };
@@ -67,20 +68,27 @@ const ClassCalendarStudent = ({ roomId }) => {
       return (
         <Container className="d-flex flex-column align-items-center">
           <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size="1.7vw" />
-            <strong className="ms-2" style={{ fontSize: "1.7vw" }}>{event.title}</strong>
-          </div>
-          <div className="d-flex align-items-center mb-2">
-            <Icon.Stack size="1.7vw" />
-            <strong className="ms-2" style={{ fontSize: "1.7vw" }}>{event.departmentName}</strong>
+           {!event.clubTitle ? <Icon.Stack size="1.7vw" /> : <Icon.LightningChargeFill size="1.7vw"/> } 
+            <strong className="ms-2" style={{ fontSize: "1.5vw" }}>{event.title} {event.clubTitle && `Kulüp Etkinliği - ${event.clubTitle} `}</strong>
           </div>
           {event.clubTitle && <div className="d-flex align-items-center">
             <Icon.LightningChargeFill className="me-1" size="1.2vw" />
             <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.clubTitle}</span>
           </div>}
           {event.eventType && <div className="d-flex align-items-center mt-2">
-            <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{event.eventType}</span>
-          </div>}
+           <Icon.PersonFill size="1.5vw"/>
+           <span className='fw-semibold' style={{ fontSize: "1.2vw" }}>{`${event.eventType} `}  
+            {event.departmentName === "Bilgisayar Mühendisliği" &&   <Icon.PcDisplay size="1.3vw"/>}
+            {event.departmentName === "Makine Mühendisliği" && <Icon.GearFill size="1.3vw"/>}
+            {event.departmentName === "Genetik ve Biyomühendislik" && <span class="material-symbols-outlined" style={{fontSize:"1.3vw"}}>genetics</span>}
+            {event.departmentName === "Gıda Mühendisliği" && <span class="material-symbols-outlined" style={{fontSize:"1.4vw"}}>fastfood</span>}
+            {event.departmentName === "Elektrik - Elektronik Mühendisliği" && <Icon.LightningFill size="1.3vw"/>}
+            {event.departmentName}
+            </span>
+          </div>
+          }
+        
+          
         </Container>
       );
     }
@@ -88,13 +96,47 @@ const ClassCalendarStudent = ({ roomId }) => {
     // Diğer görünümler için sadece başlık göster
     return <Container className="d-flex flex-column">
       <div className="d-flex align-items-center mb-2">
-        <strong className="ms-2" style={{ fontSize: "1vw" }}>{event.title}</strong>
+        <strong className="ms-2" style={{fontSize:"1vw"}}>{event.title}</strong>
       </div>
-      <strong style={{ fontSize: "0.9vw" }} className='mt-2'>{event.clubTitle}</strong>
+      <div className="mb-2 d-flex align-items-center" style={{fontSize:"1vw"}}>
+        {event.type}
+      </div>
+      {event.message}
     </Container>
   };
 
-
+  const eventPropGetter = (event) => {
+    let className = '';
+  
+    // Her bölüm için farklı sınıf
+    switch (event.departmentName) {
+      case 'Bilgisayar Mühendisliği':
+        className = 'event-cs'; // Bilgisayar Mühendisliği için sınıf
+        break;
+      case 'Makine Mühendisliği':
+        className = 'event-me'; // Makine Mühendisliği için sınıf
+        break;
+      case 'Genetik ve Biyomühendislik':
+        className = 'event-bio'; // Genetik ve Biyomühendislik için sınıf
+        break;
+      case 'Gıda Mühendisliği':
+        className = 'event-food'; // Gıda Mühendisliği için sınıf
+        break;
+      case 'Elektrik - Elektronik Mühendisliği':
+        className = 'event-ee'; // Elektrik-Elektronik Mühendisliği için sınıf
+        break;
+      default:
+        className = 'event-default'; // Varsayılan sınıf
+    }
+  
+    // Kulüp etkinlikleri için farklı sınıf
+    if (event.eventType === 'Kulüp etkinliği') {
+      className = 'event-club';
+    }
+  
+    return { className }; // Dinamik sınıf adı döndür
+  };
+  
   return (
     <div style={{ height: '100vh' }}>
       <Calendar
@@ -120,6 +162,7 @@ const ClassCalendarStudent = ({ roomId }) => {
         components={{
           event: EventComponent, // Özel etkinlik bileşeni
         }}
+        eventPropGetter={eventPropGetter}
         messages={{
           today: 'Bugün',
           previous: 'Önceki',

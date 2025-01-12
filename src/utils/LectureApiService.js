@@ -1,4 +1,5 @@
 import axios from "axios"
+import { baseUrl2 } from "./ClubEventApiService";
 const baseUrl = "http://localhost:5132/api"
 
 export const getAllLectures = async () => {
@@ -95,7 +96,7 @@ export const deleteLecture = async (lecture) => {
 
 export const addInstructor = async (instructorId,lectureCode) => {
     try {
-        const response = await axios.post(`${baseUrl}/lectures/api/lecture/assign?instructorId=${instructorId}&lectureCode=${lectureCode}`);
+        const response = await axios.post(`${baseUrl2}assign?instructorId=${instructorId}&lectureCode=${lectureCode}`);
         console.log('Lecture added successfully:', response.data);
     } catch (error) {
         alert("Hata!" ,error)
@@ -104,11 +105,31 @@ export const addInstructor = async (instructorId,lectureCode) => {
 
 export const deleteInstructor = async (instructorId,lectureCode) => {
     try {
-        const response = await axios.post(`${baseUrl}/lectures/api/lecture/assign?instructorId=${instructorId}` ,lectureCode);
+        console.log(instructorId);
+        
+        const response = await axios.delete(`${baseUrl2}unassign/${instructorId}` ,lectureCode,
+            { headers: {
+                'Content-Type': 'application/json',
+              },}
+        );
         console.log('Lecture added successfully:', response.data);
     } catch (error) {
         alert("Hata!" ,error)
     }
 }
 
+export const unassignCourse = async (id, courseCode) => {
+    try {
+      const response = await axios.delete(`http://localhost:5132/unassign/${id}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        data: JSON.stringify(courseCode), // Body'yi doğru formatta gönder
+      });
+      console.log(response.data);
+    } catch (error) {
+      console.error('Error:', error.response ? error.response.data : error.message);
+    }
+  };
 

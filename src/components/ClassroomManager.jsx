@@ -50,6 +50,11 @@ const ClassroomManager = () => {
     fetchClassrooms();
   }, []);
 
+  const fetchClassrooms = async () => {
+    const rooms = await getAllRooms();
+    setClassrooms(rooms)
+  }
+
   console.log(classrooms);
 
   const handleInputChange = (e) => {
@@ -142,13 +147,15 @@ const ClassroomManager = () => {
     try {
       await addRoom(data);
       // Ders başarılı bir şekilde eklendiyse listeye ekle
-      setClassrooms([...classrooms, {
+     /* setClassrooms([...classrooms, {
         ...formData, isActive: true,
         buildingName: buildings.find((item) => item.buildingId === Number(formData.buildingId)).name,
         departmentName: departments.find((item) =>
           item.departmentId === Number(formData.departmentId)).name,
         roomType: Number(formData.roomType)
-      }]);
+      }]);*/
+
+      fetchClassrooms()
 
       // Formu sıfırla
       setFormData({
@@ -222,7 +229,8 @@ const [showAlert3 , setShowAlert3] = useState(false)
         roomType: Number(formData.roomType)
       };
       console.log(updatedClassrooms)
-      setClassrooms(updatedClassrooms,);
+      //setClassrooms(updatedClassrooms,);
+      fetchClassrooms()
       setShowEditModal(false);
       setEditIndex(null);
     } catch (error) {
@@ -254,7 +262,8 @@ const [showAlert3 , setShowAlert3] = useState(false)
 
     try {
       await deleteRoom(deleteRoomId)
-      setClassrooms(classrooms.filter((_, i) => i !== deleteIndex));
+      // setClassrooms(classrooms.filter((_, i) => i !== deleteIndex));
+      fetchClassrooms()
       setShowDeleteModal(false);
     } catch (error) {
       alert("Ders silinirken bir hata oluştu. Lütfen tekrar deneyin.")
@@ -289,7 +298,8 @@ const [showAlert3 , setShowAlert3] = useState(false)
     try {
       await updateRoom(id, data)
       updatedClassrooms[index].isActive = !updatedClassrooms[index].isActive;
-      setClassrooms(updatedClassrooms);
+     // setClassrooms(updatedClassrooms);
+     fetchClassrooms()
     } catch (error) {
       alert("hata")
     }
@@ -318,7 +328,8 @@ const [showAlert3 , setShowAlert3] = useState(false)
     try {
       await updateRoom(id, data)
       updatedClassrooms[index].isProjectorWorking = !updatedClassrooms[index].isProjectorWorking;
-      setClassrooms(updatedClassrooms);
+   //   setClassrooms(updatedClassrooms);
+      fetchClassrooms()
     } catch (error) {
       alert("hata")
     }

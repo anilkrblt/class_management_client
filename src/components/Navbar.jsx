@@ -46,11 +46,8 @@ const Navbarx = () => {
 
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
-  const notifications = [
-    "Yeni mesajınız var",
-    "Ödev teslim tarihi yaklaşıyor",
-    "Yeni duyuru yayınlandı"
-  ];
+
+  const notifications = [];
 
   // Referans tanımlıyoruz
   const notificationRef = useRef(null);

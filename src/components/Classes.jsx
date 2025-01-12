@@ -8,7 +8,10 @@ import { UserContext } from './UserContext';
 import ClassCalendarStudent from './ClassCalendarStudent';
 import getAllRooms from '../utils/ApiService';
 import { getLecturesByInstructorId } from '../utils/LectureApiService';
-let instructorId = 1
+import { addExtraLecture } from '../utils/InstructorsApiService';
+
+
+let instructorId = 1015
 const Classes = ({ col }) => {
 
 
@@ -17,37 +20,17 @@ const Classes = ({ col }) => {
         hour: '2-digit',
         minute: '2-digit',
 
-      });
+    });
 
-   //   const formattedDate = formatter.format(date);
+    //   const formattedDate = formatter.format(date);
 
-      
-    
-    const { userType } = useContext(UserContext);
 
-    const [events, setEvents] = useState([
-        {
-            title: 'Mimari mimari mimari mimari',
-            start: new Date(2024, 11, 19, 10, 0), // 19 Aralık 2024, 10:00
-            end: new Date(2024, 11, 19, 13, 0),
-            type: "Bilgisayar Mühendisliği",
-            message: "Ali Duru"
-        },
-        {
-            title: 'Yazılım Eğitimi',
-            start: new Date(2024, 10, 14, 13, 30), // 14 Kasım 2024, 13:30
-            end: new Date(2024, 10, 14, 15, 0),
-            type: "Telafi dersi",
-            message: "Aylin Kaya"
-        },
-        {
-            title: 'Etkinlik',
-            start: new Date(2024, 10, 14, 16, 0), // 14 Kasım 2024, 16:00
-            end: new Date(2024, 10, 14, 17, 30),
-            type: "Etkinlik",
-            message: "Seminer: Yazılım Geliştirme"
-        },
-    ]);
+    console.log(now)
+    const { userType, userId } = useContext(UserContext);
+
+    console.log(userId)
+
+    const [events, setEvents] = useState([]);
 
     const [showModal, setShowModal] = useState(false);
     const [selectedCard, setSelectedCard] = useState(null);
@@ -86,55 +69,57 @@ const Classes = ({ col }) => {
     useEffect(() => {
         if (userType === "instructor") {
             const fetchEvents = async () => {
-                const events = await getLecturesByInstructorId(instructorId);
+                const events = await getLecturesByInstructorId(1015);
                 setLectures(events); // Veriyi burada işleyebilirsiniz.
             };
-    
+
             fetchEvents();
         }
-    }, []); 
+    }, []);
 
-    const typeCode2Name = (typeName) =>{
-      
-            switch (typeName) {
-                case 0:
-                  return "Derslik"
-                case 5:
-                  return "Amfi"
-                case 2:
-                  return "Bilgisayar Laboratuvarı"
-                case 1:
-                  return "Elektrik Laboratuvarı"
-                case 3:
-                  return "Genetik Laboratuvarı"
-                case 4:
-                  return "Gıda Laboratuvarı"
-                case 6:
-                  return "Makine Laboratuvarı"
-              }
-    
+
+
+    const typeCode2Name = (typeName) => {
+
+        switch (typeName) {
+            case 0:
+                return "Derslik"
+            case 5:
+                return "Amfi"
+            case 2:
+                return "Bilgisayar Laboratuvarı"
+            case 1:
+                return "Elektrik Laboratuvarı"
+            case 3:
+                return "Genetik Laboratuvarı"
+            case 4:
+                return "Gıda Laboratuvarı"
+            case 6:
+                return "Makine Laboratuvarı"
+        }
+
     }
 
-    const typeName2Code =(typeCode) =>{
-      
+    const typeName2Code = (typeCode) => {
+
         switch (typeCode) {
             case "Derslik":
-              return 0
+                return 0
             case "Amfi":
-              return 5
+                return 5
             case "Bilgisayar Laboratuvarı":
-              return 2
+                return 2
             case "Elektrik Laboratuvarı":
-              return 1
+                return 1
             case "Genetik Laboratuvarı":
-              return 3
+                return 3
             case "Gıda Laboratuvarı":
-              return 4
+                return 4
             case "Makine Laboratuvarı":
-              return 6
-          }
+                return 6
+        }
 
-}
+    }
 
     const handleCardClick = (card) => {
         setSelectedCard(card);
@@ -175,9 +160,19 @@ const Classes = ({ col }) => {
         (filterOptions.capacity ? card.capacity >= filterOptions.capacity : true) &&
         (filterOptions.projection ? card.isProjectorWorking === (filterOptions.projection === "true") : true) &&
         (filterOptions.isActive ? card.isActive === (filterOptions.isActive === "true") : true) &&
-        (filterOptions.isEmpty ? card.isEmpty === (filterOptions.isEmpty === "true") : true) &&
-        (filterOptions.classType ? typeCode2Name(card.roomType) === filterOptions.classType : true)
-    );
+        (filterOptions.classType ? typeCode2Name(card.roomType) === filterOptions.classType : true) &&
+
+
+        (filterOptions.isEmpty
+            ? card.lectures.find(lecture =>
+                new Date(`${lecture.date.split("T")[0]}T${lecture.startTime}`) < now &&
+                new Date(`${lecture.date.split("T")[0]}T${lecture.endTime}`) > now
+            )
+            : true
+
+        ))
+
+
 
 
     const filterText = `
@@ -215,21 +210,23 @@ const Classes = ({ col }) => {
 
     const handleDataFromChild = (value) => {
         // Update the lessonDetails with the received data
-        setLessonDetails({
-            title: value.title,
+
+
+        setLessonDetails((prev) => ({
+            ...prev,
             date: value.date,
             startTime: value.startTime,
             endTime: value.endTime,
             type: "Ek ders",
+        }));
 
-        });
         setShowAddLesson(showAddLesson === false ? true : showAddLesson)
 
     };
 
     const [selectedEvent, setSelectedEvent] = useState({ start: "", end: "", title: "seçilen" })
-
-    const handleSaveLesson = () => {
+    console.log(lessonDetails)
+    const handleSaveLesson = async () => {
         // Alanların boş olup olmadığını kontrol et
         if (!lessonDetails.title || !lessonDetails.date || !lessonDetails.startTime || !lessonDetails.endTime) {
             alert('Lütfen tüm alanları doldurunuz.');
@@ -263,7 +260,27 @@ const Classes = ({ col }) => {
         };
 
         // Yeni etkinliği events array'ine ekle
-        setEvents(prevEvents => [...prevEvents, newEvent]);
+        // setEvents(prevEvents => [...prevEvents, newEvent]);
+
+        const selectedLectureCode = lectures.find(lecture => lecture.name === lessonDetails.title).code
+        const extraLesson = {
+            instructorId: instructorId,
+            lectureCode: selectedLectureCode,
+            startTime: lessonDetails.startTime,
+            endTime: lessonDetails.endTime,
+            eventDate: lessonDetails.date,
+            roomName: selectedCard.name
+        }
+
+
+        console.log(extraLesson,)
+        try {
+            await addExtraLecture(extraLesson)
+
+        } catch (error) {
+            alert("Ders eklenirken bir hata oluştu. Lütfen tekrar deneyin.")
+        }
+
 
         setSelectedEvent({ start: "", end: "", title: "seçilen" })
 
@@ -281,7 +298,7 @@ const Classes = ({ col }) => {
         console.log('Ek ders bilgileri:', lessonDetails);
     };
 
-
+    console.log(filteredRooms)
 
     return (
         <Container className='w-100  '>
@@ -290,6 +307,8 @@ const Classes = ({ col }) => {
 
                 <Col>
                     <h2 className='ps-2'>Sınıflar</h2>
+
+
 
                 </Col>
                 <Col>
@@ -325,7 +344,8 @@ const Classes = ({ col }) => {
                             <Col key={card.roomId} md={col} className="mb-4 ">
                                 <Card
                                     className={`py-3 ${card.isActive ? "cursor-pointer" : "hover-disable-card"} 
-                                    ${(!card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00") && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
+                                    ${(!card.lectures.find(lecture => new Date(`${lecture.date.split("T")[0]}T${lecture.startTime}`) < now &&
+                                        new Date(`${lecture.date.split("T")[0]}T${lecture.endTime}`) > now)?.lectureName && card.isActive) ? "shadow-sm-success" : (!card.isActive) ? "shadow-lg-danger" : ""}
             
                                      `}
 
@@ -345,9 +365,10 @@ const Classes = ({ col }) => {
                                                         <Icon.Projector size={30} />
                                                     </div>
                                                 </OverlayTrigger>
+
                                             </Col>}
 
-                                            {card.roomType===1 &&  <Col md={2}>
+                                            {card.roomType === 1 && <Col md={2}>
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Elektrik Laboratuvarı</Tooltip>}
@@ -357,7 +378,7 @@ const Classes = ({ col }) => {
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>}
-                                            {card.roomType===2 &&  <Col md={2}>
+                                            {card.roomType === 2 && <Col md={2}>
                                                 <OverlayTrigger
                                                     placement="top"
                                                     overlay={<Tooltip id="tooltip-top">Bilgisayar Laboratuvarı</Tooltip>}
@@ -367,28 +388,91 @@ const Classes = ({ col }) => {
                                                     </div>
                                                 </OverlayTrigger>
                                             </Col>}
-                                            
-                                           
+
+
+
+                                            {card.roomType === 3 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Genetik Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <span class="material-symbols-outlined">genetics</span>
+
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
+                                            {card.roomType === 4 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Gıda Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <span class="material-symbols-outlined">fastfood</span>
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
+                                            {card.roomType === 6 && <Col md={2}>
+                                                <OverlayTrigger
+                                                    placement="top"
+                                                    overlay={<Tooltip id="tooltip-top">Makine Laboratuvarı</Tooltip>}
+                                                >
+                                                    <div className='cursor-pointer'>
+                                                        <Icon.GearFill size={20} />
+                                                    </div>
+                                                </OverlayTrigger>
+                                            </Col>}
+
                                         </Row>
 
-                                        <Card.Text className={`fw-light fw-bold ${!card.isActive === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
-                                            {card.text}
-                                        </Card.Text>
 
-                                        <Card.Text className={`fw-light fw-bold ${!card.isActive === "Sınıf kapalı" ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
+
+                                        <Card.Text className={`fw-light fw-bold ${!card.isActive ? "text-danger" : card.text === "Boş" ? "text-success" : "text-muted"}`}>
                                             {!card.isActive && <span className='fw-light fw-bold text-danger'>Sınıf kapalı</span>}
                                         </Card.Text>
 
                                         <Card.Text className="fw-bolder">{card.text2}</Card.Text>
 
-                                     
 
-                            {card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName ? <>
-                            <Card.Text className='fw-light fw-bold'>Ders işleniyor</Card.Text>
-                            {card.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName}
-                            </>
-                            : <Card.Text className='text-success fw-light fw-bold'>Boş</Card.Text>
-                        }
+                                        {(() => {
+                                            const currentLecture = card.lectures.find(lecture => {
+                                                const lectureStart = new Date(`${lecture.date.split("T")[0]}T${lecture.startTime}`);
+                                                const lectureEnd = new Date(`${lecture.date.split("T")[0]}T${lecture.endTime}`);
+                                                return lectureStart < now && lectureEnd > now;
+                                            });
+                                            const currentClub = card.clubEvents.find(club => {
+                                                const clubStart = new Date(`${club.eventDate.split("T")[0]}T${club.startTime}`);
+                                                const clubEnd = new Date(`${club.eventDate.split("T")[0]}T${club.endTime}`);
+                                                return clubStart < now && clubEnd > now;
+                                            });
+
+                                            if (currentLecture && card.isActive) {
+                                                return (
+                                                    <>
+                                                        <Card.Text className='fw-light fw-bold'>Ders işleniyor</Card.Text>
+                                                        {currentLecture.lectureName}
+                                                    </>
+                                                );
+                                            } 
+
+                                            if (currentClub && card.isActive) {
+                                                return (
+                                                    <>
+                                                        <Card.Text className='fw-light fw-bold'>Kulüp etkinliği yapılıyor</Card.Text>
+                                                        {currentClub.clubName} - {currentClub.title}
+                                                    </>
+                                                );
+                                            } 
+                                            
+                                            else if (card.isActive) {
+                                                return <Card.Text className='text-success fw-light fw-bold'>Boş</Card.Text>;
+                                            }
+
+                                            return null; // Aktif değilse hiçbir şey döndürme
+                                        })()}
+
                                     </Card.Body>
                                 </Card>
                             </Col>
@@ -497,50 +581,43 @@ const Classes = ({ col }) => {
                 <Modal show={showModal} size="lg" onHide={handleCloseModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>{selectedCard.name}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Header>
-                        {selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName &&
-                        <>
-                      <span className='fw-semibold'>İşlenen ders: </span>{" "}{selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.lectureName} 
-                        {selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.endTime}
-                        </> }
-
-
-                        {selectedCard.text === "Ders işleniyor" && (
+                    
+                        {selectedCard.lectures.find(lecture => new Date(`${lecture.date.split("T")[0]}T${lecture.startTime}`) < now &&
+                            new Date(`${lecture.date.split("T")[0]}T${lecture.endTime}`) > now)?.lectureName &&
                             <>
-                                {selectedCard.text2} - Bilgisayar Mühendisliği - <b>13:00</b>
-
-                            </>
-                        )}
+                                <span className='fw-semibold'>İşlenen ders: </span>{" "}{selectedCard.lectures.find(lecture => new Date(`${lecture.date.split("T")[0]}T${lecture.startTime}`) < now &&
+                                    new Date(`${lecture.date.split("T")[0]}T${lecture.endTime}`) > now)?.lectureName}
+                                {selectedCard.lectures.find(lecture => lecture.startTime < "09:00" && lecture.endTime > "09:00")?.endTime}
+                            </>}
                     </Modal.Header>
 
                     <Modal.Body>
 
                         {userType !== "student" && <Button
-                            variant="outline-primary"
+                            variant= {showAddLesson ? "primary" : "outline-primary"}
                             className="mb-2"
                             onClick={handleAddLessonClick}
                         >
                             Ek Ders Ekle
                         </Button>}
                         {showAddLesson && (
-                            <Form className="mt-3">
+                            <Form className="mb-2">
 
                                 <Form.Group controlId="formLesson">
                                     <Form.Label>Ders</Form.Label>
-                                   <Form.Select name="title"
+                                    <Form.Select name="title"
                                         value={lessonDetails.title}
                                         onChange={handleLessonDetailsChange}>
-                                            <option>Seçin</option>
-                                   {lectures.map(lecture => (
-                  <option key={lecture.name} value={lecture.name}>{lecture.name}</option>
-                ))}
-                                   </Form.Select>
+                                        <option value="">Seçin</option>
+                                        {lectures.map(lecture => (
+                                            <option key={lecture.name} value={lecture.name}>{lecture.name}</option>
+                                        ))}
+                                    </Form.Select>
                                 </Form.Group>
-                                <Row>
-                                    <Col>
+                                <Row className='d-flex'>
+                                    <Col md={3}>
                                         <Form.Group controlId="formDate">
-                                            <Form.Label>Tarih</Form.Label>
+                                            <Form.Label className='mt-2'>Tarih</Form.Label>
                                             <Form.Control
                                                 type="date"
                                                 name="date"
@@ -549,7 +626,7 @@ const Classes = ({ col }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col>
+                                    <Col md={3}>
                                         <Form.Group controlId="formStartTime" className="mt-2">
                                             <Form.Label>Başlangıç Saati</Form.Label>
                                             <Form.Control
@@ -560,7 +637,7 @@ const Classes = ({ col }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col>
+                                    <Col md={3}>
                                         <Form.Group controlId="formEndTime" className="mt-2">
                                             <Form.Label>Bitiş Saati</Form.Label>
                                             <Form.Control
@@ -571,28 +648,29 @@ const Classes = ({ col }) => {
                                             />
                                         </Form.Group>
                                     </Col>
-
+                                    <Col md={3}>
+                                        <Button
+                                            variant="success"
+                                            className="mt-4"
+                                            onClick={handleSaveLesson}
+                                        >
+                                            Kaydet
+                                        </Button>
+                                    </Col>
                                 </Row>
 
 
 
-                                <Button
-                                    variant="success"
-                                    className="mt-3"
-                                    onClick={handleSaveLesson}
-                                >
-                                    Kaydet
-                                </Button>
+
                             </Form>
                         )}
                         {userType === "student"
-                            ? <ClassCalendarStudent roomId= {selectedCard.roomId}/>
+                            ? <ClassCalendarStudent roomId={selectedCard.roomId} />
                             : <ClassCalendar
-                                roomId = {selectedCard.roomId}
+                                roomId={selectedCard.roomId}
                                 onDataSubmit={handleDataFromChild}
                                 lessonName={lessonDetails.title}
                                 lesson={lessonDetails}
-                                events1={events}
                                 setEvents={setEvents}
                                 selectedEvent={selectedEvent}
                                 setSelectedEvent={setSelectedEvent} />}

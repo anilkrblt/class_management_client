@@ -6,9 +6,10 @@ import { Col, Row } from "react-bootstrap";
 import "moment/locale/tr";
 import moment from "moment";
 import { updateComplaint } from '../utils/ComplaintApiService';
+import { closeRoom } from '../utils/RoomApiService';
 moment.locale('tr');
 
-const ComplaintsNew = ({complaints}) => {
+const ComplaintsNew = ({ complaints }) => {
     const [show, setShow] = useState(false);
     const [showResolveModal, setShowResolveModal] = useState(false);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
@@ -45,9 +46,13 @@ const ComplaintsNew = ({complaints}) => {
         setShow(true);
     };
 
-    const handleClose = () => {
-        setShow(false);
-        setSelectedComplaint(null);
+    const handleClose = async () => {
+
+        try {
+            await closeRoom(selectedComplaint.roomName)
+        } catch (error) {
+            alert("hata")
+        }
     };
 
     const handleResolveComplaint = () => {
@@ -63,15 +68,13 @@ const ComplaintsNew = ({complaints}) => {
         setResponseText(e.target.value);
     }
 
-    const handleCloseRoom = (roomName) =>{
-       
-    }
     const handleSubmitResponse = async () => {
-        const data= { status: "approved", solveDescription: responseText}
+        const data = { status: "approved", solveDescription: responseText }
         const id = selectedComplaint.requestId
         console.log(data)
         try {
-            await updateComplaint(id,data)
+            await updateComplaint(id, data)
+            setShow(false)
         } catch (error) {
             alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.")
         }
@@ -144,7 +147,7 @@ const ComplaintsNew = ({complaints}) => {
                     )}
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={()=>handleCloseRoom(selectedComplaint?.roomName)}>
+                    <Button variant="danger" onClick={() => handleClose()}>
                         {selectedComplaint && (selectedComplaint.roomName)} sınıfını kapat
                     </Button>
                     <Button onClick={handleResolveComplaint}>
@@ -163,7 +166,7 @@ const ComplaintsNew = ({complaints}) => {
                 </Modal.Header>
 
                 <Modal.Body>
-                    <textarea 
+                    <textarea
                         value={responseText}
                         onChange={handleResponseChange}
                         className="form-control"

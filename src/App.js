@@ -41,24 +41,7 @@ const App = () => {
 
   const { userType, setUserType } = useContext(UserContext);
 
-  //room sayfası
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const events = await getAllRooms();
-      console.log(events); // Veriyi burada işleyebilirsiniz.
-    };
 
-    fetchEvents();
-  }, []);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      const events = await getAllComplaints();
-      console.log(events); // Veriyi burada işleyebilirsiniz.
-    };
-
-    fetchEvents();
-  }, []);
 
   
   return (
@@ -148,7 +131,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<CreateExam />} />
+        <Route path="*" element={<ErrorPage />} />
 
         <Route
           path="/profil"

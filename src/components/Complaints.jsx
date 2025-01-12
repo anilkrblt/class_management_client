@@ -2,14 +2,16 @@ import Button from 'react-bootstrap/Button';
 import React, { useEffect, useState } from 'react';
 import { ListGroup, Card, Container, Modal, Row, Col } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
-import { getAllComplaints } from '../utils/ComplaintApiService';
+import { getAllComplaints, updateComplaint } from '../utils/ComplaintApiService';
 import moment from 'moment';
+import { closeRoom } from '../utils/RoomApiService';
 
 const Complaints = () => {
     const [show, setShow] = useState(false);
     const [selectedComplaint, setSelectedComplaint] = useState(null);
-
+    const [showResolveModal, setShowResolveModal] = useState(false);
     const [complaints, setComplaints] = useState([])
+const [responseText, setResponseText] = useState("");
 
     useEffect(() => {
         const fetchComplaints = async () => {
@@ -20,15 +22,58 @@ const Complaints = () => {
         fetchComplaints();
     }, []);
 
+    const fetchComplaints = async () => {
+        const complaint = await getAllComplaints();
+        setComplaints(complaint.filter((event) => event.status === "pending"))
+    };
+
     const handleShow = (complaint) => {
         setSelectedComplaint(complaint);
         setShow(true);
     };
 
-    const handleClose = () => {
+
+
+    const handleClose = async () => {
+
+        try {
+            await closeRoom(selectedComplaint.roomName)
+        } catch (error) {
+            alert("hata")
+        }
         setShow(false);
+        
         setSelectedComplaint(null);
     };
+
+
+    const handleResolveComplaint = () => {
+        setShowResolveModal(true);
+    }
+
+    const handleResolveClose = () => {
+        setShowResolveModal(false);
+        setResponseText("");
+    }
+
+
+    const handleResponseChange = (e) => {
+        setResponseText(e.target.value);
+    }
+
+      const handleSubmitResponse = async () => {
+            const data = { status: "approved", solveDescription: responseText }
+            const id = selectedComplaint.requestId
+            console.log(data)
+            try {
+                await updateComplaint(id, data)
+                fetchComplaints()
+                setShow(false)
+            } catch (error) {
+                alert("Bir hata oluştu. Lütfen daha sonra tekrar deneyiniz.")
+            }
+            handleResolveClose();
+        }
 
     function formatToInitials(str) {
         // Türkçe harfleri doğru şekilde dönüştürmek için harf dönüşümü
@@ -119,10 +164,37 @@ const Complaints = () => {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={handleClose}>
-                        {selectedComplaint && (selectedComplaint.class)} sınıfını kapat
+                        {selectedComplaint && (selectedComplaint.roomName)} sınıfını kapat
+                    </Button>
+                    <Button onClick={handleResolveComplaint}>
+                        Şikayeti çöz
                     </Button>
                     <Button variant="secondary" onClick={handleClose}>
                         Kapat
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showResolveModal} onHide={handleResolveClose} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Şikayete Geri Dönüş</Modal.Title>
+                </Modal.Header>
+
+                <Modal.Body>
+                    <textarea
+                        value={responseText}
+                        onChange={handleResponseChange}
+                        className="form-control"
+                        rows="5"
+                        placeholder="Şikayet hakkında geri dönüş yazınız."
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="danger" onClick={handleResolveClose}>
+                        İptal
+                    </Button>
+                    <Button onClick={handleSubmitResponse}>
+                        Geri Dönüşü Gönder
                     </Button>
                 </Modal.Footer>
             </Modal>

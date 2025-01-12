@@ -10,6 +10,7 @@ import { UserContext } from "./UserContext";
 import "moment/locale/tr";
 import * as Icon from 'react-bootstrap-icons';
 import { baseUrl, baseUrl2, createClubEvent } from "../utils/ClubEventApiService";
+import axios from "axios";
 moment.locale('tr');
 
 
@@ -22,6 +23,8 @@ const ClubEvents = ({ events }) => {
     const [showNewEventModal, setShowNewEventModal] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const [showAlert, setShowAlert] = useState(false);
+    const [previewImage, setPreviewImage] = useState(null);
+    const formData = new FormData();
 
     const [selectedTime, setSelectedTime] = useState(null)
     const [newEvent, setNewEvent] = useState({
@@ -74,7 +77,8 @@ const ClubEvents = ({ events }) => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedImage(URL.createObjectURL(file));
+            setSelectedImage(file); // Önizleme için URL oluşturuluyor
+            setPreviewImage(URL.createObjectURL(file));
         }
     };
 
@@ -86,8 +90,8 @@ const ClubEvents = ({ events }) => {
         if (newEvent.eventsName &&
             selectedTime &&
             selectedCard?.name &&
-            newEvent.eventsDetails 
-            
+            newEvent.eventsDetails
+
         ) {
             console.log(selectedTime)
             const selectedDate = new Date(selectedTime.start);
@@ -101,12 +105,12 @@ const ClubEvents = ({ events }) => {
 
             const updatedEvent = {
                 studentId: 3,
-                clubName: "Bilgisayar Kulübü",
+                clubName: "Robotics Club",
                 roomName: selectedCard.name,
                 startTime: start,
                 endTime: end,
                 eventTime: formattedDate,
-                title: newEvent.eventsDetails,
+                title: newEvent.eventsName,
                 details: newEvent.eventsDetails,
                 link: newEvent.eventsLink,
                 banner: selectedImage,
@@ -114,8 +118,47 @@ const ClubEvents = ({ events }) => {
 
             };
 
+            // FormData oluşturma
+            const formData = new FormData();
+            formData.append("StudentId", 3);
+            formData.append("ClubName", "Robotics Club");
+            formData.append("RoomName", selectedCard.name);
+            formData.append("StartTime", start);
+            formData.append("EndTime", end);
+            formData.append("EventTime", formattedDate);
+            formData.append("Title", newEvent.eventsDetails);
+            formData.append("Details", newEvent.eventsDetails);
+            formData.append("Link", newEvent.eventsLink || ""); // Link opsiyonel olabilir
+            formData.append("Status", "pending");
+
+            // Eğer bir dosya seçildiyse FormData'ya ekle
+            if (selectedImage) {
+                formData.append("BannerFile", selectedImage); // Backend ile aynı isimde olmalı
+            }
+            console.log(previewImage)
             try {
-                await createClubEvent(updatedEvent)
+                // Axios ile POST isteği
+                const response = await axios.post(
+                    "http://localhost:5132/api/reservations/clubreservation",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+
+                console.log("Başarılı:", response.data);
+                setShowNewEventModal(false);
+                setShowModal2(true);
+            } catch (error) {
+                console.error("Bir hata oluştu:", error);
+                alert("Bir hata oluştu.");
+            }
+
+
+            try {
+                //await createClubEvent(updatedEvent)
                 setShowNewEventModal(false)
                 setShowModal2(true)
             } catch (error) {
@@ -166,11 +209,11 @@ const ClubEvents = ({ events }) => {
         const formattedEnd = moment(endTime, "HH:mm:ss").format("HH:mm"); // Bitiş zamanını formatla
         return `${formattedStart} - ${formattedEnd}`; // Formatlanmış zamanları birleştir
     }
-console.log(selectedCard)
+    console.log(selectedCard)
     return (
-        <Container className="bg-light rounded-4">
+        <Container className="bg-light rounded-4 p-1 ps-3">
             <Row className="justify-content-start align-items-center">
-                <Col md="auto"><h3 className="sticky-top bg-light">Henüz gerçekleşmeyen kulüp etkinlikleri</h3></Col>
+                <Col md="auto"><h3 className="sticky-top bg-light">Henüz Gerçekleşmeyen Kulüp Etkinlikleri</h3></Col>
                 <Col md="auto"><Button variant="outline-success" onClick={handleShowNewEventModal}>Yeni etkinlik oluştur</Button></Col>
                 {userType === "admin" &&
                     <Col md="auto"><Button variant="outline-success" onClick={() => { navigate("/kulüpler-rezervasyon") }}>Etkinlik İstekleri</Button></Col>
@@ -228,7 +271,7 @@ console.log(selectedCard)
                     </Modal.Header>
                     <Modal.Body>
                         <p><strong>Etkinlik adı:</strong> {selectedEvent.title}</p>
-                        <p><strong>Tarih:</strong> {formatDate(selectedEvent.eventDate)}{" "}{formatEventTime(selectedEvent.eventTime)}</p>
+                        <p><strong>Tarih ve saat:</strong> {formatDate(selectedEvent.eventDate)}{" "}{formatEventTime(selectedEvent.eventTime)}</p>
                         <p><strong>Yer:</strong> {selectedEvent.clubRoomName}</p>
                         <Row>
                             <Col md="auto">
@@ -352,7 +395,7 @@ console.log(selectedCard)
                 </Modal.Body>
                 <Row className="px-1">
                     <Col md={6} className="scrollable"> <ClassesList setSelectedCard={setSelectedCard} /></Col>
-                    <Col md={6}> <ClubEventCreateCalendar setSelectedTime={setSelectedTime} selectedCard= {selectedCard} /> </Col>
+                    <Col md={6}> <ClubEventCreateCalendar setSelectedTime={setSelectedTime} selectedCard={selectedCard} /> </Col>
                 </Row>
 
 

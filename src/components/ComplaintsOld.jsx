@@ -39,7 +39,7 @@ const ComplaintsOld = ({ complaints }) => {
 
     // Pagination item'larını oluştur
     let items = [];
-    for (let number = 2020; number <= 2024; number++) {
+    for (let number = 2020; number <= 2025; number++) {
         items.push(
             <Pagination.Item
                 key={number}
@@ -83,7 +83,7 @@ const ComplaintsOld = ({ complaints }) => {
                 <h2 className="my-3 text-center">Çözülen Şikayetler</h2>
                 {/* Yıl seçimi için Pagination */}
                 <div className="d-flex justify-content-left align-items-center">
-                    <Pagination className="mb-3" >
+                    <Pagination className="mb-3 custom-pagination" >
                         <Pagination.Item
                             onClick={() => {
                                 setShowAll(true)

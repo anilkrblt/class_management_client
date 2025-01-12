@@ -11,6 +11,8 @@ export const getAllInstructors = async () => {
     }
 };
 
+
+
 export const addExtraLecture = async (lecture) => {
     try {
         const response = await axios.post(`${baseUrl}/reservations/lecturereservation`, lecture,

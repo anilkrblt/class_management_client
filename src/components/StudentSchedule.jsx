@@ -20,7 +20,7 @@ const StudentSchedule = () => {
 
     fetchEvents();
   }, []);
-
+console.log(schedule)
   const getDayOfWeek = (day) => {
     const days = {
       Monday: RRule.MO,

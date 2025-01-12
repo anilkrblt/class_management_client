@@ -202,8 +202,8 @@ code {
 }
 
 .custom-checkbox .form-check-input {
-  background-color: rgb(233, 7, 7);
-  border-color: #31d059;
+  background-color: #233E90;
+  border-color: #ffffff;
 }
 
 .custom-checkbox .form-check-input:checked {
@@ -222,9 +222,9 @@ code {
 }
 
 .rbc-event {
-  background-color: #ff5722 !important; /* Etkinliklerin rengi */
+  background-color: #ff223c !important; /* Etkinliklerin rengi */
   color: white !important; /* Etkinlik yazı rengi */
-  border-radius: 4px; /* Köşeleri yuvarla */
+  border-radius: 8px !important; /* Köşeleri yuvarla */
 }
 
 .rbc-today {
@@ -257,10 +257,85 @@ code {
   background-color: #c4d598 !important; /* Çok koyu yeşil */
 }
 
+
+
+
+/* CSS dosyasına şu sınıfları ekleyin */
+
+/* Bilgisayar Mühendisliği etkinliği */
+.event-cs {
+  background-color: #4caf50 !important; 
+  border-color: #4caf50 !important; /* Yeşil renk */
+  color: white;
+
+  
+}
+
+/* Makine Mühendisliği etkinliği */
+.event-me {
+  background-color: #f44336 !important;
+  border-color: #f44336 !important;/* Kırmızı renk */
+  color: white;
+  padding: 5px;
+}
+
+/* Genetik ve Biyomühendislik etkinliği */
+.event-bio {
+  background-color: #2196f3!important;
+  border-color: #2196f3!important; /* Mavi renk */
+  color: white;
+  padding: 5px;
+}
+
+/* Gıda Mühendisliği etkinliği */
+.event-food {
+  background-color: #ff9800 !important;
+  border-color: #ff9800 !important; /* Turuncu renk */
+  color: white;
+  padding: 5px;
+}
+
+/* Elektrik-Elektronik Mühendisliği etkinliği */
+.event-ee {
+  background-color: #9c27b0 !important;
+  border-color: #9c27b0 !important; /* Mor renk */
+  color: white;
+  padding: 5px;
+}
+
+/* Kulüp etkinliği */
+.event-club {
+  background-color: #ff223c !important; 
+  background-color: #ff223c !important;/* Gri renk */
+  color: black;
+  padding: 5px;
+}
+
+/* Varsayılan etkinlikler için renk */
+.event-default {
+  background-color: #cccccc; /* Varsayılan gri renk */
+  color: black;
+  padding: 5px;
+}
+
 .custom-pagination {
   max-width: 100% !important; /* Maksimum genişlik */
   width: fit-content  !important; /* İçeriğe göre genişlik */
   margin: 0 auto  !important; /* Ortalamak için */
 }
 
+.custom-pagination .page-item.active .page-link {
+  background-color: #ff5722; /* Aktif sayfa rengi */
+  border-color: #ff5722;
+  color: white;
+}
 
+.custom-pagination .page-item .page-link {
+  color: #333; /* Diğer sayfa bağlantılarının rengi */
+}
+
+.custom-pagination .page-item .page-link:hover {
+  background-color: #ff5722; /* Hover rengi */
+  border-color: #ff5722;
+  color:white
+}
