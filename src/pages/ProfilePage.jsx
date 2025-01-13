@@ -10,13 +10,18 @@ const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState(null); 
     const [user, setUser] = useState([]);
 
+    
 
     useEffect(() => {
         const fetchUserData = async () => {
             let user;
             if (userType === "instructor") {
                 user = await getInstructorById(userId);
-            } else if (userType === "student") {
+            } 
+            else if (userType === "admin") {
+                user = await getInstructorById(userId);
+            }
+            else if (userType === "student") {
                 user = await getStudentById(userId);
             }
             setUserInfo(user); 
@@ -29,7 +34,7 @@ const ProfilePage = () => {
         if (userInfo) {
             let userDetails = [];
             
-            if (userType === "instructor") {
+            if (userType === "instructor" || "admin") {
                 userDetails = [
                     { x: "Ünvan", y: userInfo.title },
                     { x: "Ad Soyad", y: userInfo.instructorName },

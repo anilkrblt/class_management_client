@@ -7,10 +7,14 @@ import { useContext, useEffect } from "react";
 import { UserContext } from "../components/UserContext";
 import { Helmet } from "react-helmet";
 import StudentExams from "../components/StudentExams";
+import { useLocation } from "react-router-dom";
 
 const StudentHomePage = () => {
   const { userType, setUserType, userName } = useContext(UserContext);
-console.log(userName)
+  const location = useLocation();
+  const notifications = location.state?.notifications || []; // Gönderilen veriyi alın
+  console.log(notifications)
+  console.log(userName)
   useEffect(() => {
     setUserType("student");
   }, [setUserType]);

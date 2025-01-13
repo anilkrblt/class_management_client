@@ -3,7 +3,7 @@ import { Container, Row, Col, Form, Button, Card, Image, Alert } from 'react-boo
 import { LoginApiService } from '../utils/LoginApiService';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../components/UserContext';
-
+import { Helmet } from 'react-helmet';
 const LoginScreen = () => {
   const [formData, setFormData] = useState({
     email: '',
@@ -38,32 +38,43 @@ const LoginScreen = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     console.log('Form Data:', formData);
-
+  
     try {
       const response = await LoginApiService(formData);
       if (response && response.token) {
-        setUser(response); 
-        const tokenData = parseJwt(response.token); 
-        console.log(tokenData); 
-        const role= tokenData['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
-
-        setUserType(role.toLowerCase())
-        setUserId(user.user.id) 
-        setUserName(user.user.instructorName|| user.user.fullName)
-        console.log(user.notifications)
-        setNotifications(user.notifications)
-        navigate("/anasayfa")
-
+        setUser(response); // response verisini set ediyoruz
+        const tokenData = parseJwt(response.token);
+        console.log(tokenData);
+  
+        const role = tokenData['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  
+        // response üzerinden gelen verilerle UserContext'i güncelliyoruz
+        if (role.includes('Admin')) {
+          setUserType('admin');
+        } else {
+          setUserType(role.toLowerCase());
+        }
+        
+        setUserId(response.user.id); // user'ı doğrudan response'tan alıyoruz
+        setUserName(response.user.instructorName || response.user.fullName);
+        setNotifications(response.notifications); 
+        console.log(response)
+        navigate("/anasayfa");
       } else {
         console.error('Token bulunamadı');
       }
     } catch (error) {
-      setShowAlert(true)
+      setShowAlert(true);
     }
   };
+  
 
   return (
+    
     <Container className="d-flex justify-content-center align-items-center vh-100">
+      <Helmet>
+            <title>Sınıf Yönetimi</title>
+        </Helmet>
       <Row className="w-100">
         <Col xs={12} md={6} lg={4} className="mx-auto">
           <div className="d-flex justify-content-center mb-1">
@@ -81,7 +92,7 @@ const LoginScreen = () => {
             <Card.Body>
               <h2 className="text-center mb-4">Giriş Yap</h2>
 
-              {showAlert && <Alert variant='danger'>Kullanıcı adı veya şifre hatalı!</Alert>}
+              {showAlert && <Alert variant='danger'>E-posta veya şifre hatalı!</Alert>}
               <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                   <Form.Label>E-posta</Form.Label>
@@ -105,9 +116,7 @@ const LoginScreen = () => {
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3" controlId="formBasicCheckbox">
-                  <Form.Check type="checkbox" label="Beni hatırla" className="custom-checkbox" />
-                </Form.Group>
+      
                 <Button className="hover-effect w-100" type="submit">
                   Giriş Yap
                 </Button>

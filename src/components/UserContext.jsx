@@ -6,7 +6,19 @@ export const UserProvider = ({ children }) => {
   const [userType, setUserType] = useState(() => localStorage.getItem("userType") || null);
   const [userId, setUserId] = useState(() => localStorage.getItem("userId") || null);
   const [userName, setUserName] = useState(() => localStorage.getItem("userName") || null);
-  const [notifications, setNotifications] = useState(() => localStorage.getItem("notifications") || null);
+  const [notifications, setNotifications] = useState(() => {
+    const storedNotifications = localStorage.getItem("notifications");
+    if (storedNotifications) {
+      try {
+        return JSON.parse(storedNotifications);
+      } catch (e) {
+        console.error("Hata: notifications verisi JSON formatında değil", e);
+        return [];  // Hata durumunda boş bir dizi döndür
+      }
+    }
+    return []; // Eğer önceden kaydedilmiş bir veri yoksa, başlangıçta boş bir dizi
+  });
+  
 
 
   useEffect(() => {
@@ -20,7 +32,7 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("userName", userName);
     }
     if (notifications) {
-      localStorage.setItem("notifications", notifications);
+      localStorage.setItem("notifications", JSON.stringify(notifications));
     }
   }, [userType, userId, userName, notifications]);
 

@@ -37,7 +37,7 @@ let menusAdmin = [
 ];
 
 const Navbarx = () => {
-  const { userType, setUserType,notifications, userName } = useContext(UserContext);
+  const { userType, setUserType, setUserId, setUserName, userName, notifications, setNotifications } = useContext(UserContext);
   const menus =
     userType === "admin"
       ? menusAdmin
@@ -70,7 +70,12 @@ console.log(JSON.stringify(notifications, null, 2))
 
   const handleLogout = () => {
     localStorage.removeItem('userType'); // Kullanıcı türünü temizle
-    setUserType(null); // Context'teki kullanıcı türünü sıfırla
+    localStorage.removeItem("userId")
+    localStorage.removeItem("userName")
+    setUserType(null); 
+    setUserName(null)
+    setUserId(null)
+    setNotifications(null)
     navigate("/giris")
   };
 
@@ -138,7 +143,7 @@ console.log(JSON.stringify(notifications, null, 2))
                       <ListGroup variant="flush">
                         {notifications.length > 0 ? (
                           notifications.map((notification, idx) => (
-                            <ListGroup.Item key={idx}>{notification}</ListGroup.Item>
+                            <ListGroup.Item key={idx}>{notification?.title}</ListGroup.Item>
                           ))
                         ) : (
                           <ListGroup.Item>Hiç bildirim yok</ListGroup.Item>

@@ -9,13 +9,34 @@ import { useNavigate } from "react-router-dom";
 import { UserContext } from "./UserContext";
 import "moment/locale/tr";
 import * as Icon from "react-bootstrap-icons";
-import {baseUrl2} from "../utils/ClubEventApiService";
+import {baseUrl2, getClubsById} from "../utils/ClubEventApiService";
 import axios from "axios";
+import { getStudentById } from "../utils/StudentApiService";
 moment.locale("tr");
 
 const ClubEvents = ({ events }) => {
-  const { userType } = useContext(UserContext);
+  const { userType, userId} = useContext(UserContext);
 
+  const [student, setStudent] = useState({})
+  const [club, setClub] = useState("")
+
+   useEffect(() => {
+          const fetchComplaints = async () => {
+              const std = await getStudentById(userId);
+              setStudent(std)
+              const club = await getClubsById(Number(std.clubId));
+              console.log(club)
+              setClub(club.clubName)
+          };
+  
+          fetchComplaints();
+      }, []);
+
+
+
+  console.log(club) 
+  console.log(student);
+     
   const [showModal, setShowModal] = useState(false);
   const [showModal2, setShowModal2] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -85,14 +106,13 @@ const ClubEvents = ({ events }) => {
       console.log(selectedTime);
       const selectedDate = new Date(selectedTime.start);
       const selectedEnd = new Date(selectedTime.end);
-
       const formattedDate = moment(selectedDate).toISOString();
       const start = moment(selectedDate).format("HH:mm:ss");
       const end = moment(selectedEnd).format("HH:mm:ss");
 
       const updatedEvent = {
-        studentId: 3,
-        clubName: "Robotics Club",
+        studentId: Number(userId),
+        clubName: club,
         roomName: selectedCard.name,
         startTime: start,
         endTime: end,
@@ -103,11 +123,12 @@ const ClubEvents = ({ events }) => {
         banner: selectedImage,
         status: "pending",
       };
+console.log(updatedEvent);
 
       // FormData oluşturma
       const formData = new FormData();
-      formData.append("StudentId", 3);
-      formData.append("ClubName", "Robotics Club");
+      formData.append("StudentId", Number(userId));
+      formData.append("ClubName", club);
       formData.append("RoomName", selectedCard.name);
       formData.append("StartTime", start);
       formData.append("EndTime", end);
@@ -199,7 +220,7 @@ const ClubEvents = ({ events }) => {
         </Col>
         <Col md="auto">
 
-        {userType !== "admin" && <Button variant="outline-success" onClick={handleShowNewEventModal}>
+        {(userType !== "admin" && student.isManager===1) &&<Button variant="outline-success" onClick={handleShowNewEventModal}>
             Yeni etkinlik oluştur
           </Button>}    
         </Col>
@@ -348,7 +369,7 @@ const ClubEvents = ({ events }) => {
             <Row className="align-items-center">
               <Col md={3}>
                 <p>
-                  <strong>Kulübünüzün adı: </strong>IEEE
+                  <strong>Kulübünüzün adı: </strong>{club}
                 </p>
               </Col>
               <Col md={6}>

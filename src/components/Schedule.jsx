@@ -1,19 +1,29 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { ListGroup, Card, Container, Accordion } from "react-bootstrap";
 import Image from "react-bootstrap/Image";
 import * as Icon from 'react-bootstrap-icons';
 import { useState } from "react";
-import { getLecturesByStudentId } from "../utils/LectureApiService";
-let id= 1
-const Schedule = () => {
+import { getLecturesByStudentId, getScheduleByInstructorId } from "../utils/LectureApiService";
+import { UserContext } from "./UserContext";
 
+const Schedule = () => {
+  const now = new Date();
+  const { userType, userId} = useContext(UserContext);
   const [schedule, setSchedule] = useState([])
 
     useEffect(() => {
       const fetchClassrooms = async () => {
         try {
-          const data = await getLecturesByStudentId(id);
-          setSchedule(data.schedule);
+          if(userType === "student") {
+            const data = await getLecturesByStudentId(userId);
+            setSchedule(data.schedule);
+          }
+          if(userType === "instructor") {
+            const data = await getScheduleByInstructorId(userId);
+            setSchedule(data.schedule);
+          }
+         
+   
         } catch (err) {
           console.error("Dersler yüklenirken hata oluştu:", err);
         }
@@ -21,42 +31,7 @@ const Schedule = () => {
   
       fetchClassrooms();
     }, []);
-
-// Günlerin Türkçe çevirisi
-const dayMapping = {
-  Monday: "Pazartesi",
-  Tuesday: "Salı",
-  Wednesday: "Çarşamba",
-  Thursday: "Perşembe",
-  Friday: "Cuma",
-
-};
-
-// Dönüşüm işlemi
-const scheduleMap = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday"
-].map((day) => {
-  const lessonsForDay = schedule
-    .filter((item) => item.dayOfWeek === day)
-    .map((lesson) => ({
-      class: lesson.roomName,
-      lesson: lesson.lectureName,
-      hours: `${lesson.startTime.slice(0, 5)} - ${lesson.endTime.slice(0, 5)}`,
-    }));
-
-  return {
-    logo: "/tu_logo.jpg",
-    day: dayMapping[day],
-    lessons: lessonsForDay,
-  };
-});
-
-console.log(scheduleMap);
-
+console.log(schedule)
 
   function turkishToLatin(str) {
     const map = {
@@ -76,6 +51,53 @@ console.log(scheduleMap);
   
     return str.replace(/[çğıİöşüÇÖŞĞÜ]/g, match => map[match] || match).toLowerCase();
   }
+
+  function getWeekDays(date) {
+    const currentDate = new Date(date); // Girilen tarihi bir Date nesnesine çevir
+    const dayOfWeek = currentDate.getDay(); // Haftanın gününü al (0: Pazar, 1: Pazartesi, ..., 6: Cumartesi)
+  
+    // Pazartesiye gitmek için gereken gün sayısı
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  
+    // Pazartesi tarihini hesapla
+    const monday = new Date(currentDate);
+    monday.setDate(currentDate.getDate() + diffToMonday);
+  
+    // Pazartesiden itibaren diğer günleri ekle
+    const weekdays = [];
+    for (let i = 0; i < 5; i++) { // Pazartesi'den Cuma'ya kadar
+      const day = new Date(monday);
+      day.setDate(monday.getDate() + i);
+      weekdays.push(day.toISOString().split('T')[0]); // YYYY-MM-DD formatında ekle
+    }
+  
+    return weekdays;
+  }
+
+  const weekDays = getWeekDays(now)
+  
+  function getLecturesForWeek(weekdays, schedule) {
+    // Her gün için o güne ait dersleri filtrele
+    return weekdays.map((weekday) => {
+      const lecturesForDay = schedule.filter((lecture) => {
+        // Tarih formatlarını karşılaştırmak için normalize et
+        const lectureDate = new Date(lecture.date).toISOString().split("T")[0];
+        return lectureDate === weekday; // Dersin tarihi, günle eşleşiyorsa dahil et
+      });
+  
+      // Günün derslerini döndür
+      return {
+        day: new Date(weekday).toLocaleDateString("tr-TR", { weekday: "long" }),
+        lessons: lecturesForDay.map((lecture) => ({
+          class: lecture.roomName,
+          lesson: `${lecture.lectureName}`,
+          hours: `${lecture.startTime.slice(0, 5)} - ${lecture.endTime.slice(0, 5)}`,
+        })),
+      };
+    });
+  }
+
+  const weeklySchedule = getLecturesForWeek(weekDays, schedule);
   
   return (
     <Container className="bg-light rounded-4 schedule px-2 shadow my-4">
@@ -83,7 +105,7 @@ console.log(scheduleMap);
       <ListGroup className="ms-1">
 
         <Accordion className="custom-accordion">
-          {scheduleMap.map((item, index) => (
+          {weeklySchedule.map((item, index) => (
             item.lessons.length > 1
               ? <Accordion.Item eventKey={index.toString()} key={index} className="border-0">
                 <Card

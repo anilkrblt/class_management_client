@@ -48,7 +48,7 @@ const App = () => {
         <Route
           path="/"
           element={
-            userType === null ? <Navigate to="/giris" replace /> : <HomePage />
+            userType === null ? <Navigate to="/giris" replace /> : <LoginScreen />
           }
         />
         <Route
@@ -147,7 +147,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<LoginScreen />} />
+        <Route path="*" element={<ErrorPage />} />
 
         <Route
           path="/profil"

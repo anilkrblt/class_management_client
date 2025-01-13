@@ -52,3 +52,14 @@ export const changeRequest = async (id, request) => {
       throw error;
   }
 }
+
+export const getClubsById = async (id) => {
+    try {
+        const response = await axios.get(`${baseUrl}/clubs/${id}`);
+        return response.data;
+
+    } catch (error) {
+        console.error("Hata:", error);
+        return [];
+    }
+};
