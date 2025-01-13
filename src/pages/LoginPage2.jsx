@@ -47,6 +47,7 @@ const LoginScreen = () => {
         console.log(tokenData);
   
         const role = tokenData['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+  console.log(role);
   
         // response üzerinden gelen verilerle UserContext'i güncelliyoruz
         if (role.includes('Admin')) {

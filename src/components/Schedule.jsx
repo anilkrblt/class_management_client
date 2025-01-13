@@ -31,8 +31,8 @@ const Schedule = () => {
   
       fetchClassrooms();
     }, []);
-console.log(schedule)
 
+console.log(schedule)
   function turkishToLatin(str) {
     const map = {
       'ç': 'c',
@@ -67,15 +67,16 @@ console.log(schedule)
     const weekdays = [];
     for (let i = 0; i < 5; i++) { // Pazartesi'den Cuma'ya kadar
       const day = new Date(monday);
-      day.setDate(monday.getDate() + i);
+      day.setDate(monday.getDate() + i); // Günleri doğru şekilde al
       weekdays.push(day.toISOString().split('T')[0]); // YYYY-MM-DD formatında ekle
     }
   
     return weekdays;
-  }
+}
+
 
   const weekDays = getWeekDays(now)
-  
+  console.log(weekDays)
   function getLecturesForWeek(weekdays, schedule) {
     // Her gün için o güne ait dersleri filtrele
     return weekdays.map((weekday) => {

@@ -29,6 +29,7 @@ let menusInstructor = [
 let menusAdmin = [
   { name: "Ana sayfa", href: "/anasayfa", icon: <Icon.HouseDoorFill size={20} />, disableIcon: <Icon.HouseDoor /> },
   { name: "Sınıflar", href: "/sınıflar", icon: <Icon.Grid3x3GapFill size={20} />, disableIcon: <Icon.Grid3x3Gap /> },
+  { name: "Ders programı", href: "/dersprogrami", icon: <Icon.Calendar2WeekFill size={20} />, disableIcon: <Icon.Calendar2Week /> },
   { name: "Dersler", href: "/dersler", icon: <Icon.LayersFill size={20} />, disableIcon: <Icon.Layers /> },
   { name: "Sınıf yönetimi", href: "/sınıfyonetimi", icon: <Icon.ClipboardCheckFill size={20} />, disableIcon: <Icon.ClipboardCheck />},
   { name: "Sınavlar", href: "/sınavolustur", icon: <Icon.ClipboardCheckFill size={20} />, disableIcon: <Icon.ClipboardCheck />},

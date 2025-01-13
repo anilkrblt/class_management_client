@@ -10,7 +10,7 @@ const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState(null); 
     const [user, setUser] = useState([]);
 
-    
+    console.log(userType)
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -18,11 +18,12 @@ const ProfilePage = () => {
             if (userType === "instructor") {
                 user = await getInstructorById(userId);
             } 
-            else if (userType === "admin") {
+            if (userType === "admin") {
                 user = await getInstructorById(userId);
             }
-            else if (userType === "student") {
+            if (userType === "student") {
                 user = await getStudentById(userId);
+                console.log(user)
             }
             setUserInfo(user); 
         };
@@ -43,7 +44,7 @@ const ProfilePage = () => {
                     { x: "Fakülte", y: "Mühendislik Fakültesi" },
                     { x: "Bölüm", y: userInfo.departmentName },
                 ];
-            } else if (userType === "student") {
+            } if (userType === "student") {
                 userDetails = [
                     { x: "Ünvan", y: "Öğrenci" },
                     { x: "Ad Soyad", y: userInfo.fullName },
