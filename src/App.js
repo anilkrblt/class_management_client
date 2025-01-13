@@ -54,7 +54,7 @@ const App = () => {
         <Route
           path="/giris"
           element={
-            userType !== null ? <Navigate to="/anasayfa" /> : <LoginPage />
+            userType !== null ? <Navigate to="/anasayfa" /> : <LoginScreen />
           }
         />
         <Route path="/anasayfa" element={<HomePage />} />
