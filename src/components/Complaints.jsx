@@ -158,7 +158,23 @@ const [responseText, setResponseText] = useState("");
                             <p><strong>Şikayet Yeri: </strong>{selectedComplaint.roomName}</p>
                             <p><strong>Şikayet Tarihi: </strong>{moment(selectedComplaint.createdAt).format("DD MMMM YYYY HH:mm")}</p>
                             <p><strong>Şikayet Açıklaması: </strong>{selectedComplaint.content}</p>
-                            <p><strong>Fotoğraflar: </strong></p><Image src={selectedComplaint.photos} />
+                            <p>
+                <strong>Fotoğraflar: </strong>
+              </p>
+              <div className="d-flex flex-wrap">
+                {selectedComplaint.photos.split(",").map((photo, index) => (
+                  <Image
+                    key={index}
+                    src={`http://localhost:5132/${photo}`}
+                    alt={`Complaint Photo ${index + 1}`}
+                    rounded
+                    style={{
+                      maxWidth: "150px",
+                      margin: "10px",
+                    }}
+                  />
+                ))}
+              </div>
                         </>
                     )}
                 </Modal.Body>

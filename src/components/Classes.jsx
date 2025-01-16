@@ -475,19 +475,7 @@ const Classes = ({ col }) => {
                                 <option value={false}>Kapalı sınıflar</option>
                             </Form.Control>
                         </Form.Group>
-                        <Form.Group controlId="formisempty">
-                            <Form.Label>Boş/Dolu Sınıf</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="isEmpty"
-                                value={filterOptions.isEmpty}
-                                onChange={handleFilterChange}
-                            >
-                                <option value="">Tümü</option>
-                                <option value={true}>Boş sınıflar</option>
-                                <option value={false}>Dolu sınıflar</option>
-                            </Form.Control>
-                        </Form.Group>
+                      
 
                         <Form.Group controlId="formProjection">
                             <Form.Label>Projeksiyon</Form.Label>

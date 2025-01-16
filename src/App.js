@@ -35,6 +35,8 @@ import ComplaintsStudentPage from "./pages/ComplaintsStudentPage";
 import CreateExam from "./components/CreateExam";
 import CreateExamPage from "./pages/CreateExamPage";
 import StudentSchedule from "./components/StudentSchedule";
+import { Helmet } from "react-helmet";
+import { Image } from "react-bootstrap";
 
 const App = () => {
   const { userType, setUserType } = useContext(UserContext);
@@ -44,6 +46,12 @@ const App = () => {
   
   return (
     <BrowserRouter>
+      <Helmet>
+      <div>
+      <Image src="/tulogot.jpeg" roundedCircle alt="Logo" />
+    </div>
+        
+      </Helmet>
       <Routes>
         <Route
           path="/"
